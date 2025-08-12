@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hostel_dayout_app/injection.dart';
-import 'package:hostel_dayout_app/requests/presentation/bloc/request_block.dart';
+import 'package:hostel_dayout_app/requests/presentation/bloc/request_bloc.dart';
 import 'package:hostel_dayout_app/requests/presentation/pages/dashboard_page.dart';
 
 class AppRouter {
