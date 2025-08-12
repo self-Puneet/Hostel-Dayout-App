@@ -1,0 +1,41 @@
+// lib/requests/presentation/bloc/request_list/request_list_event.dart
+import 'package:equatable/equatable.dart';
+
+abstract class RequestListEvent extends Equatable {
+  const RequestListEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
+/// Triggered when the page should load requests (e.g., on init or refresh)
+class LoadRequestsEvent extends RequestListEvent {
+  final String? searchQuery;
+  final String? sortOrder;
+
+  const LoadRequestsEvent({this.searchQuery, this.sortOrder});
+
+  @override
+  List<Object?> get props => [searchQuery, sortOrder];
+}
+
+/// Triggered when a user taps on a specific request card
+class RequestSelectedEvent extends RequestListEvent {
+  final String requestId;
+
+  const RequestSelectedEvent(this.requestId);
+
+  @override
+  List<Object?> get props => [requestId];
+}
+
+
+/// Triggered when a user wants to place a call to a given phone number
+class PlaceCallEvent extends RequestListEvent {
+  final String phoneNumber;
+
+  const PlaceCallEvent(this.phoneNumber);
+
+  @override
+  List<Object?> get props => [phoneNumber];
+}
