@@ -7,6 +7,7 @@ import 'package:hostel_dayout_app/requests/data/datasource/request_remote_dataso
 import 'package:hostel_dayout_app/requests/domain/entities/request.dart'
     as domain; // alias to avoid clash
 import 'package:hostel_dayout_app/requests/domain/repository/request_repository.dart';
+import 'package:http/http.dart';
 
 class RequestRepositoryImpl implements RequestRepository {
   final RequestRemoteDataSource remoteDataSource;
@@ -82,6 +83,24 @@ class RequestRepositoryImpl implements RequestRepository {
       }
     } on CacheException {
       return Left(CacheFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<domain.Request>>> getPriorityRequests() async {
+    if (await networkInfo.isConnected) {
+      try {
+        final remoteRequest = await remoteDataSource.getPriorityRequests();
+
+        // remoteRequest is a list of request models
+        return Right(remoteRequest.map((model) => model.toEntity()).toList());
+      } on ServerException {
+        return Left(ServerFailure());
+      }
+    }
+    {
+      // return a empty list.
+      return Right([]);
     }
   }
 }

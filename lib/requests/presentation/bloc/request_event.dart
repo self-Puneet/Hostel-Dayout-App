@@ -29,13 +29,10 @@ class RequestSelectedEvent extends RequestListEvent {
   List<Object?> get props => [requestId];
 }
 
-
-/// Triggered when a user wants to place a call to a given phone number
-class PlaceCallEvent extends RequestListEvent {
-  final String phoneNumber;
-
-  const PlaceCallEvent(this.phoneNumber);
+/// Triggered when a user comes on the home screen and get priority requests
+class GetPriorityRequestsEvent extends RequestListEvent {
+  const GetPriorityRequestsEvent();
 
   @override
-  List<Object?> get props => [phoneNumber];
+  List<Object?> get props => [];
 }

@@ -3,7 +3,7 @@ import 'package:hive/hive.dart';
 
 part 'request_state.g.dart';
 
-@HiveType(typeId: 3)
+@HiveType(typeId: 8)
 enum RequestState {
   @HiveField(0)
   active,

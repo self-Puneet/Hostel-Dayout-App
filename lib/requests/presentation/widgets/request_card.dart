@@ -37,17 +37,21 @@ class RequestCard extends StatelessWidget {
         return Colors.grey;
     }
   }
+  // InkWell(
+  //       onTap: onTap,
+  //       borderRadius: BorderRadius.circular(12),
+  //       child:
 
   @override
   Widget build(BuildContext context) {
     final inputConvertor = InputConverter();
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Card(
-        elevation: 1,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(

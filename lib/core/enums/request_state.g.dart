@@ -8,7 +8,7 @@ part of 'request_state.dart';
 
 class RequestStateAdapter extends TypeAdapter<RequestState> {
   @override
-  final int typeId = 3;
+  final int typeId = 8;
 
   @override
   RequestState read(BinaryReader reader) {

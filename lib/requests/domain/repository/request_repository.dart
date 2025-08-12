@@ -10,4 +10,6 @@ abstract class RequestRepository {
   });
 
   Future<Either<Failure, Request>> getRequestDetail(String requestId);
+
+  Future<Either<Failure, List<Request>>> getPriorityRequests();
 }
