@@ -4,10 +4,8 @@ import 'package:hostel_dayout_app/core/failures.dart';
 import 'package:hostel_dayout_app/core/network_info.dart';
 import 'package:hostel_dayout_app/requests/data/datasource/request_local_datasource.dart';
 import 'package:hostel_dayout_app/requests/data/datasource/request_remote_datasource.dart';
-import 'package:hostel_dayout_app/requests/domain/entities/request.dart'
-    as domain; // alias to avoid clash
+import 'package:hostel_dayout_app/requests/domain/entities/request.dart';
 import 'package:hostel_dayout_app/requests/domain/repository/request_repository.dart';
-import 'package:http/http.dart';
 
 class RequestRepositoryImpl implements RequestRepository {
   final RequestRemoteDataSource remoteDataSource;
@@ -21,13 +19,12 @@ class RequestRepositoryImpl implements RequestRepository {
   });
 
   @override
-  Future<Either<Failure, List<domain.Request>>> getRequests({
+  Future<Either<Failure, List<Request>>> getRequests({
     String? searchQuery,
     String? sortOrder,
   }) async {
     if (await networkInfo.isConnected) {
       try {
-        print("6" * 89);
         final remoteRequests = await remoteDataSource.getRequests(
           searchQuery: searchQuery,
           sortOrder: sortOrder,
@@ -53,7 +50,7 @@ class RequestRepositoryImpl implements RequestRepository {
   }
 
   @override
-  Future<Either<Failure, domain.Request>> getRequestDetail(
+  Future<Either<Failure, Request>> getRequestDetail(
     String requestId,
   ) async {
     if (await networkInfo.isConnected) {
@@ -87,7 +84,7 @@ class RequestRepositoryImpl implements RequestRepository {
   }
 
   @override
-  Future<Either<Failure, List<domain.Request>>> getPriorityRequests() async {
+  Future<Either<Failure, List<Request>>> getPriorityRequests() async {
     if (await networkInfo.isConnected) {
       try {
         final remoteRequest = await remoteDataSource.getPriorityRequests();

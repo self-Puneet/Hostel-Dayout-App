@@ -23,7 +23,7 @@ class RequestListBloc extends Bloc<RequestListEvent, RequestListState> {
   }) : super(RequestListInitial()) {
     on<LoadRequestsEvent>(_onLoadRequests);
     on<RequestSelectedEvent>(_onRequestSelected);
-    on<GetPriorityRequestsEvent>(_onPriorityRequests);
+    on<LoadPriorityRequestsEvent>(_onPriorityRequests);
   }
 
   Future<void> _onLoadRequests(
@@ -39,7 +39,6 @@ class RequestListBloc extends Bloc<RequestListEvent, RequestListState> {
       ),
     );
 
-    print(result);
 
     result.fold(
       (failure) => emit(RequestListError(_mapFailureToMessage(failure))),
@@ -65,7 +64,7 @@ class RequestListBloc extends Bloc<RequestListEvent, RequestListState> {
 
   // implement _onPriorityRequests
   Future<void> _onPriorityRequests(
-    GetPriorityRequestsEvent event,
+    LoadPriorityRequestsEvent event,
     Emitter<RequestListState> emit,
   ) async {
     emit(RequestListLoading());

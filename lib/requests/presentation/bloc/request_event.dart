@@ -30,8 +30,8 @@ class RequestSelectedEvent extends RequestListEvent {
 }
 
 /// Triggered when a user comes on the home screen and get priority requests
-class GetPriorityRequestsEvent extends RequestListEvent {
-  const GetPriorityRequestsEvent();
+class LoadPriorityRequestsEvent extends RequestListEvent {
+  const LoadPriorityRequestsEvent();
 
   @override
   List<Object?> get props => [];

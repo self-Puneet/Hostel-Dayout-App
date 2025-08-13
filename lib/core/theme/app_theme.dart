@@ -3,6 +3,15 @@ import 'package:flutter/material.dart';
 class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
+      textTheme: TextTheme(
+        // Override bodyLarge to match h2 semibold style
+        bodyLarge: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.w600,
+          height: 1.3,
+          color: Colors.black87,
+        ),
+      ),
       // Elevated Button Theme
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(

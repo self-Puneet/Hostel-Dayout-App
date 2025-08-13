@@ -2,22 +2,59 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hostel_dayout_app/injection.dart';
-import 'package:hostel_dayout_app/requests/presentation/bloc/request_bloc.dart';
-import 'package:hostel_dayout_app/requests/presentation/pages/dashboard_page.dart';
+import 'package:hostel_dayout_app/requests/presentation/bloc/bloc.dart';
+import 'package:hostel_dayout_app/requests/presentation/pages/pages.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: '/dashboard',
+    initialLocation: '/home',
     routes: [
-      GoRoute(
-        path: '/dashboard',
-        name: 'dashboard',
-        pageBuilder: (context, state) => MaterialPage(
-          child: BlocProvider<RequestListBloc>(
-            create: (_) => sl<RequestListBloc>(),
-            child: DashboardPage(),
+      ShellRoute(
+        builder: (context, state, child) {
+          return AppLayout(location: state.uri.path, child: child);
+        },
+        routes: [
+          GoRoute(
+            path: '/home',
+            name: 'home',
+            pageBuilder: (context, state) => MaterialPage(
+              child: BlocProvider<RequestListBloc>(
+                create: (_) => sl<RequestListBloc>(),
+                child: DashboardPage(),
+              ),
+            ),
           ),
-        ),
+          GoRoute(
+            path: '/requests',
+            name: 'requests',
+            pageBuilder: (context, state) => MaterialPage(
+              child: BlocProvider<RequestListBloc>(
+                create: (_) => sl<RequestListBloc>(),
+                child: RequestsPage(),
+              ),
+            ),
+          ),
+          GoRoute(
+            path: '/alerts',
+            name: 'alerts',
+            pageBuilder: (context, state) => MaterialPage(
+              child: BlocProvider<RequestListBloc>(
+                create: (_) => sl<RequestListBloc>(),
+                child: DashboardPage(),
+              ),
+            ),
+          ),
+          GoRoute(
+            path: '/settings',
+            name: 'settings',
+            pageBuilder: (context, state) => MaterialPage(
+              child: BlocProvider<RequestListBloc>(
+                create: (_) => sl<RequestListBloc>(),
+                child: DashboardPage(),
+              ),
+            ),
+          ),
+        ],
       ),
     ],
   );

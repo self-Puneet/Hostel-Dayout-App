@@ -1,23 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hostel_dayout_app/core/enums/request_state.dart';
+import 'package:hostel_dayout_app/core/enums/sort_order.dart';
 import '../bloc/bloc.dart';
 import 'package:hostel_dayout_app/requests/presentation/widgets/request_card.dart';
-import '../widgets/stats_card.dart';
-import '../widgets/greeting_header.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class DashboardPage extends StatefulWidget {
-  const DashboardPage({super.key});
+class RequestsPage extends StatefulWidget {
+  const RequestsPage({super.key});
 
   @override
-  State<DashboardPage> createState() => _DashboardPageState();
+  State<RequestsPage> createState() => _RequestsPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
+class _RequestsPageState extends State<RequestsPage> {
   @override
   void initState() {
     super.initState();
-    context.read<RequestListBloc>().add(LoadPriorityRequestsEvent());
+    context.read<RequestListBloc>().add(
+      LoadRequestsEvent(
+        searchQuery: RequestState.active.displayName,
+        sortOrder: SortOrder.descending.displayName,
+      ),
+    );
   }
 
   @override
@@ -83,67 +88,7 @@ class _DashboardPageState extends State<DashboardPage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Greeting
-            const GreetingHeader(wardenName: "CrashTricosd"),
-            const SizedBox(height: 16),
-
-            // Stats
-            Row(
-              children: const [
-                Expanded(
-                  child: StatsCard(
-                    count: 8,
-                    label: "Active today",
-                    onTap: null,
-                  ),
-                ),
-                SizedBox(width: 8),
-                Expanded(
-                  child: StatsCard(
-                    count: 2,
-                    label: "Late returns",
-                    onTap: null,
-                  ),
-                ),
-                SizedBox(width: 8),
-                Expanded(
-                  child: StatsCard(count: 5, label: "Pending", onTap: null),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Priority Requests
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Text(
-                  "Priority requests",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                Text(
-                  "View all",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            bloc,
-
-            // const SizedBox(height: 24),
-            SizedBox(child: Container()),
-
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text("Hostel Overview"),
-            ),
-          ],
+          children: [bloc],
         ),
       ),
     );
