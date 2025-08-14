@@ -21,6 +21,8 @@ class TimelineActorAdapter extends TypeAdapter<TimelineActor> {
         return TimelineActor.warden;
       case 3:
         return TimelineActor.security;
+      case 4:
+        return TimelineActor.server;
       default:
         return TimelineActor.student;
     }
@@ -40,6 +42,9 @@ class TimelineActorAdapter extends TypeAdapter<TimelineActor> {
         break;
       case TimelineActor.security:
         writer.writeByte(3);
+        break;
+      case TimelineActor.server:
+        writer.writeByte(4);
         break;
     }
   }

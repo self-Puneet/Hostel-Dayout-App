@@ -7,6 +7,7 @@ import '../widgets/stats_card.dart';
 import '../widgets/greeting_header.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:go_router/go_router.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -55,7 +56,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   (req) => RequestCard(
                     request: req,
                     onTap: () {
-                      // Navigate to request detail page
+                      context.go('/requests/${req.id}');
                     },
                     onCallTap: () async {
                       final phoneNumber = req.parent.phone;

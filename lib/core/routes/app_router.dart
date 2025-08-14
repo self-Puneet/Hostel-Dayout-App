@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hostel_dayout_app/injection.dart';
 import 'package:hostel_dayout_app/requests/presentation/bloc/bloc.dart';
+import 'package:hostel_dayout_app/requests/presentation/bloc/request_detail_bloc.dart';
+import 'package:hostel_dayout_app/requests/presentation/bloc/request_detail_event.dart';
 import 'package:hostel_dayout_app/requests/presentation/pages/pages.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -34,6 +36,22 @@ class AppRouter {
                 child: ShadToaster(child: RequestsPage()),
               ),
             ),
+          ),
+          // ✅ Dynamic route for request details
+          GoRoute(
+            path: '/requests/:id',
+            name: 'requestDetails',
+            pageBuilder: (context, state) {
+              final id = state.pathParameters['id']!;
+
+              return MaterialPage(
+                child: BlocProvider(
+                  create: (_) =>
+                      sl<RequestDetailBloc>()..add(LoadRequestDetailEvent(id)),
+                  child: ShadToaster(child: RequestDetailsPage(requestId: id)),
+                ),
+              );
+            },
           ),
           GoRoute(
             path: '/alerts',

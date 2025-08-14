@@ -10,14 +10,14 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
+
   Hive.registerAdapter(RequestStatusAdapter());
   Hive.registerAdapter(RequestTypeAdapter());
   Hive.registerAdapter(TimelineActorAdapter());
   Hive.registerAdapter(RequestModelAdapter());
   Hive.registerAdapter(ParentInfoModelAdapter());
   Hive.registerAdapter(StudentInfoModelAdapter());
-  Hive.registerAdapter(TimelineEventModelAdapter());
-  // await Hive.deleteBoxFromDisk('requests');
+  await Hive.deleteBoxFromDisk('requests');
   await Hive.openBox<RequestModel>('requests');
   await init();
   runApp(const MyApp());

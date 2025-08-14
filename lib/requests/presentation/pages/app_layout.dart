@@ -26,12 +26,6 @@ class AppLayout extends StatelessWidget {
       icon: Icons.notifications_none,
       activeIcon: Icons.notifications,
     ),
-    _TabInfo(
-      name: 'settings',
-      label: 'Settings',
-      icon: Icons.settings_outlined,
-      activeIcon: Icons.settings,
-    ),
   ];
 
   static const _titles = ['Home', 'Requests', 'Alerts', 'Settings'];

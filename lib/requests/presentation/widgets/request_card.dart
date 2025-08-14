@@ -4,6 +4,7 @@ import 'package:hostel_dayout_app/core/enums/request_status.dart';
 import 'package:hostel_dayout_app/core/enums/request_type.dart';
 import 'package:hostel_dayout_app/core/util/input_convertor.dart';
 import 'package:hostel_dayout_app/requests/domain/entities/request.dart';
+import 'package:hostel_dayout_app/requests/presentation/widgets/status_tag.dart';
 
 class RequestCard extends StatelessWidget {
   final Request request;
@@ -16,31 +17,6 @@ class RequestCard extends StatelessWidget {
     this.onTap,
     this.onCallTap,
   }) : super(key: key);
-
-  Color _statusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'requested': // Student submitted
-        return Colors.blue;
-      case 'referred': // Sent to parent
-        return Colors.orange;
-      case 'cancelled': // Warden cancelled before review
-        return Colors.grey;
-      case 'parent approved':
-        return Colors.green;
-      case 'parent denied':
-        return Colors.redAccent;
-      case 'rejected': // Warden rejected after parent approval
-        return Colors.red;
-      case 'approved': // Warden approved after parent approval
-        return Colors.green.shade700;
-      default:
-        return Colors.grey;
-    }
-  }
-  // InkWell(
-  //       onTap: onTap,
-  //       borderRadius: BorderRadius.circular(12),
-  //       child:
 
   @override
   Widget build(BuildContext context) {
@@ -100,28 +76,7 @@ class RequestCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 2),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _statusColor(
-                              request.status.displayName,
-                            ).withValues(alpha: 0.15),
-
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            request.status.displayName.split(' ').join('\n'),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: _statusColor(request.status.displayName),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
+                        StatusTag(status: request.status.displayName),
                       ],
                     ),
                     const SizedBox(height: 4),

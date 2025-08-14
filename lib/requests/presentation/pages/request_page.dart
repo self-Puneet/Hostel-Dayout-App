@@ -5,7 +5,8 @@ import '../bloc/bloc.dart';
 import 'package:hostel_dayout_app/requests/presentation/widgets/request_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-import 'package:hostel_dayout_app/core/enums/enum.dart'; // <-- Import your RequestStatus enum
+import 'package:hostel_dayout_app/core/enums/enum.dart';
+import 'package:go_router/go_router.dart';
 
 class RequestsPage extends StatefulWidget {
   const RequestsPage({super.key});
@@ -51,7 +52,8 @@ class _RequestsPageState extends State<RequestsPage> {
                   (req) => RequestCard(
                     request: req,
                     onTap: () {
-                      // Navigate to request detail page
+                      // go routing navigating to the RequestDetailsPage with id
+                      context.go('/requests/${req.id}');
                     },
                     onCallTap: () async {
                       final phoneNumber = req.parent.phone;

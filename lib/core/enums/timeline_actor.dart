@@ -16,6 +16,9 @@ enum TimelineActor {
 
   @HiveField(3)
   security,
+
+  @HiveField(4)
+  server
 }
 
 
@@ -30,6 +33,8 @@ extension TimelineActorX on TimelineActor {
         return 'Warden';
       case TimelineActor.security:
         return 'Security';
+      case TimelineActor.server:
+        return 'Server';
     }
   }
 }

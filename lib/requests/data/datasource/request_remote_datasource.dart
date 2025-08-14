@@ -1,10 +1,9 @@
-import 'package:hostel_dayout_app/core/enums/request_status.dart';
-import 'package:hostel_dayout_app/core/enums/request_type.dart';
-import 'package:hostel_dayout_app/core/enums/timeline_actor.dart';
+import 'package:flutter/material.dart';
+import 'package:hostel_dayout_app/core/enums/enum.dart';
 import 'package:hostel_dayout_app/core/exception.dart';
 import 'package:hostel_dayout_app/requests/data/models/parent_info_model.dart';
 import 'package:hostel_dayout_app/requests/data/models/student_info_model.dart';
-import 'package:hostel_dayout_app/requests/data/models/timeline_event_model.dart';
+import 'package:hostel_dayout_app/requests/domain/entities/timeline_event.dart';
 import '../models/request_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -53,10 +52,40 @@ class RequestRemoteDataSourceImpl implements RequestRemoteDataSource {
         reason: 'Attending family function',
         requestedAt: DateTime.now().subtract(const Duration(hours: 1)),
         timeline: [
-          TimelineEventModel(
-            description: 'Request created by student',
-            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+          TimelineEvent(
+            type: 'requested',
+            description: 'Request Created',
+            timestamp: DateTime.now(),
             actor: TimelineActor.student,
+            icon: Icon(Icons.radio_button_checked),
+          ),
+          TimelineEvent(
+            type: 'referred',
+            description: 'Referred to Parents',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.warden,
+            icon: Icon(Icons.phone_in_talk_outlined),
+          ),
+          TimelineEvent(
+            type: 'parent_approved',
+            description: 'Parent Approved Request',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.parent,
+            icon: Icon(Icons.verified_outlined),
+          ),
+          TimelineEvent(
+            type: 'accepted',
+            description: 'Request Accepted',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.warden,
+            icon: Icon(Icons.check),
+          ),
+          TimelineEvent(
+            type: 'closed',
+            description: 'Request Closed',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.server,
+            icon: Icon(Icons.remove_circle_outline),
           ),
         ],
       ),
@@ -81,15 +110,40 @@ class RequestRemoteDataSourceImpl implements RequestRemoteDataSource {
         reason: 'Visiting relatives',
         requestedAt: DateTime.now().subtract(const Duration(hours: 3)),
         timeline: [
-          TimelineEventModel(
-            description: 'Request created by student',
-            timestamp: DateTime.now().subtract(const Duration(hours: 3)),
+          TimelineEvent(
+            type: 'requested',
+            description: 'Request Created',
+            timestamp: DateTime.now(),
             actor: TimelineActor.student,
+            icon: Icon(Icons.radio_button_checked),
           ),
-          TimelineEventModel(
-            description: 'Request approved by warden',
+          TimelineEvent(
+            type: 'referred',
+            description: 'Referred to Parents',
             timestamp: DateTime.now().subtract(const Duration(hours: 1)),
             actor: TimelineActor.warden,
+            icon: Icon(Icons.phone_in_talk_outlined),
+          ),
+          TimelineEvent(
+            type: 'parent_approved',
+            description: 'Parent Approved Request',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.parent,
+            icon: Icon(Icons.verified_outlined),
+          ),
+          TimelineEvent(
+            type: 'accepted',
+            description: 'Request Accepted',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.warden,
+            icon: Icon(Icons.check),
+          ),
+          TimelineEvent(
+            type: 'closed',
+            description: 'Request Closed',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.server,
+            icon: Icon(Icons.remove_circle_outline),
           ),
         ],
       ),
@@ -132,10 +186,40 @@ class RequestRemoteDataSourceImpl implements RequestRemoteDataSource {
       reason: 'Attending family function',
       requestedAt: DateTime.now().subtract(const Duration(hours: 1)),
       timeline: [
-        TimelineEventModel(
-          description: 'Request created by student',
-          timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+        TimelineEvent(
+          type: 'requested',
+          description: 'Request Created',
+          timestamp: DateTime.now(),
           actor: TimelineActor.student,
+          icon: Icon(Icons.radio_button_checked),
+        ),
+        TimelineEvent(
+          type: 'referred',
+          description: 'Referred to Parents',
+          timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+          actor: TimelineActor.warden,
+          icon: Icon(Icons.phone_in_talk_outlined),
+        ),
+        TimelineEvent(
+          type: 'parent_approved',
+          description: 'Parent Approved Request',
+          timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+          actor: TimelineActor.parent,
+          icon: Icon(Icons.verified_outlined),
+        ),
+        TimelineEvent(
+          type: 'accepted',
+          description: 'Request Accepted',
+          timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+          actor: TimelineActor.warden,
+          icon: Icon(Icons.check),
+        ),
+        TimelineEvent(
+          type: 'closed',
+          description: 'Request Closed',
+          timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+          actor: TimelineActor.server,
+          icon: Icon(Icons.remove_circle_outline),
         ),
       ],
     );
@@ -178,10 +262,40 @@ class RequestRemoteDataSourceImpl implements RequestRemoteDataSource {
         reason: 'Attending family function',
         requestedAt: DateTime.now().subtract(const Duration(hours: 1)),
         timeline: [
-          TimelineEventModel(
-            description: 'Request created by student',
-            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+          TimelineEvent(
+            type: 'requested',
+            description: 'Request Created',
+            timestamp: DateTime.now(),
             actor: TimelineActor.student,
+            icon: Icon(Icons.radio_button_checked),
+          ),
+          TimelineEvent(
+            type: 'referred',
+            description: 'Referred to Parents',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.warden,
+            icon: Icon(Icons.phone_in_talk_outlined),
+          ),
+          TimelineEvent(
+            type: 'parent_approved',
+            description: 'Parent Approved Request',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.parent,
+            icon: Icon(Icons.verified_outlined),
+          ),
+          TimelineEvent(
+            type: 'accepted',
+            description: 'Request Accepted',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.warden,
+            icon: Icon(Icons.check),
+          ),
+          TimelineEvent(
+            type: 'closed',
+            description: 'Request Closed',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.server,
+            icon: Icon(Icons.remove_circle_outline),
           ),
         ],
         priority: true,
@@ -207,15 +321,40 @@ class RequestRemoteDataSourceImpl implements RequestRemoteDataSource {
         reason: 'Visiting relatives',
         requestedAt: DateTime.now().subtract(const Duration(hours: 3)),
         timeline: [
-          TimelineEventModel(
-            description: 'Request created by student',
-            timestamp: DateTime.now().subtract(const Duration(hours: 3)),
+          TimelineEvent(
+            type: 'requested',
+            description: 'Request Created',
+            timestamp: DateTime.now(),
             actor: TimelineActor.student,
+            icon: Icon(Icons.radio_button_checked),
           ),
-          TimelineEventModel(
-            description: 'Request approved by warden',
+          TimelineEvent(
+            type: 'referred',
+            description: 'Referred to Parents',
             timestamp: DateTime.now().subtract(const Duration(hours: 1)),
             actor: TimelineActor.warden,
+            icon: Icon(Icons.phone_in_talk_outlined),
+          ),
+          TimelineEvent(
+            type: 'parent_approved',
+            description: 'Parent Approved Request',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.parent,
+            icon: Icon(Icons.verified_outlined),
+          ),
+          TimelineEvent(
+            type: 'accepted',
+            description: 'Request Accepted',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.warden,
+            icon: Icon(Icons.check),
+          ),
+          TimelineEvent(
+            type: 'closed',
+            description: 'Request Closed',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.server,
+            icon: Icon(Icons.remove_circle_outline),
           ),
         ],
         priority: true,
@@ -241,12 +380,43 @@ class RequestRemoteDataSourceImpl implements RequestRemoteDataSource {
         reason: 'Attending family function',
         requestedAt: DateTime.now().subtract(const Duration(hours: 1)),
         timeline: [
-          TimelineEventModel(
-            description: 'Request created by student',
-            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+          TimelineEvent(
+            type: 'requested',
+            description: 'Request Created',
+            timestamp: DateTime.now(),
             actor: TimelineActor.student,
+            icon: Icon(Icons.radio_button_checked),
+          ),
+          TimelineEvent(
+            type: 'referred',
+            description: 'Referred to Parents',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.warden,
+            icon: Icon(Icons.phone_in_talk_outlined),
+          ),
+          TimelineEvent(
+            type: 'parent_approved',
+            description: 'Parent Approved Request',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.parent,
+            icon: Icon(Icons.verified_outlined),
+          ),
+          TimelineEvent(
+            type: 'accepted',
+            description: 'Request Accepted',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.warden,
+            icon: Icon(Icons.check),
+          ),
+          TimelineEvent(
+            type: 'closed',
+            description: 'Request Closed',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.server,
+            icon: Icon(Icons.remove_circle_outline),
           ),
         ],
+
         priority: true,
       ),
       RequestModel(
@@ -270,15 +440,40 @@ class RequestRemoteDataSourceImpl implements RequestRemoteDataSource {
         reason: 'Visiting relatives',
         requestedAt: DateTime.now().subtract(const Duration(hours: 3)),
         timeline: [
-          TimelineEventModel(
-            description: 'Request created by student',
-            timestamp: DateTime.now().subtract(const Duration(hours: 3)),
+          TimelineEvent(
+            type: 'requested',
+            description: 'Request Created',
+            timestamp: DateTime.now(),
             actor: TimelineActor.student,
+            icon: Icon(Icons.radio_button_checked),
           ),
-          TimelineEventModel(
-            description: 'Request approved by warden',
+          TimelineEvent(
+            type: 'referred',
+            description: 'Referred to Parents',
             timestamp: DateTime.now().subtract(const Duration(hours: 1)),
             actor: TimelineActor.warden,
+            icon: Icon(Icons.phone_in_talk_outlined),
+          ),
+          TimelineEvent(
+            type: 'parent_approved',
+            description: 'Parent Approved Request',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.parent,
+            icon: Icon(Icons.verified_outlined),
+          ),
+          TimelineEvent(
+            type: 'accepted',
+            description: 'Request Accepted',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.warden,
+            icon: Icon(Icons.check),
+          ),
+          TimelineEvent(
+            type: 'closed',
+            description: 'Request Closed',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.server,
+            icon: Icon(Icons.remove_circle_outline),
           ),
         ],
         priority: true,
@@ -305,10 +500,40 @@ class RequestRemoteDataSourceImpl implements RequestRemoteDataSource {
         reason: 'Emergency medical visit',
         requestedAt: DateTime.now().subtract(const Duration(minutes: 30)),
         timeline: [
-          TimelineEventModel(
-            description: 'Priority request created by student',
-            timestamp: DateTime.now().subtract(const Duration(minutes: 30)),
+          TimelineEvent(
+            type: 'requested',
+            description: 'Request Created',
+            timestamp: DateTime.now(),
             actor: TimelineActor.student,
+            icon: Icon(Icons.radio_button_checked),
+          ),
+          TimelineEvent(
+            type: 'referred',
+            description: 'Referred to Parents',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.warden,
+            icon: Icon(Icons.phone_in_talk_outlined),
+          ),
+          TimelineEvent(
+            type: 'parent_approved',
+            description: 'Parent Approved Request',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.parent,
+            icon: Icon(Icons.verified_outlined),
+          ),
+          TimelineEvent(
+            type: 'accepted',
+            description: 'Request Accepted',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.warden,
+            icon: Icon(Icons.check),
+          ),
+          TimelineEvent(
+            type: 'closed',
+            description: 'Request Closed',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.server,
+            icon: Icon(Icons.remove_circle_outline),
           ),
         ],
         priority: true,
@@ -334,15 +559,40 @@ class RequestRemoteDataSourceImpl implements RequestRemoteDataSource {
         reason: 'Urgent family meeting',
         requestedAt: DateTime.now().subtract(const Duration(hours: 1)),
         timeline: [
-          TimelineEventModel(
-            description: 'Priority request created by student',
-            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+          TimelineEvent(
+            type: 'requested',
+            description: 'Request Created',
+            timestamp: DateTime.now(),
             actor: TimelineActor.student,
+            icon: Icon(Icons.radio_button_checked),
           ),
-          TimelineEventModel(
-            description: 'Request approved by warden',
-            timestamp: DateTime.now().subtract(const Duration(minutes: 45)),
+          TimelineEvent(
+            type: 'referred',
+            description: 'Referred to Parents',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
             actor: TimelineActor.warden,
+            icon: Icon(Icons.phone_in_talk_outlined),
+          ),
+          TimelineEvent(
+            type: 'parent_approved',
+            description: 'Parent Approved Request',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.parent,
+            icon: Icon(Icons.verified_outlined),
+          ),
+          TimelineEvent(
+            type: 'accepted',
+            description: 'Request Accepted',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.warden,
+            icon: Icon(Icons.check),
+          ),
+          TimelineEvent(
+            type: 'closed',
+            description: 'Request Closed',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.server,
+            icon: Icon(Icons.remove_circle_outline),
           ),
         ],
         priority: true,
@@ -377,10 +627,40 @@ class RequestRemoteDataSourceImpl implements RequestRemoteDataSource {
         reason: 'Attending family function',
         requestedAt: DateTime.now().subtract(const Duration(hours: 1)),
         timeline: [
-          TimelineEventModel(
-            description: 'Request created by student',
-            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+          TimelineEvent(
+            type: 'requested',
+            description: 'Request Created',
+            timestamp: DateTime.now(),
             actor: TimelineActor.student,
+            icon: Icon(Icons.radio_button_checked),
+          ),
+          TimelineEvent(
+            type: 'referred',
+            description: 'Referred to Parents',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.warden,
+            icon: Icon(Icons.phone_in_talk_outlined),
+          ),
+          TimelineEvent(
+            type: 'parent_approved',
+            description: 'Parent Approved Request',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.parent,
+            icon: Icon(Icons.verified_outlined),
+          ),
+          TimelineEvent(
+            type: 'accepted',
+            description: 'Request Accepted',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.warden,
+            icon: Icon(Icons.check),
+          ),
+          TimelineEvent(
+            type: 'closed',
+            description: 'Request Closed',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.server,
+            icon: Icon(Icons.remove_circle_outline),
           ),
         ],
       ),
@@ -405,10 +685,40 @@ class RequestRemoteDataSourceImpl implements RequestRemoteDataSource {
         reason: 'Attending family function',
         requestedAt: DateTime.now().subtract(const Duration(hours: 1)),
         timeline: [
-          TimelineEventModel(
-            description: 'Request created by student',
-            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+          TimelineEvent(
+            type: 'requested',
+            description: 'Request Created',
+            timestamp: DateTime.now(),
             actor: TimelineActor.student,
+            icon: Icon(Icons.radio_button_checked),
+          ),
+          TimelineEvent(
+            type: 'referred',
+            description: 'Referred to Parents',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.warden,
+            icon: Icon(Icons.phone_in_talk_outlined),
+          ),
+          TimelineEvent(
+            type: 'parent_approved',
+            description: 'Parent Approved Request',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.parent,
+            icon: Icon(Icons.verified_outlined),
+          ),
+          TimelineEvent(
+            type: 'accepted',
+            description: 'Request Accepted',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.warden,
+            icon: Icon(Icons.check),
+          ),
+          TimelineEvent(
+            type: 'closed',
+            description: 'Request Closed',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.server,
+            icon: Icon(Icons.remove_circle_outline),
           ),
         ],
       ),
@@ -433,15 +743,40 @@ class RequestRemoteDataSourceImpl implements RequestRemoteDataSource {
         reason: 'Visiting relatives',
         requestedAt: DateTime.now().subtract(const Duration(hours: 3)),
         timeline: [
-          TimelineEventModel(
-            description: 'Request created by student',
-            timestamp: DateTime.now().subtract(const Duration(hours: 3)),
+          TimelineEvent(
+            type: 'requested',
+            description: 'Request Created',
+            timestamp: DateTime.now(),
             actor: TimelineActor.student,
+            icon: Icon(Icons.radio_button_checked),
           ),
-          TimelineEventModel(
-            description: 'Request approved by warden',
+          TimelineEvent(
+            type: 'referred',
+            description: 'Referred to Parents',
             timestamp: DateTime.now().subtract(const Duration(hours: 1)),
             actor: TimelineActor.warden,
+            icon: Icon(Icons.phone_in_talk_outlined),
+          ),
+          TimelineEvent(
+            type: 'parent_approved',
+            description: 'Parent Approved Request',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.parent,
+            icon: Icon(Icons.verified_outlined),
+          ),
+          TimelineEvent(
+            type: 'accepted',
+            description: 'Request Accepted',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.warden,
+            icon: Icon(Icons.check),
+          ),
+          TimelineEvent(
+            type: 'closed',
+            description: 'Request Closed',
+            timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+            actor: TimelineActor.server,
+            icon: Icon(Icons.remove_circle_outline),
           ),
         ],
       ),

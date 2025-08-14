@@ -1,7 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:hostel_dayout_app/core/enums/request_status.dart';
-import 'package:hostel_dayout_app/core/enums/request_type.dart';
-import 'package:hostel_dayout_app/requests/data/models/timeline_event_model.dart';
+import 'package:hostel_dayout_app/core/enums/enum.dart';
+import 'package:hostel_dayout_app/requests/domain/entities/timeline_event.dart';
 import '../../domain/entities/request.dart';
 import 'student_info_model.dart';
 import 'parent_info_model.dart';
@@ -38,7 +38,7 @@ class RequestModel extends HiveObject {
   final DateTime requestedAt;
 
   @HiveField(9)
-  final List<TimelineEventModel> timeline;
+  final List<TimelineEvent> timeline;
 
   @HiveField(10)
   final bool? priority;
@@ -60,6 +60,77 @@ class RequestModel extends HiveObject {
   String encrypt(String value) => value;
   String decrypt(String value) => value;
 
+  static TimelineEvent getMappedTimelineEvent(String type, DateTime timestamp) {
+    switch (type) {
+      case 'requested':
+        return TimelineEvent(
+          type: type,
+          description: 'Request Created',
+          actor: TimelineActor.student,
+          timestamp: timestamp,
+          icon: Icon(Icons.radio_button_checked),
+        );
+      case 'referred':
+        return TimelineEvent(
+          type: type,
+          description: 'Referred to Parents',
+          actor: TimelineActor.warden,
+          timestamp: timestamp,
+          icon: Icon(Icons.phone_in_talk_outlined),
+        );
+      case 'parent_approved':
+        return TimelineEvent(
+          type: type,
+          description: 'Parent Approved Request',
+          actor: TimelineActor.parent,
+          timestamp: timestamp,
+          icon: Icon(Icons.verified_outlined),
+        );
+      case 'parent_denied':
+        return TimelineEvent(
+          type: type,
+          description: 'Request Denied',
+          actor: TimelineActor.parent,
+          timestamp: timestamp,
+          icon: Icon(Icons.cancel_outlined),
+        );
+      case 'cancelled':
+        return TimelineEvent(
+          type: type,
+          description: 'Request Cancelled',
+          actor: TimelineActor.warden,
+          timestamp: timestamp,
+          icon: Icon(Icons.cancel_outlined),
+        );
+      case 'rejected':
+        return TimelineEvent(
+          type: type,
+          description: 'Request Rejected',
+          actor: TimelineActor.warden,
+          timestamp: timestamp,
+          icon: Icon(Icons.cancel_outlined),
+        );
+      case 'accepted':
+        return TimelineEvent(
+          type: type,
+          description: 'Request Accepted',
+          actor: TimelineActor.warden,
+          timestamp: timestamp,
+          icon: Icon(Icons.check),
+        );
+      case 'closed':
+        return TimelineEvent(
+          type: type,
+          description: 'Request Closed',
+          actor: TimelineActor.server,
+          timestamp: timestamp,
+          icon: Icon(Icons.remove_circle_outline),
+        );
+      default:
+        throw ArgumentError('Invalid type: $type');
+    }
+  }
+
   factory RequestModel.fromJson(Map<String, dynamic> json) {
     return RequestModel(
       id: json['id'],
@@ -71,9 +142,14 @@ class RequestModel extends HiveObject {
       returnTime: DateTime.parse(json['returnTime']),
       reason: json['reason'],
       requestedAt: DateTime.parse(json['requestedAt']),
-      timeline: (json['timeline'] as List)
-          .map((e) => TimelineEventModel.fromJson(e))
-          .toList(),
+      // In fromJson
+      timeline: (json['timeline'] as List).map((timelineEvent) {
+        final type = timelineEvent['type'] as String;
+        final time = DateTime.parse(timelineEvent['timestamp']);
+
+        return getMappedTimelineEvent(type, time); // ✅ Return
+      }).toList(),
+
       priority: json['priority'],
     );
   }
@@ -88,7 +164,11 @@ class RequestModel extends HiveObject {
     'returnTime': returnTime.toIso8601String(),
     'reason': reason,
     'requestedAt': requestedAt.toIso8601String(),
-    'timeline': timeline.map((e) => e.toJson()).toList(),
+    'timeline': timeline
+        .map(
+          (e) => {'type': e.type, 'timestamp': e.timestamp.toIso8601String()},
+        )
+        .toList(),
     'priority': priority,
   };
 
@@ -103,9 +183,7 @@ class RequestModel extends HiveObject {
       returnTime: entity.returnTime,
       reason: entity.reason,
       requestedAt: entity.requestedAt,
-      timeline: entity.timeline
-          .map((e) => TimelineEventModel.fromEntity(e))
-          .toList(),
+      timeline: entity.timeline,
     );
   }
 
@@ -120,7 +198,7 @@ class RequestModel extends HiveObject {
       returnTime: returnTime,
       reason: reason,
       requestedAt: requestedAt,
-      timeline: timeline.map((e) => e.toEntity()).toList(),
+      timeline: timeline,
     );
   }
 }

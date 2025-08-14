@@ -1,10 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:hostel_dayout_app/core/enums/request_status.dart';
 import 'package:hostel_dayout_app/core/enums/request_type.dart';
+import 'package:hostel_dayout_app/requests/domain/entities/timeline_event.dart';
 
 import 'student_info.dart';
 import 'parent_info.dart';
-import 'timeline_event.dart';
 
 class Request extends Equatable {
   final String id;
