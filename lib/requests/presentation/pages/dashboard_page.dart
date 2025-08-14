@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hostel_dayout_app/requests/presentation/widgets/skeleton_loader.dart';
 import '../bloc/bloc.dart';
 import 'package:hostel_dayout_app/requests/presentation/widgets/request_card.dart';
 import '../widgets/stats_card.dart';
 import '../widgets/greeting_header.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -21,11 +23,19 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   @override
+  void dispose() {
+    // context.read<RequestListBloc>().add(LoadRequestsByStatusEvent());
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final bloc = BlocBuilder<RequestListBloc, RequestListState>(
       builder: (context, state) {
         if (state is RequestListLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const Column(
+            children: [ShimmerCard(), ShimmerCard(), ShimmerCard()],
+          );
         } else if (state is RequestListLoaded) {
           final priorityRequests = state.requests.toList();
 
@@ -66,11 +76,24 @@ class _DashboardPageState extends State<DashboardPage> {
                 .toList(),
           );
         } else if (state is RequestListError) {
-          return Center(
-            child: Text(
-              state.message,
-              style: const TextStyle(color: Colors.red),
-            ),
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ShadToaster.of(context).show(
+              ShadToast.destructive(
+                title: Text(state.message),
+                description: null,
+                action: ShadButton.destructive(
+                  child: const Text('Try again'),
+                  onPressed: () {
+                    print('Retry action triggered');
+                    ShadToaster.of(context).hide();
+                  },
+                ),
+              ),
+            );
+          });
+
+          return const Column(
+            children: [ShimmerCard(), ShimmerCard(), ShimmerCard()],
           );
         } else {
           return const SizedBox.shrink();
@@ -85,7 +108,7 @@ class _DashboardPageState extends State<DashboardPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Greeting
-            const GreetingHeader(wardenName: "CrashTricosd"),
+            const GreetingHeader(wardenName: "CrashTrico"),
             const SizedBox(height: 16),
 
             // Stats
@@ -135,15 +158,14 @@ class _DashboardPageState extends State<DashboardPage> {
             const SizedBox(height: 12),
 
             bloc,
-
-            // const SizedBox(height: 24),
-            SizedBox(child: Container()),
-
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text("Hostel Overview"),
-            ),
           ],
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ElevatedButton(
+          onPressed: () {},
+          child: const Text("Hostel Overview"),
         ),
       ),
     );

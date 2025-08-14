@@ -3,15 +3,49 @@ import 'package:flutter/material.dart';
 class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
-      textTheme: TextTheme(
+      // inputDecorationTheme: InputDecorationTheme(
+      //   border: OutlineInputBorder(
+      //     borderRadius: BorderRadius.circular(8),
+      //     borderSide: const BorderSide(color: Color(0xFF0B1228), width: 1.2),
+      //   ),
+      //   enabledBorder: OutlineInputBorder(
+      //     borderRadius: BorderRadius.circular(8),
+      //     borderSide: const BorderSide(color: Color(0xFF0B1228), width: 1.2),
+      //   ),
+      //   focusedBorder: OutlineInputBorder(
+      //     borderRadius: BorderRadius.circular(8),
+      //     borderSide: const BorderSide(color: Color(0xFF0B1228), width: 2),
+      //   ),
+      //   errorBorder: OutlineInputBorder(
+      //     borderRadius: BorderRadius.circular(8),
+      //     borderSide: const BorderSide(color: Colors.red, width: 1.2),
+      //   ),
+      //   focusedErrorBorder: OutlineInputBorder(
+      //     borderRadius: BorderRadius.circular(8),
+      //     borderSide: const BorderSide(color: Colors.red, width: 2),
+      //   ),
+      //   fillColor: const Color(0xFFF4F7FB),
+      //   filled: true,
+      //   contentPadding: const EdgeInsets.symmetric(
+      //     vertical: 10,
+      //     horizontal: 14,
+      //   ),
+      //   hintStyle: const TextStyle(color: Colors.black38, fontSize: 14),
+      //   labelStyle: const TextStyle(
+      //     color: Color(0xFF0B1228),
+      //     fontWeight: FontWeight.w200,
+      //   ),
+      // ),
+      // textTheme: TextTheme(
         // Override bodyLarge to match h2 semibold style
-        bodyLarge: TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.w600,
-          height: 1.3,
-          color: Colors.black87,
-        ),
-      ),
+      //   bodyLarge: TextStyle(
+      //     fontSize: 24,
+      //     fontWeight: FontWeight.w600,
+      //     height: 1.3,
+      //     color: Colors.black87,
+      //   ),
+      // ),
+
       // Elevated Button Theme
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -26,36 +60,6 @@ class AppTheme {
           textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
       ),
-      // elevatedButtonTheme: ElevatedButtonThemeData(
-      //   style: ButtonStyle(
-      //     minimumSize: WidgetStatePropertyAll<Size>(const Size.fromHeight(50)),
-      //     maximumSize: WidgetStatePropertyAll<Size>(
-      //       const Size(double.infinity, double.infinity),
-      //     ),
-      //     shape: WidgetStatePropertyAll<OutlinedBorder>(
-      //       RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      //     ),
-      //     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      //     alignment: Alignment.center,
-      //     // Set solid background color to #F13B09
-      //     backgroundColor: WidgetStatePropertyAll(Color(0xFFF13B09)),
-      //     foregroundColor: WidgetStatePropertyAll(Colors.white),
-      //     elevation: WidgetStatePropertyAll(0),
-      //     splashFactory: NoSplash.splashFactory,
-      //     overlayColor: WidgetStatePropertyAll(Colors.transparent),
-      //     shadowColor: WidgetStatePropertyAll(Colors.transparent),
-      //     surfaceTintColor: WidgetStatePropertyAll(Colors.transparent),
-      //     animationDuration: Duration.zero,
-      //     textStyle: WidgetStatePropertyAll(
-      //       TextStyle(
-      //         fontFamily: 'Inter',
-      //         fontWeight: FontWeight.w500, // Medium
-      //         fontSize: 14,
-      //         color: Colors.white,
-      //       ),
-      //     ),
-      //   ),
-      // ),
 
       // Outlined Button Theme
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -68,6 +72,21 @@ class AppTheme {
           ),
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+        ),
+      ),
+
+      // text Button theme
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          backgroundColor: Colors.black12, // light grey background
+          foregroundColor: Colors.black87, // text color
+          // padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          textStyle: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            // height: 1.3,
+          ),
         ),
       ),
     );

@@ -27,6 +27,8 @@ class RequestStatusAdapter extends TypeAdapter<RequestStatus> {
         return RequestStatus.rejected;
       case 6:
         return RequestStatus.approved;
+      case 7:
+        return RequestStatus.inactive;
       default:
         return RequestStatus.requested;
     }
@@ -55,6 +57,9 @@ class RequestStatusAdapter extends TypeAdapter<RequestStatus> {
         break;
       case RequestStatus.approved:
         writer.writeByte(6);
+        break;
+      case RequestStatus.inactive:
+        writer.writeByte(7);
         break;
     }
   }

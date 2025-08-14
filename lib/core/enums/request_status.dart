@@ -32,6 +32,10 @@ enum RequestStatus {
   /// Approved after parent approval
   @HiveField(6)
   approved,
+
+  /// Inactive
+  @HiveField(7)
+  inactive,
 }
 
 extension RequestStatusX on RequestStatus {
@@ -51,6 +55,8 @@ extension RequestStatusX on RequestStatus {
         return 'Rejected';
       case RequestStatus.approved:
         return 'Approved';
+      case RequestStatus.inactive:
+        return 'Inactive';
     }
   }
 }

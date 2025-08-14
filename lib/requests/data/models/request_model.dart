@@ -1,5 +1,4 @@
 import 'package:hive/hive.dart';
-import 'package:hostel_dayout_app/core/enums/request_state.dart';
 import 'package:hostel_dayout_app/core/enums/request_status.dart';
 import 'package:hostel_dayout_app/core/enums/request_type.dart';
 import 'package:hostel_dayout_app/requests/data/models/timeline_event_model.dart';
@@ -42,7 +41,7 @@ class RequestModel extends HiveObject {
   final List<TimelineEventModel> timeline;
 
   @HiveField(10)
-  final RequestState requestState;
+  final bool? priority;
 
   RequestModel({
     required this.id,
@@ -55,7 +54,7 @@ class RequestModel extends HiveObject {
     required this.reason,
     required this.requestedAt,
     required this.timeline,
-    required this.requestState,
+    this.priority = false,
   });
 
   String encrypt(String value) => value;
@@ -75,7 +74,7 @@ class RequestModel extends HiveObject {
       timeline: (json['timeline'] as List)
           .map((e) => TimelineEventModel.fromJson(e))
           .toList(),
-      requestState: RequestState.values[json['requestState']],
+      priority: json['priority'],
     );
   }
 
@@ -90,7 +89,7 @@ class RequestModel extends HiveObject {
     'reason': reason,
     'requestedAt': requestedAt.toIso8601String(),
     'timeline': timeline.map((e) => e.toJson()).toList(),
-    'requestState': requestState.index,
+    'priority': priority,
   };
 
   factory RequestModel.fromEntity(Request entity) {
@@ -107,7 +106,6 @@ class RequestModel extends HiveObject {
       timeline: entity.timeline
           .map((e) => TimelineEventModel.fromEntity(e))
           .toList(),
-      requestState: entity.requestState,
     );
   }
 
@@ -123,7 +121,6 @@ class RequestModel extends HiveObject {
       reason: reason,
       requestedAt: requestedAt,
       timeline: timeline.map((e) => e.toEntity()).toList(),
-      requestState: requestState,
     );
   }
 }

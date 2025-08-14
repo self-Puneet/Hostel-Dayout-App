@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:hostel_dayout_app/core/enums/request_state.dart';
 import 'package:hostel_dayout_app/core/enums/request_status.dart';
 import 'package:hostel_dayout_app/core/enums/request_type.dart';
 
@@ -18,7 +17,6 @@ class Request extends Equatable {
   final String reason;
   final DateTime requestedAt;
   final List<TimelineEvent> timeline;
-  final RequestState requestState;
 
   Request({
     required this.id,
@@ -31,7 +29,6 @@ class Request extends Equatable {
     required this.reason,
     required this.requestedAt,
     required this.timeline,
-    required this.requestState,
   });
 
   @override
@@ -46,6 +43,5 @@ class Request extends Equatable {
     reason,
     requestedAt,
     timeline,
-    requestState,
   ];
 }

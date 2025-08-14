@@ -27,14 +27,13 @@ class RequestModelAdapter extends TypeAdapter<RequestModel> {
       reason: fields[7] as String,
       requestedAt: fields[8] as DateTime,
       timeline: (fields[9] as List).cast<TimelineEventModel>(),
-      requestState: fields[10] as RequestState,
     );
   }
 
   @override
   void write(BinaryWriter writer, RequestModel obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -54,9 +53,7 @@ class RequestModelAdapter extends TypeAdapter<RequestModel> {
       ..writeByte(8)
       ..write(obj.requestedAt)
       ..writeByte(9)
-      ..write(obj.timeline)
-      ..writeByte(10)
-      ..write(obj.requestState);
+      ..write(obj.timeline);
   }
 
   @override

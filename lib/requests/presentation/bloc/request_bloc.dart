@@ -8,6 +8,7 @@ import 'package:hostel_dayout_app/requests/domain/entities/request.dart';
 import 'package:hostel_dayout_app/requests/domain/usecase/get_priority_request.dart';
 import 'package:hostel_dayout_app/requests/domain/usecase/get_request_detail.dart';
 import 'package:hostel_dayout_app/requests/domain/usecase/get_requests.dart';
+import 'package:hostel_dayout_app/requests/domain/usecase/get_status_filter.dart';
 import 'package:hostel_dayout_app/requests/presentation/bloc/request_event.dart';
 import 'package:hostel_dayout_app/requests/presentation/bloc/request_state.dart';
 
@@ -15,15 +16,18 @@ class RequestListBloc extends Bloc<RequestListEvent, RequestListState> {
   final GetRequests getAllRequests;
   final GetRequestDetail getRequestDetail;
   final GetPriorityRequests getPriorityRequests;
+  final GetFilterRequest getFilterRequest;
 
   RequestListBloc({
     required this.getAllRequests,
     required this.getRequestDetail,
     required this.getPriorityRequests,
+    required this.getFilterRequest,
   }) : super(RequestListInitial()) {
     on<LoadRequestsEvent>(_onLoadRequests);
     on<RequestSelectedEvent>(_onRequestSelected);
     on<LoadPriorityRequestsEvent>(_onPriorityRequests);
+    on<LoadRequestsByFilterEvent>(_onLoadRequestsByFilter);
   }
 
   Future<void> _onLoadRequests(
@@ -33,12 +37,8 @@ class RequestListBloc extends Bloc<RequestListEvent, RequestListState> {
     emit(RequestListLoading());
 
     final Either<Failure, List<Request>> result = await getAllRequests(
-      GetRequestsParams(
-        searchQuery: event.searchQuery,
-        sortOrder: event.sortOrder,
-      ),
+      event.filterRequestStatus,
     );
-
 
     result.fold(
       (failure) => emit(RequestListError(_mapFailureToMessage(failure))),
@@ -69,7 +69,28 @@ class RequestListBloc extends Bloc<RequestListEvent, RequestListState> {
   ) async {
     emit(RequestListLoading());
 
-    final Either<Failure, List<Request>> result = await getPriorityRequests(NoParams());
+    final Either<Failure, List<Request>> result = await getPriorityRequests(
+      NoParams(),
+    );
+
+    result.fold(
+      (failure) => emit(RequestListError(_mapFailureToMessage(failure))),
+      (requests) => emit(RequestListLoaded(requests)),
+    );
+  }
+
+  Future<void> _onLoadRequestsByFilter(
+    LoadRequestsByFilterEvent event,
+    Emitter<RequestListState> emit,
+  ) async {
+    emit(RequestListLoading());
+
+    final Either<Failure, List<Request>> result = await getFilterRequest(
+      GetRequestByFilterParams(
+        status: event.status,
+        searchTerm: event.searchTerm,
+      ),
+    );
 
     result.fold(
       (failure) => emit(RequestListError(_mapFailureToMessage(failure))),
@@ -81,8 +102,8 @@ class RequestListBloc extends Bloc<RequestListEvent, RequestListState> {
     switch (failure) {
       case ServerFailure _:
         return "Server error occurred";
-      case CacheFailure _:
-        return "No cached data available";
+      case NetworkFailure _:
+        return "No internet connection";
       default:
         return "Unexpected error occurred";
     }

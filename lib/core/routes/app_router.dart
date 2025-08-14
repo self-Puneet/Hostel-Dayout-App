@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hostel_dayout_app/injection.dart';
 import 'package:hostel_dayout_app/requests/presentation/bloc/bloc.dart';
 import 'package:hostel_dayout_app/requests/presentation/pages/pages.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -20,7 +21,7 @@ class AppRouter {
             pageBuilder: (context, state) => MaterialPage(
               child: BlocProvider<RequestListBloc>(
                 create: (_) => sl<RequestListBloc>(),
-                child: DashboardPage(),
+                child: ShadToaster(child: DashboardPage()),
               ),
             ),
           ),
@@ -30,7 +31,7 @@ class AppRouter {
             pageBuilder: (context, state) => MaterialPage(
               child: BlocProvider<RequestListBloc>(
                 create: (_) => sl<RequestListBloc>(),
-                child: RequestsPage(),
+                child: ShadToaster(child: RequestsPage()),
               ),
             ),
           ),
