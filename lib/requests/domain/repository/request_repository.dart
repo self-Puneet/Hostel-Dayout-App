@@ -2,7 +2,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:hostel_dayout_app/core/enums/enum.dart';
 import 'package:hostel_dayout_app/core/failures.dart';
-import 'package:hostel_dayout_app/requests/domain/usecase/get_status_filter.dart';
 import '../entities/request.dart';
 
 abstract class RequestRepository {

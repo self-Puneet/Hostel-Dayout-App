@@ -46,7 +46,6 @@ class AppLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selectedIndex = _calculateSelectedIndex();
-    final TextTheme textTheme = Theme.of(context).textTheme;
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(

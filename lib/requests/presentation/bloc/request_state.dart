@@ -1,6 +1,5 @@
 // lib/requests/presentation/bloc/request_list/request_list_state.dart
 import 'package:equatable/equatable.dart';
-import 'package:hostel_dayout_app/core/enums/enum.dart';
 import '../../domain/entities/request.dart';
 
 abstract class RequestListState extends Equatable {

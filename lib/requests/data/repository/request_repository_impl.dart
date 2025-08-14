@@ -6,7 +6,6 @@ import 'package:hostel_dayout_app/core/network_info.dart';
 import 'package:hostel_dayout_app/requests/data/datasource/request_remote_datasource.dart';
 import 'package:hostel_dayout_app/requests/domain/entities/request.dart';
 import 'package:hostel_dayout_app/requests/domain/repository/request_repository.dart';
-import 'package:hostel_dayout_app/requests/domain/usecase/get_status_filter.dart';
 import 'package:hostel_dayout_app/requests/presentation/bloc/runtime_storage.dart';
 
 class RequestRepositoryImpl implements RequestRepository {
