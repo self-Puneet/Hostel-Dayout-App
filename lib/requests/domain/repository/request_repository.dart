@@ -18,4 +18,9 @@ abstract class RequestRepository {
     String? searchTerm,
     RequestStatus? status,
   );
+
+  // function for changing  the status of a request
+  Future<Either<Failure, List<Request>>> updateRequestStatus(
+    Map<String, RequestStatus> requestUpdates,
+  );
 }

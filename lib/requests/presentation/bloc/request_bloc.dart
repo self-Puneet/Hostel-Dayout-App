@@ -9,6 +9,8 @@ import 'package:hostel_dayout_app/requests/domain/usecase/get_priority_request.d
 import 'package:hostel_dayout_app/requests/domain/usecase/get_request_detail.dart';
 import 'package:hostel_dayout_app/requests/domain/usecase/get_requests.dart';
 import 'package:hostel_dayout_app/requests/domain/usecase/get_status_filter.dart';
+// import 'package:hostel_dayout_app/requests/domain/usecase/update_requests.dart';
+import 'package:hostel_dayout_app/requests/presentation/bloc/action_mapping.dart';
 import 'package:hostel_dayout_app/requests/presentation/bloc/request_event.dart';
 import 'package:hostel_dayout_app/requests/presentation/bloc/request_state.dart';
 
@@ -17,17 +19,20 @@ class RequestListBloc extends Bloc<RequestListEvent, RequestListState> {
   final GetRequestDetail getRequestDetail;
   final GetPriorityRequests getPriorityRequests;
   final GetFilterRequest getFilterRequest;
+  // final UpdateRequest updateRequests;
 
   RequestListBloc({
     required this.getAllRequests,
     required this.getRequestDetail,
     required this.getPriorityRequests,
     required this.getFilterRequest,
+    // required this.updateRequests,
   }) : super(RequestListInitial()) {
     on<LoadRequestsEvent>(_onLoadRequests);
     on<RequestSelectedEvent>(_onRequestSelected);
     on<LoadPriorityRequestsEvent>(_onPriorityRequests);
     on<LoadRequestsByFilterEvent>(_onLoadRequestsByFilter);
+    // on<UpdateRequestsEvent>(_onUpdateRequests);
   }
 
   Future<void> _onLoadRequests(
@@ -42,7 +47,12 @@ class RequestListBloc extends Bloc<RequestListEvent, RequestListState> {
 
     result.fold(
       (failure) => emit(RequestListError(_mapFailureToMessage(failure))),
-      (requests) => emit(RequestListLoaded(requests)),
+      (requests) => emit(
+        RequestListLoaded(
+          requests,
+          ActionMapping.getPossibleActionsForOnScreenRequests(),
+        ),
+      ),
     );
   }
 
@@ -58,7 +68,11 @@ class RequestListBloc extends Bloc<RequestListEvent, RequestListState> {
 
     result.fold(
       (failure) => emit(RequestListError(_mapFailureToMessage(failure))),
-      (request) => emit(RequestListLoaded([request])),
+      (request) => emit(
+        RequestListLoaded([
+          request,
+        ], ActionMapping.getPossibleActionsForOnScreenRequests()),
+      ),
     );
   }
 
@@ -75,7 +89,7 @@ class RequestListBloc extends Bloc<RequestListEvent, RequestListState> {
 
     result.fold(
       (failure) => emit(RequestListError(_mapFailureToMessage(failure))),
-      (requests) => emit(RequestListLoaded(requests)),
+      (requests) => emit(PriorityRequestListLoaded(requests)),
     );
   }
 
@@ -94,9 +108,30 @@ class RequestListBloc extends Bloc<RequestListEvent, RequestListState> {
 
     result.fold(
       (failure) => emit(RequestListError(_mapFailureToMessage(failure))),
-      (requests) => emit(RequestListLoaded(requests)),
+      (requests) => emit(
+        RequestListLoaded(
+          requests,
+          ActionMapping.getPossibleActionsForOnScreenRequests(),
+        ),
+      ),
     );
   }
+
+  // Future<void> _onUpdateRequests(
+  //   UpdateRequestsEvent event,
+  //   Emitter<RequestListState> emit,
+  // ) async {
+  //   emit(RequestListLoading());
+
+  //   final updatedRequest = await updateRequests(, event.newStatus);
+
+  //   // Emit the updated state
+  //   emit(
+  //     RequestListLoaded([
+  //       updatedRequest,
+  //     ], ActionMapping.getPossibleActionsForOnScreenRequests()),
+  //       );
+  // }
 
   String _mapFailureToMessage(Failure failure) {
     switch (failure) {

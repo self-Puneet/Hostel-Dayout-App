@@ -20,6 +20,10 @@ abstract class RequestRemoteDataSource {
     String? searchTerm,
     RequestStatus? status,
   });
+
+  Future<List<RequestModel>> updateRequestStatus(
+    Map<String, RequestStatus> requestUpdates,
+  );
 }
 
 class RequestRemoteDataSourceImpl implements RequestRemoteDataSource {
@@ -781,5 +785,52 @@ class RequestRemoteDataSourceImpl implements RequestRemoteDataSource {
         ],
       ),
     ];
+  }
+
+  @override
+  Future<List<RequestModel>> updateRequestStatus(
+    Map<String, RequestStatus> requestUpdates,
+  ) async {
+    // --- API call commented out ---
+    /*
+    final uri = Uri.parse('https://api.example.com/requests/update-status');
+    final response = await client.post(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(requestUpdates),
+    );
+    if (response.statusCode == 200) {
+      final List<dynamic> decoded = json.decode(response.body);
+      return decoded.map((json) => RequestModel.fromJson(json)).toList();
+    } else {
+      throw ServerException('Failed to update request status');
+    }
+    */
+
+    // --- Demo Update ---
+    return requestUpdates.entries.map((entry) {
+      return RequestModel(
+        id: entry.key,
+        type: RequestType.dayout,
+        status: entry.value,
+        student: StudentInfoModel(
+          name: 'John Doe',
+          enrollment: 'ENR123456',
+          room: 'B-201',
+          year: '3rd Year',
+          block: 'B',
+        ),
+        parent: ParentInfoModel(
+          name: 'Jane Doe',
+          relationship: 'Mother',
+          phone: '9876543210',
+        ),
+        outTime: DateTime.now().add(const Duration(hours: 2)),
+        returnTime: DateTime.now().add(const Duration(hours: 8)),
+        reason: 'Attending family function',
+        requestedAt: DateTime.now().subtract(const Duration(hours: 1)),
+        timeline: [],
+      );
+    }).toList();
   }
 }

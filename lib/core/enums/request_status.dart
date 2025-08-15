@@ -1,5 +1,6 @@
 // lib/core/enums/request_status.dart
 import 'package:hive/hive.dart';
+import 'package:flutter/material.dart';
 
 part 'request_status.g.dart';
 
@@ -57,6 +58,27 @@ extension RequestStatusX on RequestStatus {
         return 'Approved';
       case RequestStatus.inactive:
         return 'Inactive';
+    }
+  }
+
+  Color get statusColor {
+    switch (this) {
+      case RequestStatus.requested:
+        return Colors.blue;
+      case RequestStatus.referred:
+        return Colors.orange;
+      case RequestStatus.cancelled:
+        return Colors.grey;
+      case RequestStatus.parentApproved:
+        return Colors.green;
+      case RequestStatus.parentDenied:
+        return Colors.redAccent;
+      case RequestStatus.rejected:
+        return Colors.red;
+      case RequestStatus.approved:
+        return Colors.green.shade700;
+      default:
+        return Colors.grey;
     }
   }
 }

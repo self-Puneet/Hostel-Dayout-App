@@ -14,10 +14,13 @@ import 'package:hostel_dayout_app/requests/presentation/bloc/request_bloc.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:hive/hive.dart';
 import 'package:hostel_dayout_app/requests/data/models/request_model.dart';
+import 'package:hostel_dayout_app/requests/presentation/bloc/runtime_storage.dart';
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
+  // Runtime Storage
+  sl.registerLazySingleton<RequestStorage>(() => RequestStorage());
   // External
   sl.registerLazySingleton(() => http.Client());
   sl.registerLazySingleton(() => InternetConnectionChecker.createInstance());
@@ -43,6 +46,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetRequestDetail(sl()));
   sl.registerLazySingleton(() => GetPriorityRequests(sl()));
   sl.registerLazySingleton(() => GetFilterRequest(sl()));
+  // sl.registerLazySingleton(() => UpdateRequestStatus(sl()));
 
   // Bloc
   sl.registerFactory(
@@ -57,4 +61,6 @@ Future<void> init() async {
   sl.registerFactory<RequestDetailBloc>(
     () => RequestDetailBloc(getRequestDetail: sl()),
   );
+
+  // sl.registerFactory(() => UpdateRequestBloc(updateRequestStatus: sl()));
 }

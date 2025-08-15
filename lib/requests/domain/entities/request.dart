@@ -44,4 +44,30 @@ class Request extends Equatable {
     requestedAt,
     timeline,
   ];
+
+  Request copyWith({
+    String? id,
+    RequestType? type,
+    RequestStatus? status,
+    StudentInfo? student,
+    ParentInfo? parent,
+    DateTime? outTime,
+    DateTime? returnTime,
+    String? reason,
+    DateTime? requestedAt,
+    List<TimelineEvent>? timeline,
+  }) {
+    return Request(
+      id: id ?? this.id,
+      type: type ?? this.type,
+      status: status ?? this.status,
+      student: student ?? this.student,
+      parent: parent ?? this.parent,
+      outTime: outTime ?? this.outTime,
+      returnTime: returnTime ?? this.returnTime,
+      reason: reason ?? this.reason,
+      requestedAt: requestedAt ?? this.requestedAt,
+      timeline: timeline ?? this.timeline,
+    );
+  }
 }

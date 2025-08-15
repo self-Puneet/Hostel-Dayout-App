@@ -1,5 +1,6 @@
 // lib/requests/presentation/bloc/request_list/request_list_state.dart
 import 'package:equatable/equatable.dart';
+import 'package:hostel_dayout_app/core/enums/actions.dart';
 import '../../domain/entities/request.dart';
 
 abstract class RequestListState extends Equatable {
@@ -18,8 +19,18 @@ class RequestListLoading extends RequestListState {}
 /// Loaded state with fetched requests
 class RequestListLoaded extends RequestListState {
   final List<Request> requests;
+  final List<RequestAction> possibleActions;
 
-  const RequestListLoaded(this.requests);
+  const RequestListLoaded(this.requests, this.possibleActions);
+
+  @override
+  List<Object?> get props => [requests, possibleActions];
+}
+
+class PriorityRequestListLoaded extends RequestListState {
+  final List<Request> requests;
+
+  const PriorityRequestListLoaded(this.requests);
 
   @override
   List<Object?> get props => [requests];

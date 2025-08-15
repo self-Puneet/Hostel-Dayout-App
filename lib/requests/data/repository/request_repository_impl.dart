@@ -7,6 +7,7 @@ import 'package:hostel_dayout_app/requests/data/datasource/request_remote_dataso
 import 'package:hostel_dayout_app/requests/domain/entities/request.dart';
 import 'package:hostel_dayout_app/requests/domain/repository/request_repository.dart';
 import 'package:hostel_dayout_app/requests/presentation/bloc/runtime_storage.dart';
+import 'package:hostel_dayout_app/injection.dart';
 
 class RequestRepositoryImpl implements RequestRepository {
   final RequestRemoteDataSource remoteDataSource;
@@ -17,7 +18,7 @@ class RequestRepositoryImpl implements RequestRepository {
     required this.networkInfo,
   });
 
-  final runtimeStorage = RequestStorage();
+  final runtimeStorage = sl<RequestStorage>();
 
   @override
   Future<Either<Failure, List<Request>>> getRequests({
@@ -26,10 +27,12 @@ class RequestRepositoryImpl implements RequestRepository {
     if (await networkInfo.isConnected) {
       try {
         final remoteRequests = await remoteDataSource.getRequests();
-        runtimeStorage.clear();
-        for (var request in remoteRequests) {
-          runtimeStorage.saveRequest(request.toEntity());
-        }
+        runtimeStorage.saveRequests(
+          remoteRequests.map((model) => model.toEntity()).toList(),
+        );
+        runtimeStorage.saveOnScreenRequests(
+          remoteRequests.map((model) => model.toEntity()).toList(),
+        );
         // Map to domain entities
         return Right(remoteRequests.map((model) => model.toEntity()).toList());
       } on ServerException {
@@ -93,9 +96,10 @@ class RequestRepositoryImpl implements RequestRepository {
             searchTerm.toLowerCase(),
           );
         }).toList();
+        runtimeStorage.saveOnScreenRequests(filteredRequests);
         return Right(filteredRequests);
       }
-
+      runtimeStorage.saveOnScreenRequests(cachedRequests);
       return Right(cachedRequests);
     }
 
@@ -107,6 +111,7 @@ class RequestRepositoryImpl implements RequestRepository {
           searchTerm!.toLowerCase(),
         );
       }).toList();
+      runtimeStorage.saveOnScreenRequests(filteredRequests);
       return Right(filteredRequests);
     }
 
@@ -116,9 +121,34 @@ class RequestRepositoryImpl implements RequestRepository {
         searchTerm: searchTerm,
         status: null,
       );
+      runtimeStorage.saveOnScreenRequests(
+        requests.map((model) => model.toEntity()).toList(),
+      );
       return Right(requests.map((model) => model.toEntity()).toList());
     } on ServerException {
       return Left(ServerFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Request>>> updateRequestStatus(
+    Map<String, RequestStatus> requestUpdates,
+  ) async {
+    if (await networkInfo.isConnected) {
+      try {
+        final updatedRequests = await remoteDataSource.updateRequestStatus(
+          requestUpdates,
+        );
+        // Update in runtime storage
+        runtimeStorage.updateRequests(
+          updatedRequests.map((model) => model.toEntity()).toList(),
+        );
+        return Right(updatedRequests.map((model) => model.toEntity()).toList());
+      } on ServerException {
+        return Left(ServerFailure());
+      }
+    } else {
+      return Left(NetworkFailure());
     }
   }
 }

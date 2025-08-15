@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hostel_dayout_app/core/enums/actions.dart';
+import 'package:hostel_dayout_app/requests/presentation/bloc/action_mapping.dart';
 import 'package:hostel_dayout_app/requests/presentation/widgets/skeleton_loader.dart';
 import '../bloc/bloc.dart';
 import 'package:hostel_dayout_app/requests/presentation/widgets/request_card.dart';
@@ -7,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:hostel_dayout_app/core/enums/enum.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class RequestsPage extends StatefulWidget {
   const RequestsPage({super.key});
@@ -27,7 +30,31 @@ class _RequestsPageState extends State<RequestsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = BlocBuilder<RequestListBloc, RequestListState>(
+    return Scaffold(
+      body: GestureDetector(
+        behavior: HitTestBehavior.translucent, // ✅ allows taps to pass through
+        onTap: () => FocusScope.of(context).unfocus(), // ✅ removes focus
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSearchTextField(),
+              // const SizedBox(height: 300),
+              _buildStatusFilter(),
+              const SizedBox(height: 16),
+              _buildRequestsCards(),
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: _floatingActionButton(),
+    );
+  }
+
+  // requests cards widget seperatly
+  Widget _buildRequestsCards() {
+    return BlocBuilder<RequestListBloc, RequestListState>(
       builder: (context, state) {
         if (state is RequestListLoading) {
           return const Column(
@@ -89,17 +116,21 @@ class _RequestsPageState extends State<RequestsPage> {
               ),
             );
           });
-
           return const Column(
             children: [ShimmerCard(), ShimmerCard(), ShimmerCard()],
           );
         } else {
-          return const SizedBox.shrink();
+          return const Column(
+            children: [ShimmerCard(), ShimmerCard(), ShimmerCard()],
+          );
         }
       },
     );
+  }
 
-    final textField = TextField(
+  // make a seperate widget for that search text field
+  Widget _buildSearchTextField() {
+    return TextField(
       // i want icon in this text field
       style: TextStyle(color: Colors.black, decoration: TextDecoration.none),
       decoration: InputDecoration(
@@ -130,24 +161,78 @@ class _RequestsPageState extends State<RequestsPage> {
         );
       },
     );
+  }
 
-    return Scaffold(
-      body: GestureDetector(
-        behavior: HitTestBehavior.translucent, // ✅ allows taps to pass through
-        onTap: () => FocusScope.of(context).unfocus(), // ✅ removes focus
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _floatingActionButton() {
+    return BlocBuilder<RequestListBloc, RequestListState>(
+      builder: (context, state) {
+        if (state is RequestListLoading) {
+          return FloatingActionButton(
+            onPressed: null,
+            backgroundColor: Colors.grey,
+            child: const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
+            ),
+          );
+        }
+
+        if (state is RequestListError) {
+          // Optionally show an error FAB
+          return FloatingActionButton(
+            onPressed: () {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.message)));
+            },
+            backgroundColor: Colors.red,
+            child: const Icon(Icons.error),
+          );
+        }
+        if (state is RequestListLoaded) {
+          debugPrint('5' * 78);
+          debugPrint(
+            ActionMapping.getPossibleActionsForOnScreenRequests().toString(),
+          );
+          // Default: Show your SpeedDial
+          return SpeedDial(
+            label: const Text('Actions'),
+            icon: Icons.add,
+            activeIcon: Icons.close,
+            backgroundColor: Colors.blue,
+            overlayColor: Colors.black,
+            overlayOpacity: 0.4,
+            spacing: 12,
+            spaceBetweenChildren: 8,
             children: [
-              textField,
-              _buildStatusFilter(),
-              const SizedBox(height: 16),
-              bloc,
+              ...state.possibleActions.map((action) {
+                return SpeedDialChild(
+                  child: action.icon,
+                  label: action.name,
+                  backgroundColor: action.actionColor,
+                  onTap: () {
+                    // context.read<RequestListBloc>().add(
+                    //   (
+                    //     ActionMapping.getStatusMappingForAction(action),
+                    //   ),
+                    // );
+                  },
+                );
+              }),
             ],
-          ),
-        ),
-      ),
+          );
+        } else {
+          return FloatingActionButton(
+            onPressed: () {},
+            backgroundColor: Colors.red,
+            child: const Icon(Icons.error),
+          );
+        }
+      },
     );
   }
 

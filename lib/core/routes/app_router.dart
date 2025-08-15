@@ -10,7 +10,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: '/home',
+    initialLocation: '/requests',
     routes: [
       ShellRoute(
         builder: (context, state, child) {
@@ -31,12 +31,13 @@ class AppRouter {
             path: '/requests',
             name: 'requests',
             pageBuilder: (context, state) => MaterialPage(
-              child: BlocProvider<RequestListBloc>(
-                create: (_) => sl<RequestListBloc>(),
-                child: ShadToaster(child: RequestsPage()),
+              child: BlocProvider(
+                create: (_) => sl<RequestListBloc>()..add(LoadRequestsEvent()),
+                child: const ShadToaster(child: RequestsPage()),
               ),
             ),
           ),
+
           // ✅ Dynamic route for request details
           GoRoute(
             path: '/requests/:id',

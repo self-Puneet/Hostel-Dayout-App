@@ -26,6 +26,8 @@ dependencies:
   url_launcher: ^6.3.2
   shimmer: ^3.0.0
   shadcn_ui: ^0.28.5
+  flutter_speed_dial: ^7.0.0
+  shadcn_flutter: ^0.0.38
 
 dev_dependencies:
   flutter_test:

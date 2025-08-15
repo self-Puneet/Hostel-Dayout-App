@@ -4,6 +4,7 @@ import 'package:hostel_dayout_app/requests/domain/entities/request.dart';
 
 class RequestStorage {
   final Map<String, Request> _storage = {};
+  final Map<String, Request> _onScreenStorage = {};
 
   Request? getRequest(String id) {
     return _storage[id];
@@ -21,6 +22,13 @@ class RequestStorage {
     return _storage.values.toList();
   }
 
+  void saveRequests(List<Request> requests) {
+    clear();
+    for (var request in requests) {
+      _storage[request.id] = request;
+    }
+  }
+
   List<Request> getRequestsByStatus(RequestStatus status) {
     return _storage.values
         .where((request) => request.status == status)
@@ -29,5 +37,36 @@ class RequestStorage {
 
   void clear() {
     _storage.clear();
+  }
+
+  void updateRequests(List<Request> requests) {
+    // update all the request with the new requests send whose ids matches and keep others same
+    for (var request in requests) {
+      _storage[request.id] = request;
+      _onScreenStorage[request.id] = request;
+    }
+  }
+
+  List<Request> getOnScreenRequests() {
+    return _onScreenStorage.values.toList();
+  }
+
+  void clearOnScreenRequests() {
+    _onScreenStorage.clear();
+  }
+
+  void saveOnScreenRequests(List<Request> requests) {
+    print("\$" * 20);
+    print(requests);
+    print(_onScreenStorage[requests.first.student.name]);
+    clearOnScreenRequests();
+    for (var request in requests) {
+      _onScreenStorage[request.id] = request;
+      print(
+        '--------------------------------------------------------------------------${_onScreenStorage[request.id]}',
+      );
+    }
+    print('#' * 90);
+    print(_onScreenStorage);
   }
 }

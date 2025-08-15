@@ -49,3 +49,13 @@ class LoadRequestsByFilterEvent extends RequestListEvent {
   @override
   List<Object?> get props => [status, searchTerm];
 }
+
+class UpdateRequestsEvent extends RequestListEvent {
+  final RequestStatus newStatus;
+  final String requestId;
+
+  const UpdateRequestsEvent(this.newStatus, this.requestId);
+
+  @override
+  List<Object?> get props => [newStatus, requestId];
+} 

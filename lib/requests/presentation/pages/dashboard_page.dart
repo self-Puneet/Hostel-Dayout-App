@@ -23,11 +23,11 @@ class _DashboardPageState extends State<DashboardPage> {
     context.read<RequestListBloc>().add(LoadPriorityRequestsEvent());
   }
 
-  @override
-  void dispose() {
-    // context.read<RequestListBloc>().add(LoadRequestsByStatusEvent());
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   // context.read<RequestListBloc>().add(LoadRequestsByStatusEvent());
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class _DashboardPageState extends State<DashboardPage> {
           return const Column(
             children: [ShimmerCard(), ShimmerCard(), ShimmerCard()],
           );
-        } else if (state is RequestListLoaded) {
+        } else if (state is PriorityRequestListLoaded) {
           final priorityRequests = state.requests.toList();
 
           if (priorityRequests.isEmpty) {
