@@ -5,27 +5,31 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 class ConfirmDialog extends StatelessWidget {
   final String title;
   final String description;
-  final List<Widget> actions;
+  final String confirmText;
+  final VoidCallback onConfirm;
 
   const ConfirmDialog({
     super.key,
     required this.title,
     required this.description,
-    required this.actions,
+    required this.confirmText,
+    required this.onConfirm,
   });
 
   static Future<T?> show<T>({
     required BuildContext context,
     required String title,
     required String description,
-    required List<Widget> actions,
+    required String confirmText,
+    required VoidCallback onConfirm,
   }) {
     return showShadDialog<T>(
       context: context,
       builder: (context) => ConfirmDialog(
         title: title,
         description: description,
-        actions: actions,
+        confirmText: confirmText,
+        onConfirm: onConfirm,
       ),
     );
   }
@@ -38,7 +42,21 @@ class ConfirmDialog extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 8),
         child: Text(description),
       ),
-      actions: actions,
+      actions: [
+        ShadButton.outline(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text('Cancel'),
+        ),
+        ShadButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            onConfirm();
+          },
+          child: Text(confirmText),
+        ),
+      ],
     );
   }
 }

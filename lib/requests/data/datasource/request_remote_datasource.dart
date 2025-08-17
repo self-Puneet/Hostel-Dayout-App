@@ -4,8 +4,10 @@ import 'package:hostel_dayout_app/core/exception.dart';
 import 'package:hostel_dayout_app/requests/data/models/parent_info_model.dart';
 import 'package:hostel_dayout_app/requests/data/models/student_info_model.dart';
 import 'package:hostel_dayout_app/requests/domain/entities/timeline_event.dart';
+import 'package:hostel_dayout_app/requests/presentation/bloc/runtime_storage.dart';
 import '../models/request_model.dart';
 import 'package:http/http.dart' as http;
+import '../../domain/entities/request.dart';
 
 abstract class RequestRemoteDataSource {
   /// Throws a [ServerException] for all error codes.
@@ -23,6 +25,11 @@ abstract class RequestRemoteDataSource {
 
   Future<List<RequestModel>> updateRequestStatus(
     Map<String, RequestStatus> requestUpdates,
+  );
+
+  Future<RequestModel> updateRequestDetail(
+    Request request,
+    RequestStatus updatedStatus,
   );
 }
 
@@ -172,7 +179,7 @@ class RequestRemoteDataSourceImpl implements RequestRemoteDataSource {
     return RequestModel(
       id: requestId,
       type: RequestType.dayout,
-      status: RequestStatus.parentDenied,
+      status: RequestStatus.requested,
       student: StudentInfoModel(
         name: 'John Doe',
         enrollment: 'ENR123456',
@@ -832,5 +839,17 @@ class RequestRemoteDataSourceImpl implements RequestRemoteDataSource {
         timeline: [],
       );
     }).toList();
+  }
+
+  @override
+  Future<RequestModel> updateRequestDetail(
+    Request request,
+    RequestStatus updatedStatus,
+  ) async {
+    final updatedRequest = request.copyWith(
+      status: updatedStatus,
+      // Update other fields as necessary
+    );
+    return RequestModel.fromEntity(updatedRequest);
   }
 }

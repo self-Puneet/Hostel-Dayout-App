@@ -32,6 +32,17 @@ class ActionMapping {
     RequestStatus.inactive: {RequestAction.none},
   };
 
+  static final Map<RequestAction, RequestStatus> actionToResultingStatus = {
+    RequestAction.refer: RequestStatus.referred,
+    RequestAction.cancel: RequestStatus.cancelled,
+    RequestAction.approve: RequestStatus.approved,
+    RequestAction.reject: RequestStatus.rejected,
+  };
+
+  static List<RequestAction> getActionForRequest(RequestStatus status) {
+    return statusToAction[status]!.toList();
+  }
+
   static List<RequestAction> possibleActions(List<Request> requests) {
     final Set<RequestAction> actions = {};
     for (var request in requests) {
@@ -45,11 +56,8 @@ class ActionMapping {
   }
 
   static List<RequestAction> getPossibleActionsForOnScreenRequests() {
-    // complete this function using the other function in this class
     final List<Request> onScreenRequests = sl<RequestStorage>()
         .getOnScreenRequests();
-    print(onScreenRequests.length);
-    print("onScreenRequests:  ${possibleActions(onScreenRequests)}");
     return possibleActions(onScreenRequests);
   }
 
@@ -59,7 +67,7 @@ class ActionMapping {
     final Map<String, RequestStatus> mapping = {};
     final requestIds = getRequestIdsForAction(action);
     for (var id in requestIds) {
-      mapping[id] = getStatusForAction(action);
+      mapping[id] = getResultingStatusForAction(action);
     }
     return mapping;
   }
@@ -67,7 +75,7 @@ class ActionMapping {
   static RequestStatus getStatusForAction(RequestAction action) {
     for (var entry in statusToAction.entries) {
       if (entry.value.contains(action)) {
-        return entry.key; // Return the matching status
+        return entry.key;
       }
     }
     throw ArgumentError('No RequestStatus found for action: $action');
@@ -85,5 +93,10 @@ class ActionMapping {
       }
     }
     return requestIds;
+  }
+
+  // get resulting status for action
+  static RequestStatus getResultingStatusForAction(RequestAction action) {
+    return actionToResultingStatus[action] ?? RequestStatus.inactive;
   }
 }

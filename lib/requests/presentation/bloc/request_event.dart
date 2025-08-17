@@ -1,5 +1,6 @@
 // lib/requests/presentation/bloc/request_list/request_list_event.dart
 import 'package:equatable/equatable.dart';
+import 'package:hostel_dayout_app/core/enums/actions.dart';
 import 'package:hostel_dayout_app/core/enums/enum.dart';
 
 abstract class RequestListEvent extends Equatable {
@@ -38,7 +39,6 @@ class LoadPriorityRequestsEvent extends RequestListEvent {
   List<Object?> get props => [];
 }
 
-
 // write a event function for loading requests by request status
 class LoadRequestsByFilterEvent extends RequestListEvent {
   final RequestStatus? status;
@@ -51,11 +51,11 @@ class LoadRequestsByFilterEvent extends RequestListEvent {
 }
 
 class UpdateRequestsEvent extends RequestListEvent {
-  final RequestStatus newStatus;
-  final String requestId;
+  final Map<String, RequestStatus> updatedStatuses;
 
-  const UpdateRequestsEvent(this.newStatus, this.requestId);
+  const UpdateRequestsEvent(this.updatedStatuses);
 
   @override
-  List<Object?> get props => [newStatus, requestId];
-} 
+  List<Object?> get props => [updatedStatuses];
+}
+

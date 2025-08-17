@@ -45,6 +45,8 @@ class RequestStorage {
       _storage[request.id] = request;
       _onScreenStorage[request.id] = request;
     }
+    print('2' * 90);
+    print(_onScreenStorage.length);
   }
 
   List<Request> getOnScreenRequests() {
@@ -69,4 +71,10 @@ class RequestStorage {
     print('#' * 90);
     print(_onScreenStorage);
   }
+
+  Request? getRequestById(String id) {
+    return _onScreenStorage[id];
+  }
+
+  
 }

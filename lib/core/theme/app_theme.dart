@@ -54,7 +54,7 @@ class AppTheme {
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10)), // Slight round
           ),
-          minimumSize: const Size(double.infinity, 50), // 👈 Full width
+          // minimumSize: const Size(,50), // 👈 Full width
 
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
           textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),

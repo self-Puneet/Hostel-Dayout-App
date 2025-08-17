@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ParentInfoCard extends StatelessWidget {
   final String title;
@@ -22,26 +23,47 @@ class ParentInfoCard extends StatelessWidget {
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              title,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "$name • $relation",
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  phoneNumber,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: Colors.blue[700]),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              "$name • $relation",
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              phoneNumber,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.blue[700]),
+            IconButton(
+              onPressed: () async {
+                final Uri uri = Uri(scheme: 'tel', path: phoneNumber);
+
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Could not launch dialer')),
+                  );
+                }
+              },
+              // style: ButtonStyle(backgroundColor: Theme.of(context).primaryColor),
+              icon: const Icon(Icons.phone),
+              color: Colors.transparent,
             ),
           ],
         ),

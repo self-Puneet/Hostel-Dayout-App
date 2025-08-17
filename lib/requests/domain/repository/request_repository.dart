@@ -23,4 +23,9 @@ abstract class RequestRepository {
   Future<Either<Failure, List<Request>>> updateRequestStatus(
     Map<String, RequestStatus> requestUpdates,
   );
+
+  Future<Either<Failure, Request>> updateRequestDetail(
+    Request requestId,
+    RequestStatus updatedStatus,
+  );
 }

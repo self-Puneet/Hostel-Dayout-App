@@ -2,6 +2,8 @@ import 'package:get_it/get_it.dart';
 import 'package:hostel_dayout_app/core/network_info.dart';
 import 'package:hostel_dayout_app/requests/domain/usecase/get_priority_request.dart';
 import 'package:hostel_dayout_app/requests/domain/usecase/get_status_filter.dart';
+import 'package:hostel_dayout_app/requests/domain/usecase/update_request_detail.dart';
+import 'package:hostel_dayout_app/requests/domain/usecase/update_requests.dart';
 import 'package:hostel_dayout_app/requests/presentation/bloc/request_detail_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:hostel_dayout_app/core/network_info_impl.dart';
@@ -46,7 +48,8 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetRequestDetail(sl()));
   sl.registerLazySingleton(() => GetPriorityRequests(sl()));
   sl.registerLazySingleton(() => GetFilterRequest(sl()));
-  // sl.registerLazySingleton(() => UpdateRequestStatus(sl()));
+  sl.registerLazySingleton(() => UpdateRequest(sl()));
+  sl.registerLazySingleton(() => UpdateRequestDetail(sl()));
 
   // Bloc
   sl.registerFactory(
@@ -55,11 +58,12 @@ Future<void> init() async {
       getRequestDetail: sl(),
       getPriorityRequests: sl(),
       getFilterRequest: sl(),
+      updateRequests: sl(),
     ),
   );
 
   sl.registerFactory<RequestDetailBloc>(
-    () => RequestDetailBloc(getRequestDetail: sl()),
+    () => RequestDetailBloc(getRequestDetail: sl(), updateRequestDetail: sl()),
   );
 
   // sl.registerFactory(() => UpdateRequestBloc(updateRequestStatus: sl()));

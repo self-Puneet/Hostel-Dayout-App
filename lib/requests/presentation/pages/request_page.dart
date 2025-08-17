@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hostel_dayout_app/core/enums/actions.dart';
 import 'package:hostel_dayout_app/requests/presentation/bloc/action_mapping.dart';
+import 'package:hostel_dayout_app/requests/presentation/widgets/confirmation_dialog.dart';
 import 'package:hostel_dayout_app/requests/presentation/widgets/skeleton_loader.dart';
 import '../bloc/bloc.dart';
 import 'package:hostel_dayout_app/requests/presentation/widgets/request_card.dart';
@@ -34,17 +35,24 @@ class _RequestsPageState extends State<RequestsPage> {
       body: GestureDetector(
         behavior: HitTestBehavior.translucent, // ✅ allows taps to pass through
         onTap: () => FocusScope.of(context).unfocus(), // ✅ removes focus
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildSearchTextField(),
-              // const SizedBox(height: 300),
-              _buildStatusFilter(),
-              const SizedBox(height: 16),
-              _buildRequestsCards(),
-            ],
+        child: RefreshIndicator(
+          onRefresh: () async {
+            context.read<RequestListBloc>().add(LoadRequestsEvent());
+            await Future.delayed(const Duration(seconds: 1));
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSearchTextField(),
+                // const SizedBox(height: 300),
+                _buildStatusFilter(),
+                const SizedBox(height: 16),
+                _buildRequestsCards(),
+              ],
+            ),
           ),
         ),
       ),
@@ -194,10 +202,6 @@ class _RequestsPageState extends State<RequestsPage> {
           );
         }
         if (state is RequestListLoaded) {
-          debugPrint('5' * 78);
-          debugPrint(
-            ActionMapping.getPossibleActionsForOnScreenRequests().toString(),
-          );
           // Default: Show your SpeedDial
           return SpeedDial(
             label: const Text('Actions'),
@@ -215,11 +219,20 @@ class _RequestsPageState extends State<RequestsPage> {
                   label: action.name,
                   backgroundColor: action.actionColor,
                   onTap: () {
-                    // context.read<RequestListBloc>().add(
-                    //   (
-                    //     ActionMapping.getStatusMappingForAction(action),
-                    //   ),
-                    // );
+                    ConfirmDialog.show(
+                      context: context,
+                      title: action.dialogBoxMessage.title,
+                      description: action.dialogBoxMessage.description,
+                      confirmText: action.dialogBoxMessage.confirmText,
+                      onConfirm: () {
+                        // activate a event - update
+                        context.read<RequestListBloc>().add(
+                          UpdateRequestsEvent(
+                            ActionMapping.getStatusMappingForAction(action),
+                          ),
+                        );
+                      },
+                    );
                   },
                 );
               }),
@@ -227,9 +240,16 @@ class _RequestsPageState extends State<RequestsPage> {
           );
         } else {
           return FloatingActionButton(
-            onPressed: () {},
-            backgroundColor: Colors.red,
-            child: const Icon(Icons.error),
+            onPressed: null,
+            backgroundColor: Colors.grey,
+            child: const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
+            ),
           );
         }
       },

@@ -1,4 +1,6 @@
 // lib/requests/presentation/bloc/request_list/request_list_bloc.dart
+import 'dart:async';
+
 import 'package:dartz/dartz.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -9,7 +11,7 @@ import 'package:hostel_dayout_app/requests/domain/usecase/get_priority_request.d
 import 'package:hostel_dayout_app/requests/domain/usecase/get_request_detail.dart';
 import 'package:hostel_dayout_app/requests/domain/usecase/get_requests.dart';
 import 'package:hostel_dayout_app/requests/domain/usecase/get_status_filter.dart';
-// import 'package:hostel_dayout_app/requests/domain/usecase/update_requests.dart';
+import 'package:hostel_dayout_app/requests/domain/usecase/update_requests.dart';
 import 'package:hostel_dayout_app/requests/presentation/bloc/action_mapping.dart';
 import 'package:hostel_dayout_app/requests/presentation/bloc/request_event.dart';
 import 'package:hostel_dayout_app/requests/presentation/bloc/request_state.dart';
@@ -19,20 +21,20 @@ class RequestListBloc extends Bloc<RequestListEvent, RequestListState> {
   final GetRequestDetail getRequestDetail;
   final GetPriorityRequests getPriorityRequests;
   final GetFilterRequest getFilterRequest;
-  // final UpdateRequest updateRequests;
+  final UpdateRequest updateRequests;
 
   RequestListBloc({
     required this.getAllRequests,
     required this.getRequestDetail,
     required this.getPriorityRequests,
     required this.getFilterRequest,
-    // required this.updateRequests,
+    required this.updateRequests,
   }) : super(RequestListInitial()) {
     on<LoadRequestsEvent>(_onLoadRequests);
     on<RequestSelectedEvent>(_onRequestSelected);
     on<LoadPriorityRequestsEvent>(_onPriorityRequests);
     on<LoadRequestsByFilterEvent>(_onLoadRequestsByFilter);
-    // on<UpdateRequestsEvent>(_onUpdateRequests);
+    on<UpdateRequestsEvent>(_onUpdateRequests);
   }
 
   Future<void> _onLoadRequests(
@@ -117,21 +119,25 @@ class RequestListBloc extends Bloc<RequestListEvent, RequestListState> {
     );
   }
 
-  // Future<void> _onUpdateRequests(
-  //   UpdateRequestsEvent event,
-  //   Emitter<RequestListState> emit,
-  // ) async {
-  //   emit(RequestListLoading());
+  Future<void> _onUpdateRequests(
+    UpdateRequestsEvent event,
+    Emitter<RequestListState> emit,
+  ) async {
+    emit(RequestListLoading());
+    print('puneet' * 78);
 
-  //   final updatedRequest = await updateRequests(, event.newStatus);
+    final updatedRequests = await updateRequests(event.updatedStatuses);
 
-  //   // Emit the updated state
-  //   emit(
-  //     RequestListLoaded([
-  //       updatedRequest,
-  //     ], ActionMapping.getPossibleActionsForOnScreenRequests()),
-  //       );
-  // }
+    updatedRequests.fold(
+      (failure) => emit(RequestListError(_mapFailureToMessage(failure))),
+      (requests) => emit(
+        RequestListLoaded(
+          requests,
+          ActionMapping.getPossibleActionsForOnScreenRequests(),
+        ),
+      ),
+    );
+  }
 
   String _mapFailureToMessage(Failure failure) {
     switch (failure) {

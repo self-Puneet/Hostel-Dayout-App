@@ -1,5 +1,16 @@
-// make a enum for all possible actions
 import 'package:flutter/material.dart';
+
+class RequestActionDialogParam {
+  final String title;
+  final String description;
+  final String confirmText;
+
+  RequestActionDialogParam({
+    required this.title,
+    required this.description,
+    required this.confirmText,
+  });
+}
 
 enum RequestAction { refer, cancel, approve, reject, none }
 
@@ -46,6 +57,45 @@ extension RequestActionX on RequestAction {
         return Colors.red;
       case RequestAction.none:
         return Colors.grey;
+    }
+  }
+
+  RequestActionDialogParam get dialogBoxMessage {
+    switch (this) {
+      case RequestAction.refer:
+        return RequestActionDialogParam(
+          title: 'Refer All Requests',
+          description:
+              'All requests will be referred to their respective parents for further processing.',
+          confirmText: 'Refer',
+        );
+      case RequestAction.cancel:
+        return RequestActionDialogParam(
+          title: 'Cancel All Requests',
+          description:
+              'All requests will be cancelled and will not be referred to their respective parents.',
+          confirmText: 'Cancel',
+        );
+      case RequestAction.approve:
+        return RequestActionDialogParam(
+          title: 'Approve All Requests',
+          description: 'All requests will be approved and marked as completed.',
+          confirmText: 'Approve',
+        );
+      case RequestAction.reject:
+        return RequestActionDialogParam(
+          title: 'Reject All Requests',
+          description:
+              'All requests will be rejected and closed without approval.',
+          confirmText: 'Reject',
+        );
+      case RequestAction.none:
+        return RequestActionDialogParam(
+          title: 'No Action Available',
+          description:
+              'There are no available actions for the selected requests.',
+          confirmText: 'OK',
+        );
     }
   }
 }

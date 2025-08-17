@@ -103,63 +103,68 @@ class _DashboardPageState extends State<DashboardPage> {
     );
 
     return Scaffold(
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Greeting
-            const GreetingHeader(wardenName: "CrashTrico"),
-            const SizedBox(height: 16),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          context.read<RequestListBloc>().add(LoadPriorityRequestsEvent());
+          await Future.delayed(const Duration(seconds: 1));
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const GreetingHeader(wardenName: "CrashTrico"),
+              const SizedBox(height: 16),
 
-            // Stats
-            Row(
-              children: const [
-                Expanded(
-                  child: StatsCard(
-                    count: 8,
-                    label: "Active today",
-                    onTap: null,
+              Row(
+                children: const [
+                  Expanded(
+                    child: StatsCard(
+                      count: 8,
+                      label: "Active today",
+                      onTap: null,
+                    ),
                   ),
-                ),
-                SizedBox(width: 8),
-                Expanded(
-                  child: StatsCard(
-                    count: 2,
-                    label: "Late returns",
-                    onTap: null,
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: StatsCard(
+                      count: 2,
+                      label: "Late returns",
+                      onTap: null,
+                    ),
                   ),
-                ),
-                SizedBox(width: 8),
-                Expanded(
-                  child: StatsCard(count: 5, label: "Pending", onTap: null),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: StatsCard(count: 5, label: "Pending", onTap: null),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
 
-            // Priority Requests
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Text(
-                  "Priority requests",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                Text(
-                  "View all",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.w500,
+              // Priority Requests
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  Text(
+                    "Priority requests",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
+                  Text(
+                    "View all",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.blue,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
 
-            bloc,
-          ],
+              bloc,
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: Padding(

@@ -135,15 +135,37 @@ class RequestRepositoryImpl implements RequestRepository {
     Map<String, RequestStatus> requestUpdates,
   ) async {
     if (await networkInfo.isConnected) {
+      // log everything here in this function
       try {
         final updatedRequests = await remoteDataSource.updateRequestStatus(
           requestUpdates,
         );
-        // Update in runtime storage
+
         runtimeStorage.updateRequests(
           updatedRequests.map((model) => model.toEntity()).toList(),
         );
-        return Right(updatedRequests.map((model) => model.toEntity()).toList());
+
+        return Right(runtimeStorage.getOnScreenRequests());
+      } on ServerException {
+        return Left(ServerFailure());
+      }
+    } else {
+      return Left(NetworkFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, Request>> updateRequestDetail(
+    Request request,
+    RequestStatus updatedStatus,
+  ) async {
+    if (await networkInfo.isConnected) {
+      try {
+        final updatedRequest = await remoteDataSource.updateRequestDetail(
+          request,
+          updatedStatus,
+        );
+        return Right(updatedRequest.toEntity());
       } on ServerException {
         return Left(ServerFailure());
       }

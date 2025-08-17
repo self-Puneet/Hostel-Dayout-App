@@ -55,3 +55,22 @@ class CallRequestContactEvent extends RequestListState {
   @override
   List<Object?> get props => [phoneNumber];
 }
+
+class UpdateRequestList extends RequestListState {
+  final List<Request> requests;
+
+  const UpdateRequestList(this.requests);
+
+  @override
+  List<Object?> get props => [requests];
+}
+
+
+class OpenDialogState extends RequestListState {
+  final RequestAction action;
+
+  const OpenDialogState(this.action);
+
+  @override
+  List<Object?> get props => [action];
+}
