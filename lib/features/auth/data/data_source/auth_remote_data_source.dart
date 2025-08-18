@@ -25,6 +25,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw Exception('Login failed');
     }
     // Mocking a successful login response for demonstration purposes
-    return Future.value('mocked_token');
+    // return Future.value('mocked_token');
   }
 }
