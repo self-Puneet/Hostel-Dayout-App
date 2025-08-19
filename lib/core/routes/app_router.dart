@@ -14,7 +14,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 class AppRouter {
   static GoRouter router = GoRouter(
     initialLocation: '/login',
-    redirect: (context, state) => AuthGuard.redirect(context, state),
+    // redirect: (context, state) => AuthGuard.redirect(context, state),
     routes: [
       /// Public route (no guard)
       GoRoute(
@@ -65,19 +65,23 @@ class AppRouter {
               );
             },
           ),
+          // GoRoute(
+          //   path: '/alerts',
+          //   name: 'alerts',
+          //   pageBuilder: (context, state) =>
+          //       const MaterialPage(child: ShadToaster(child: DashboardPage())),
+          // ),
           GoRoute(
-            path: '/alerts',
-            name: 'alerts',
-            pageBuilder: (context, state) => const MaterialPage(
-              child: ShadToaster(child: DashboardPage()),
-            ),
+            path: '/notifications',
+            name: 'notifications',
+            pageBuilder: (context, state) =>
+                const MaterialPage(child: NotificationScreen()),
           ),
           GoRoute(
             path: '/settings',
             name: 'settings',
-            pageBuilder: (context, state) => const MaterialPage(
-              child: ShadToaster(child: DashboardPage()),
-            ),
+            pageBuilder: (context, state) =>
+                const MaterialPage(child: ShadToaster(child: DashboardPage())),
           ),
         ],
       ),

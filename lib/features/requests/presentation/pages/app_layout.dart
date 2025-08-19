@@ -21,14 +21,14 @@ class AppLayout extends StatelessWidget {
       activeIcon: Icons.assignment,
     ),
     _TabInfo(
-      name: 'alerts',
-      label: 'Alerts',
-      icon: Icons.notifications_none,
-      activeIcon: Icons.notifications,
+      name: 'notifications',
+      label: 'Notifications',
+      icon: Icons.mark_email_unread_outlined,
+      activeIcon: Icons.mark_email_unread,
     ),
   ];
 
-  static const _titles = ['Home', 'Requests', 'Alerts', 'Settings'];
+  static const _titles = ['Home', 'Requests', 'Notifications'];
 
   int _calculateSelectedIndex() {
     for (var i = 0; i < _tabs.length; i++) {
@@ -75,7 +75,7 @@ class AppLayout extends StatelessWidget {
           final tab = _tabs[index];
           print(selectedIndex);
           if (tab.name != _tabs[selectedIndex].name) {
-            GoRouter.of(context).go('/${tab.name}');
+            GoRouter.of(context).push('/${tab.name}');
           }
         },
         items: _tabs

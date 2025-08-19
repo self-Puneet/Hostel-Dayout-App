@@ -56,7 +56,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   (req) => RequestCard(
                     request: req,
                     onTap: () {
-                      context.go('/requests/${req.id}');
+                      context.push('/requests/${req.id}');
                     },
                     onCallTap: () async {
                       final phoneNumber = req.parent.phone;
@@ -145,17 +145,24 @@ class _DashboardPageState extends State<DashboardPage> {
               // Priority Requests
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
+                children: [
                   Text(
                     "Priority requests",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
-                  Text(
-                    "View all",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.blue,
-                      fontWeight: FontWeight.w500,
+                  // make it clickable and on click it should navigate to /requests push
+                  GestureDetector(
+                    onTap: () {
+                      // go router push routing
+                      context.go('/requests');
+                    },
+                    child: Text(
+                      "View all",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.blue,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],
@@ -167,13 +174,13 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ElevatedButton(
-          onPressed: () {},
-          child: const Text("Hostel Overview"),
-        ),
-      ),
+      // bottomNavigationBar: Padding(
+      //   padding: const EdgeInsets.all(16.0),
+      //   child: ElevatedButton(
+      //     onPressed: () {},
+      //     child: const Text("Hostel Overview"),
+      //   ),
+      // ),
     );
   }
 }

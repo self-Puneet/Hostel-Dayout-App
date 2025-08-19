@@ -5,6 +5,7 @@ import 'package:hostel_dayout_app/features/auth/presentation/bloc/auth_events.da
 import 'package:hostel_dayout_app/features/auth/presentation/bloc/auth_state.dart';
 import 'package:hostel_dayout_app/features/auth/presentation/widgets/custom_button.dart';
 import 'package:hostel_dayout_app/features/auth/presentation/widgets/customm_text_fields.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -27,11 +28,13 @@ class _LoginPageState extends State<LoginPage> {
 
   void _onLoginPressed(BuildContext context) {
     final bloc = context.read<LoginBloc>();
-    bloc.add(LoginButtonPressed(
-      _wardenIdController.text.trim(),
-      _passwordController.text.trim(),
-      _rememberMe,
-    ));
+    bloc.add(
+      LoginButtonPressed(
+        _wardenIdController.text.trim(),
+        _passwordController.text.trim(),
+        _rememberMe,
+      ),
+    );
   }
 
   @override
@@ -40,14 +43,16 @@ class _LoginPageState extends State<LoginPage> {
       body: BlocConsumer<LoginBloc, LoginState>(
         listener: (context, state) {
           if (state is LoginFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
           }
           if (state is LoginSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("Welcome, ${state.session.wardenId}!")),
             );
+            // Navigate to the next page or home screen using go route
+            context.go('/home');
           }
         },
         builder: (context, state) {
@@ -57,6 +62,11 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // Image.asset(
+                  //   'assets/user-login-page-with-two-characters.jpg',
+                  //   height: 120,
+                  // ),
+                  const SizedBox(height: 20),
                   const Text(
                     "Login",
                     style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),

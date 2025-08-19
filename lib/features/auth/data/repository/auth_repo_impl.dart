@@ -27,57 +27,13 @@ class AuthRepositoryImpl implements AuthRepository {
     String password,
     bool rememberMe,
   ) async {
-    // STEP 1: Try local storage (SharedPreferences)
-    try {
-      final localMap = await local.getSession();
-      if (localMap != null) {
-        final session = UserSessionModel.fromPrefs(
-          token: localMap['token'] as String,
-          wardenId: localMap['wardenId'] as String?,
-          rememberMe: localMap['rememberMe'] as bool? ?? false,
-        );
-        return Right(session.toEntity());
-      }
-    } on CacheException {
-      return Left(CacheFailure());
-    }
-
-    // STEP 2: Try runtime-only cached session
-    if (_cachedSession != null) {
-      return Right(_cachedSession!.toEntity());
-    }
-
-    // STEP 3: Go remote if connected
-    if (await networkInfo.isConnected) {
-      try {
-        final token = await remote.login(wardenId, password);
-
-        final session = UserSessionModel(
-          token: token,
-          wardenId: wardenId,
-          rememberMe: rememberMe,
-        );
-
-        if (rememberMe) {
-          try {
-            await local.saveSession(token, wardenId, rememberMe);
-          } on CacheException {
-            return Left(CacheFailure());
-          }
-          _cachedSession = null;
-        } else {
-          _cachedSession = session;
-          await local.clearSession(); // make sure not persisted accidentally
-        }
-
-        return Right(session.toEntity());
-      } on ServerException {
-        return Left(ServerFailure());
-      }
-    } else {
-      // No connection, no cached session
-      return Left(NetworkFailure());
-    }
+    // Static login: always succeed, no token, no cache, no network
+    final session = UserSession(
+      token: 'static-token',
+      wardenId: wardenId,
+      rememberMe: rememberMe,
+    );
+    return Right(session);
   }
 
   @override

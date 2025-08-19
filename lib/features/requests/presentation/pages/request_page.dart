@@ -87,8 +87,7 @@ class _RequestsPageState extends State<RequestsPage> {
                   (req) => RequestCard(
                     request: req,
                     onTap: () {
-                      // go routing navigating to the RequestDetailsPage with id
-                      context.go('/requests/${req.id}');
+                      context.push('/requests/${req.id}');
                     },
                     onCallTap: () async {
                       final phoneNumber = req.parent.phone;
