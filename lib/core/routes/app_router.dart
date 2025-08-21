@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hostel_dayout_app/core/routes/auth_guard.dart';
+// import 'package:hostel_dayout_app/core/routes/auth_guard.dart';
 import 'package:hostel_dayout_app/injection.dart';
 import 'package:hostel_dayout_app/features/auth/presentation/pages/login_page.dart';
 import 'package:hostel_dayout_app/features/requests/presentation/bloc/bloc.dart';

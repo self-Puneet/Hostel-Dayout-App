@@ -43,6 +43,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/user-login-page-with-two-characters.jpg
+    - assets/login.png
 
 
 flutter_launcher_icons:

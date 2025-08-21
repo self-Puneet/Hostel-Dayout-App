@@ -6,6 +6,8 @@ import 'package:hostel_dayout_app/features/auth/presentation/bloc/auth_state.dar
 import 'package:hostel_dayout_app/features/auth/presentation/widgets/custom_button.dart';
 import 'package:hostel_dayout_app/features/auth/presentation/widgets/customm_text_fields.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hostel_dayout_app/features/auth/presentation/pages/_keyboard_visibility_observer.dart';
+import '_keyboard_visibility_observer.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,16 +17,38 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _wardenIdController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _rememberMe = false;
+  late final _keyboardObserver = KeyboardVisibilityObserver(
+    onKeyboardClosed: () {
+      final bloc = context.read<LoginBloc>();
+      bloc.add(KeyboardVisibilityChanged(false));
+    },
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(_keyboardObserver);
+  }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(_keyboardObserver);
     _wardenIdController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
+
+  final _wardenIdController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _rememberMe = false;
+  bool isKeyboardOpen = false;
+
+  // @override
+  // void dispose() {
+  //   _wardenIdController.dispose();
+  //   _passwordController.dispose();
+  //   super.dispose();
+  // }
 
   void _onLoginPressed(BuildContext context) {
     final bloc = context.read<LoginBloc>();
@@ -54,6 +78,11 @@ class _LoginPageState extends State<LoginPage> {
             // Navigate to the next page or home screen using go route
             context.go('/home');
           }
+          if (state is KeyboardOpen) {
+            isKeyboardOpen = true;
+          } else if (state is KeyboardClosed) {
+            isKeyboardOpen = false;
+          }
         },
         builder: (context, state) {
           return Center(
@@ -62,10 +91,9 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Image.asset(
-                  //   'assets/user-login-page-with-two-characters.jpg',
-                  //   height: 120,
-                  // ),
+                  !isKeyboardOpen
+                      ? Image.asset('assets/login.png', height: 250)
+                      : const SizedBox.shrink(),
                   const SizedBox(height: 20),
                   const Text(
                     "Login",

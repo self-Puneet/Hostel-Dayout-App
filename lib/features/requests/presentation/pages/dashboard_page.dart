@@ -154,7 +154,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   GestureDetector(
                     onTap: () {
                       // go router push routing
-                      context.go('/requests');
+                      context.push('/requests');
                     },
                     child: Text(
                       "View all",
