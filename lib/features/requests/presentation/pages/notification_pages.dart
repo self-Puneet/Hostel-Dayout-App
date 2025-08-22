@@ -21,7 +21,7 @@ class NotificationScreen extends StatelessWidget {
             SizedBox(height: 12), // Spacing between cards
             NotificationCard(
               title: 'Overdue return for REQ-0004',
-              timestamp: '8/19/2025, 9:38:54 AM',
+              timestamp: '8/19/2025 -  9:38:54 AM',
             ),
           ],
         ),

@@ -4,6 +4,7 @@ import 'package:hostel_dayout_app/core/enums/enum.dart';
 import 'package:hostel_dayout_app/core/failures.dart';
 import '../entities/request.dart';
 
+
 abstract class RequestRepository {
   Future<Either<Failure, List<Request>>> getRequests({
     RequestStatus? filterRequestStatus,
