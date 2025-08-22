@@ -1,14 +1,5 @@
-// lib/core/enums/request_type.dart
-import 'package:hive/hive.dart';
-
-part 'request_type.g.dart';
-
-@HiveType(typeId: 1)
 enum RequestType {
-  @HiveField(0)
   dayout,
-
-  @HiveField(1)
   leave,
 }
 

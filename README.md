@@ -1,4 +1,4 @@
-# hostel_dayout_app
+# hostel_mgmt
 
 A new Flutter project.
 

@@ -21,11 +21,18 @@ class CacheException implements Exception {
   String toString() => 'CacheException: $message';
 }
 
-
 class NetworkException implements Exception {
   final String message;
   NetworkException(this.message);
 
   @override
   String toString() => 'NetworkException: $message';
+}
+
+class InputFormatException implements Exception {
+  final String message;
+  InputFormatException(this.message);
+
+  @override
+  String toString() => 'InputFormatExeption: $message';
 }
