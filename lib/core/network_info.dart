@@ -1,29 +1,30 @@
-import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:get/get.dart';
 
-class NetworkProvider extends ChangeNotifier {
+class NetworkProvider extends GetxService {
   final Connectivity _connectivity = Connectivity();
-  bool _isConnected = true;
+  final RxBool isConnected = true.obs;
+  Future<NetworkProvider> init() async {
+    // Initial connectivity → just set value
+    final initialResults = await _connectivity.checkConnectivity();
+    _handleStatus(initialResults, showSnackbar: false);
 
-  bool get isConnected => _isConnected;
+    // Later changes → show snackbar
+    _connectivity.onConnectivityChanged.listen((results) {
+      print("Network status changed: $results");
+      _handleStatus(results, showSnackbar: true);
+    });
 
-  NetworkProvider() {
-    _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
-    _initConnectivity();
+    return this;
   }
 
-  Future<void> _initConnectivity() async {
-    final results = await _connectivity.checkConnectivity();
-    _updateConnectionStatus(results);
-  }
-
-  void _updateConnectionStatus(List<ConnectivityResult> results) {
-    // true if at least one network is active
+  void _handleStatus(
+    List<ConnectivityResult> results, {
+    bool showSnackbar = true,
+  }) {
     final newStatus = results.any((r) => r != ConnectivityResult.none);
+    isConnected.value = newStatus;
 
-    if (_isConnected != newStatus) {
-      _isConnected = newStatus;
-      notifyListeners();
-    }
+    if (!newStatus && showSnackbar) {}
   }
 }
