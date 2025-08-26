@@ -21,7 +21,8 @@ class HomePage extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: state.isLoading
-                ? const ShimmerCard()
+                ? SingleChildScrollView(
+                    child: const ShimmerCard())
                 : SingleChildScrollView(
                     child: Column(
                       children: state.requests.map((req) {

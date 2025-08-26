@@ -6,13 +6,20 @@ import '../../../models/outing_rule_model.dart';
 // Removed third-party picker, using built-in pickers
 
 class RequestFormPage extends StatelessWidget {
-  final OutingRule outingRule;
-  const RequestFormPage({super.key, required this.outingRule});
+  const RequestFormPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<RequestFormState>(
-      create: (_) => RequestFormState(outingRule: outingRule),
+      create: (context) {
+        final state = RequestFormState();
+        final controller = RequestFormController(
+          state: state,
+          context: context,
+        );
+        controller.fetchOutingRule();
+        return state;
+      },
       child: Consumer<RequestFormState>(
         builder: (context, state, _) {
           final controller = RequestFormController(
@@ -24,17 +31,28 @@ class RequestFormPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (!outingRule.isUnrestricted)
+                if (state.isLoadingRules)
+                  const Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(12.0),
+                      child: SizedBox(
+                        height: 32,
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                    ),
+                  )
+                else if (state.loadedOutingRule != null &&
+                    !state.loadedOutingRule!.isUnrestricted)
                   Card(
-                    color: outingRule.isRestricted
+                    color: state.loadedOutingRule!.isRestricted
                         ? Colors.red[100]
                         : Colors.green[100],
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Text(
-                        outingRule.isRestricted
+                        state.loadedOutingRule!.isRestricted
                             ? 'Outing is restricted today.'
-                            : 'Outing allowed from ${OutingRule.formatTimeOfDay(outingRule.fromTime!)} to ${OutingRule.formatTimeOfDay(outingRule.toTime!)}',
+                            : 'Outing allowed from ${OutingRule.formatTimeOfDay(state.loadedOutingRule!.fromTime!)} to ${OutingRule.formatTimeOfDay(state.loadedOutingRule!.toTime!)}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -54,6 +72,35 @@ class RequestFormPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: OutlinedButton(
+                        style: ButtonStyle(
+                          side: MaterialStateProperty.resolveWith<BorderSide>((
+                            states,
+                          ) {
+                            if (state.fromDateTime == null ||
+                                state.isFromDateTimeValid) {
+                              return const BorderSide(
+                                color: Colors.grey,
+                                width: 2,
+                              );
+                            } else {
+                              return const BorderSide(
+                                color: Colors.red,
+                                width: 2,
+                              );
+                            }
+                          }),
+                          foregroundColor:
+                              MaterialStateProperty.resolveWith<Color>((
+                                states,
+                              ) {
+                                if (state.fromDateTime == null ||
+                                    state.isFromDateTimeValid) {
+                                  return Colors.black;
+                                } else {
+                                  return Colors.red;
+                                }
+                              }),
+                        ),
                         onPressed: () async {
                           final pickedDate = await showDatePicker(
                             context: context,
@@ -72,6 +119,7 @@ class RequestFormPage extends StatelessWidget {
                                 state.fromDateTime ?? DateTime.now(),
                               ),
                             );
+                            print("Picked From Date & Time: ${state.error}");
                             if (pickedTime != null) {
                               final combined = DateTime(
                                 pickedDate.year,
@@ -94,6 +142,35 @@ class RequestFormPage extends StatelessWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: OutlinedButton(
+                        style: ButtonStyle(
+                          side: MaterialStateProperty.resolveWith<BorderSide>((
+                            states,
+                          ) {
+                            if (state.toDateTime == null ||
+                                state.isToDateTimeValid) {
+                              return const BorderSide(
+                                color: Colors.grey,
+                                width: 2,
+                              );
+                            } else {
+                              return const BorderSide(
+                                color: Colors.red,
+                                width: 2,
+                              );
+                            }
+                          }),
+                          foregroundColor:
+                              MaterialStateProperty.resolveWith<Color>((
+                                states,
+                              ) {
+                                if (state.toDateTime == null ||
+                                    state.isToDateTimeValid) {
+                                  return Colors.black;
+                                } else {
+                                  return Colors.red;
+                                }
+                              }),
+                        ),
                         onPressed: () async {
                           final pickedDate = await showDatePicker(
                             context: context,
@@ -133,13 +210,57 @@ class RequestFormPage extends StatelessWidget {
                     ),
                   ],
                 ),
+                (!state.error)
+                    ? const SizedBox()
+                    : Padding(
+                        padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
+                        child: Row(
+                          children: [
+                            Icon(
+                              state.canSubmit
+                                  ? Icons.check_circle
+                                  : Icons.error,
+                              color: state.canSubmit
+                                  ? Colors.green
+                                  : Colors.red,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                state.errorReason,
+                                style: TextStyle(
+                                  color: state.canSubmit
+                                      ? Colors.green
+                                      : Colors.red,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                 const SizedBox(height: 30),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: state.isSubmitting
+                    onPressed: state.isSubmitting || !state.canSubmit
+                        // state.isSubmitting || !state.canSubmit
                         ? null
                         : () => controller.submit(),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                        (states) {
+                          if (state.isSubmitting ||
+                              state.loadedOutingRule == null ||
+                              state.loadedOutingRule!.isRestricted) {
+                            return Colors.grey;
+                          } else {
+                            return Theme.of(context).primaryColor;
+                          }
+                        },
+                      ),
+                    ),
                     child: state.isSubmitting
                         ? const SizedBox(
                             width: 24,

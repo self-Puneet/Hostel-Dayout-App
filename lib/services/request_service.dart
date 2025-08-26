@@ -1,4 +1,7 @@
-import '../models/request_model.dart';
+import 'package:hostel_mgmt/models/outing_rule_model.dart';
+import 'package:hostel_mgmt/models/request_model.dart';
+
+import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/enums/request_type.dart';
 import 'package:hostel_mgmt/core/enums/request_status.dart';
 import 'dart:async';
@@ -15,5 +18,15 @@ class RequestService {
         status: RequestStatus.parentApproved,
       ),
     ];
+  }
+
+  Future<OutingRule> fetchOutingRule() async {
+    await Future.delayed(const Duration(seconds: 2)); // Simulate network delay
+    // Return mock rule: allowed from 10:00 to 20:00
+    return OutingRule.allowed(
+      fromTime: TimeOfDay(hour: 10, minute: 0),
+      toTime: TimeOfDay(hour: 20, minute: 0),
+    );
+    // return OutingRule.restricted();
   }
 }

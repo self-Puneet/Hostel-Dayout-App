@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../state/request_form_state.dart';
+import '../../../services/request_service.dart';
 
 class RequestFormController {
   final RequestFormState state;
@@ -7,29 +8,10 @@ class RequestFormController {
 
   RequestFormController({required this.state, required this.context});
 
-  bool validate() {
-    if (state.reason.trim().isEmpty) {
-      _showSnackBar('Reason cannot be empty');
-      return false;
-    }
-    if (state.fromDateTime == null || state.toDateTime == null) {
-      _showSnackBar('Please select both From and To date/time');
-      return false;
-    }
-    if (!state.fromDateTime!.isBefore(state.toDateTime!)) {
-      _showSnackBar('From time must be before To time');
-      return false;
-    }
-    if (state.outingRule.isRestricted) {
-      _showSnackBar('Outing is restricted today');
-      return false;
-    }
-    if (!state.outingRule.isWithinAllowedTime(state.fromDateTime!) ||
-        !state.outingRule.isWithinAllowedTime(state.toDateTime!)) {
-      _showSnackBar('Selected time is outside allowed outing window');
-      return false;
-    }
-    return true;
+  Future<void> fetchOutingRule() async {
+    // Simulate fetching from service
+    final rule = await RequestService().fetchOutingRule();
+    state.setOutingRule(rule);
   }
 
   void _showSnackBar(String message) {
@@ -39,10 +21,12 @@ class RequestFormController {
   }
 
   Future<void> submit() async {
-    if (!validate()) return;
+    // if (!validate()) return;
     state.setSubmitting(true);
+    if (state.error == true) return;
     await Future.delayed(const Duration(seconds: 2)); // Simulate network
     state.setSubmitting(false);
     _showSnackBar('Request submitted successfully!');
+    // go.rout
   }
 }

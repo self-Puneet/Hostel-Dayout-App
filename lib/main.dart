@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
+import 'package:hostel_mgmt/core/routes/app_router.dart';
 // import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
 // import 'package:hostel_mgmt/core/helpers/network_status_widget.dart';
 import 'package:hostel_mgmt/core/theme/app_theme.dart';
@@ -26,11 +28,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(theme: AppTheme.lightTheme, home: StudentLayout());
+    final router = AppRouter.build();
+
+    return MaterialApp.router(
+      title: "Hostel Mgmt",
+      theme: AppTheme.lightTheme,
+      routerConfig: router, // 👈 just pass the GoRouter here
+    );
   }
 }
 
-
+// return GetMaterialApp(theme: AppTheme.lightTheme, initialRoute: router.initialLocation, // ⬅️ initial route from your class
+//       getPages: router.routes,
+//       home: StudentLayout());
+//   }
 
 // import 'package:flutter/material.dart';
 
