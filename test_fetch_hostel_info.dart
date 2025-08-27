@@ -1,6 +1,6 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hostel_mgmt/view/student/profile/profile_service.dart';
-import 'package:hostel_mgmt/view/student/profile/models.dart';
+// import 'package:hostel_mgmt/view/student/profile/models.dart';
 
 Future<void> main() async {
   // Load environment variables

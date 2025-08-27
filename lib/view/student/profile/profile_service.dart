@@ -7,11 +7,11 @@ import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 
 class ProfileService {
   // Mock data
-  static final List<HostelModel> _hostels = [
-    HostelModel(hostelId: '1', hostelName: 'A Block'),
-    HostelModel(hostelId: '2', hostelName: 'B Block'),
-    HostelModel(hostelId: '3', hostelName: 'C Block'),
-  ];
+  // static final List<HostelModel> _hostels = [
+  //   HostelModel(hostelId: '1', hostelName: 'A Block'),
+  //   HostelModel(hostelId: '2', hostelName: 'B Block'),
+  //   HostelModel(hostelId: '3', hostelName: 'C Block'),
+  // ];
 
   static final List<BranchModel> _branches = [
     BranchModel(branch: 'CSE', maxSemester: 8),
