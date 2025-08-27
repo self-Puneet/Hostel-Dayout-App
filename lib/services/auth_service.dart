@@ -1,63 +1,94 @@
 import 'dart:convert';
-import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/core/util/crypto_utils.dart';
 import 'package:http/http.dart' as http;
+import 'package:get/get.dart';
+import 'dart:typed_data';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-class AuthService {
-  static const baseUrl = "https://your-backend-url.com/api";
-  static LoginSession? session;
-
-  /// Login API
-  static Future<LoginSession> login(
-    String enroll,
-    String password,
-    TimelineActor actor,
-  ) async {
-    final payload = {"enroll": enroll, "password": password};
-
-    // Encrypt before sending
-    final encrypted = CryptoUtils.encryptData(payload);
-
-    final response = await http.post(
-      Uri.parse("$baseUrl/login"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"data": encrypted}),
-    );
-
-    if (response.statusCode == 200) {
-      final responseJson = jsonDecode(response.body);
-
-      // Decrypt response
-      final decrypted = CryptoUtils.decryptData(responseJson["data"]);
-
-      // Build LoginSession
-      final newSession = LoginSession(
-        token: decrypted["token"] ?? "",
-        username: decrypted["username"] ?? "",
-        email: decrypted["email"],
-        identityId: enroll,
-      );
-
-      // Save globally + persist
-      session = newSession;
-      await session!.saveToPrefs();
-
-      return newSession;
-    } else {
-      throw Exception("Failed to login: ${response.body}");
-    }
+class StudentAuthService {
+  static const String apiUrl = "http://20.192.25.27:4141/api/student/login";
+  static String get cryptoSecret => dotenv.env['CRYPTO_SECRET'] ?? '';
+  static Uint8List get cryptoIv {
+    final ivString = dotenv.env['CRYPTO_IV'] ?? '';
+    final ivList = ivString
+        .split(',')
+        .map((e) => int.parse(e, radix: 16))
+        .toList();
+    return Uint8List.fromList(ivList);
   }
 
-  /// Logout - clears the saved session
-  static Future<void> logout() async {
-    session = null;
+  static Future<Map<String, dynamic>?> loginStudent({
+    required String enrollmentNo,
+    required String password,
+  }) async {
+    try {
+      final payload = {"enrollment_no": enrollmentNo, "password": password};
+
+      final encrypted = CryptoUtil.encryptPayload(
+        payload,
+        cryptoSecret,
+        cryptoIv,
+      );
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"encrypted": encrypted}),
+      );
+
+      print("📡 Status: ${response.statusCode}");
+
+      if (response.statusCode == 200) {
+        try {
+          final encryptedResponse = response.body.trim().replaceAll('"', '');
+          final decrypted = CryptoUtil.decryptPayload(
+            encryptedResponse,
+            cryptoSecret,
+            cryptoIv,
+          );
+          return decrypted;
+        } catch (e) {
+          print("❌ Error decrypting: $e");
+          print("Raw response: ${response.body}");
+        }
+      } else {
+        try {
+          print("❌ Error: ${response.body}");
+          final encryptedResponse = response.body.trim().replaceAll('"', '');
+          final decrypted = CryptoUtil.decryptPayload(
+            encryptedResponse,
+            cryptoSecret,
+            cryptoIv,
+          );
+          return decrypted;
+        } catch (e) {
+          print("❌ Error decrypting: $e");
+          print("Raw response: ${response.body}");
+        }
+      }
+    } catch (e) {
+      print("❌ Exception: $e");
+    }
+    return null;
+  }
+
+  /// Student Logout - clears the saved session
+  static Future<void> logoutStudent() async {
     await LoginSession.clearPrefs();
   }
 
-  /// Load existing session
-  static Future<LoginSession?> getSavedSession() async {
-    session = await LoginSession.loadFromPrefs();
+  /// Load existing student session
+  static Future<LoginSession?> getSavedStudentSession() async {
+    final session = await LoginSession.loadFromPrefs();
+    if (session != null && Get.isRegistered<LoginSession>()) {
+      final diSession = Get.find<LoginSession>();
+      diSession.token = session.token;
+      diSession.username = session.username;
+      diSession.email = session.email;
+      diSession.identityId = session.identityId;
+      diSession.role = session.role;
+    }
     return session;
   }
 }

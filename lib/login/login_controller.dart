@@ -4,6 +4,9 @@ import 'package:hostel_mgmt/core/enums/ui_eums/snackbar_type.dart';
 import 'package:hostel_mgmt/services/auth_service.dart';
 import 'package:hostel_mgmt/login/login_state.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
+import 'package:get/get.dart';
+import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
+import 'package:go_router/go_router.dart';
 
 enum LoginSnackBarType {
   emptyFields,
@@ -52,7 +55,8 @@ class LoginController {
     final identity =
         state.textFieldMap[actor]?[FieldsType.identityField]?.text.trim() ?? "";
     final verification =
-        state.textFieldMap[actor]?[FieldsType.verificationField]?.text.trim() ?? "";
+        state.textFieldMap[actor]?[FieldsType.verificationField]?.text.trim() ??
+        "";
 
     if (identity.isEmpty || verification.isEmpty) {
       state.setLoggingIn(false);
@@ -66,13 +70,43 @@ class LoginController {
     }
 
     try {
-      // ✅ AuthService now returns & saves LoginSession internally
-      await AuthService.login(identity, verification, actor);
+      Map<String, dynamic>? result;
+      if (actor == TimelineActor.student) {
+        result = await StudentAuthService.loginStudent(
+          enrollmentNo: identity,
+          password: verification,
+        );
+      } else {
+        // TODO: Implement other actor logins
+        throw Exception("Unsupported actor type");
+      }
+
+      // Handle null or missing token
+      if (result == null || (result['token'] ?? '').toString().isEmpty) {
+        state.setLoggingIn(false);
+        final backendMsg = result?['message'] ?? result?['error'];
+        AppSnackBar.show(
+          context,
+          message: backendMsg ?? LoginSnackBarType.loginFailed.message,
+          type: AppSnackBarType.error,
+          icon: LoginSnackBarType.loginFailed.icon,
+        );
+        return;
+      }
+
+      // ✅ Update DI LoginSession
+      final session = Get.find<LoginSession>();
+      session.token = result['token'] ?? '';
+      session.username = result['username'] ?? '';
+      session.email = result['email'];
+      session.identityId = identity;
+      session.role = actor;
 
       state.setLoggingIn(false);
+      GoRouter.of(context).go('/home');
       AppSnackBar.show(
         context,
-        message: LoginSnackBarType.success.message,
+        message: result['message'] ?? LoginSnackBarType.success.message,
         type: AppSnackBarType.success,
         icon: LoginSnackBarType.success.icon,
       );
@@ -80,9 +114,18 @@ class LoginController {
       // TODO: Navigate to home page (based on actor)
     } catch (e) {
       state.setLoggingIn(false);
+
+      String errorMessage = e.toString();
+      // try to extract backend error if StudentAuthService throws response body
+      if (errorMessage.contains("Exception:")) {
+        errorMessage = errorMessage.replaceFirst("Exception:", "").trim();
+      }
+
       AppSnackBar.show(
         context,
-        message: LoginSnackBarType.loginFailed.message,
+        message: errorMessage.isNotEmpty
+            ? errorMessage
+            : LoginSnackBarType.loginFailed.message,
         type: AppSnackBarType.error,
         icon: LoginSnackBarType.loginFailed.icon,
       );

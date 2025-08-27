@@ -154,7 +154,8 @@ class OverlappingThreeButtons extends StatelessWidget {
             Expanded(
               child: ElevatedButton(
                 onPressed: () {
-                  // 👈 navigate to request
+                  context.go('/profile');
+                  // 👈 navigate to profile
                 },
                 child: const Text("Profile"),
               ),

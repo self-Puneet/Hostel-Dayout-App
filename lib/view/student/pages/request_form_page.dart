@@ -244,7 +244,9 @@ class RequestFormPage extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: state.isSubmitting || !state.canSubmit
+                    onPressed: (state.isSubmitting ||
+                              state.loadedOutingRule == null ||
+                              state.loadedOutingRule!.isRestricted)
                         // state.isSubmitting || !state.canSubmit
                         ? null
                         : () => controller.submit(),

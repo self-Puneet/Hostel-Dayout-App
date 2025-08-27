@@ -1,14 +1,19 @@
 import 'dart:convert';
+import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginSession {
-  final String token;
-  final String username;
-  final String? email;
-  final String? identityId;
-  final DateTime? expiry;
-  final String? phone;
-  final String? fcmToken;
+  String token;
+  String username;
+  String? email;
+  String? hostel_id;
+  String? hostel;
+  String? identityId;
+  DateTime? expiry;
+  String? phone;
+  String? fcmToken;
+  TimelineActor role;
+  String? imageURL;
 
   LoginSession({
     required this.token,
@@ -18,27 +23,39 @@ class LoginSession {
     this.expiry,
     this.phone,
     this.fcmToken,
+    required this.role,
+    this.hostel_id,
+    this.hostel,
+    this.imageURL,
   });
 
   Map<String, dynamic> toJson() => {
-        "token": token,
-        "username": username,
-        "email": email,
-        "identityId": identityId,
-        "expiry": expiry?.toIso8601String(),
-        "phone": phone,
-        "fcm_token": fcmToken,
-      };
+    "token": token,
+    "username": username,
+    "email": email,
+    "identityId": identityId,
+    "expiry": expiry?.toIso8601String(),
+    "phone": phone,
+    "fcm_token": fcmToken,
+    "role": TimelineActorX.toShortString(role),
+    "hostel_id": hostel_id,
+    "hostel": hostel,
+    "imageURL": imageURL,
+  };
 
   factory LoginSession.fromJson(Map<String, dynamic> json) => LoginSession(
-        token: json["token"],
-        username: json["username"],
-        email: json["email"],
-        identityId: json["identityId"],
-        expiry: json["expiry"] != null ? DateTime.tryParse(json["expiry"]) : null,
-        phone: json["phone"],
-        fcmToken: json["fcm_token"],
-      );
+    token: json["token"],
+    username: json["username"],
+    email: json["email"],
+    identityId: json["identityId"],
+    expiry: json["expiry"] != null ? DateTime.tryParse(json["expiry"]) : null,
+    phone: json["phone"],
+    fcmToken: json["fcm_token"],
+    role: TimelineActorX.fromString(json["role"]),
+    hostel_id: json["hostel_id"],
+    hostel: json["hostel"],
+    imageURL: json["imageURL"],
+  );
 
   Future<void> saveToPrefs() async {
     final prefs = await SharedPreferences.getInstance();

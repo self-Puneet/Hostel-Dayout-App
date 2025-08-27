@@ -1,33 +1,30 @@
 // app_router.dart
 import 'package:go_router/go_router.dart';
-import 'package:hostel_mgmt/core/routes/auth_guard.dart';
+import 'package:get/get.dart';
+import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/login/login_layout.dart';
 import 'package:hostel_mgmt/view/student/pages/home.dart';
 import 'package:hostel_mgmt/view/student/pages/request_form_page.dart';
 import 'package:hostel_mgmt/view/student/pages/student_layout.dart';
+import 'package:hostel_mgmt/view/student/profile/profile_page.dart';
 
 class AppRouter {
   static GoRouter build() {
     return GoRouter(
       initialLocation: '/home',
+      redirect: (context, state) {
+        final session = Get.find<LoginSession>();
+        final isLoggedIn = session.token.isNotEmpty && session.isValid;
+        final goingToLogin = state.matchedLocation == '/login';
 
-      // refreshListenable: auth,
-
-      // redirect: (context, state) {
-      //   final bool isLoggedIn = auth.isLoggedIn;
-      //   final bool isLoading = auth.isLoading;
-      //   final bool goingToLogin = state.matchedLocation == '/login';
-
-      //   if (isLoading) return null;
-
-      //   if (!isLoggedIn) {
-      //     return goingToLogin ? null : '/login';
-      //   }
-
-      //   if (isLoggedIn && goingToLogin) return '/home';
-
-      //   return null;
-      // },
+        if (!isLoggedIn && !goingToLogin) {
+          return '/login';
+        }
+        if (isLoggedIn && goingToLogin) {
+          return '/home';
+        }
+        return null;
+      },
       routes: [
         /// Login route (outside shell)
         GoRoute(
@@ -49,14 +46,39 @@ class AppRouter {
               path: '/home',
               name: 'home',
               builder: (context, state) => const HomePage(),
+              // Add LoginGuard middleware
+              redirect: (context, state) {
+                final session = Get.find<LoginSession>();
+                if (session.token.isEmpty || !session.isValid) {
+                  return '/login';
+                }
+                return null;
+              },
             ),
 
-            /// Request page as a sub-route of shell
             GoRoute(
               path: '/request',
               name: 'request',
-              builder: (context, state) =>
-                  const RequestFormPage(), // <-- You can create this
+              builder: (context, state) => const RequestFormPage(),
+              redirect: (context, state) {
+                final session = Get.find<LoginSession>();
+                if (session.token.isEmpty || !session.isValid) {
+                  return '/login';
+                }
+                return null;
+              },
+            ),
+            GoRoute(
+              path: '/profile',
+              name: 'profile',
+              builder: (context, state) => const ProfilePage(),
+              redirect: (context, state) {
+                final session = Get.find<LoginSession>();
+                if (session.token.isEmpty || !session.isValid) {
+                  return '/login';
+                }
+                return null;
+              },
             ),
           ],
         ),
