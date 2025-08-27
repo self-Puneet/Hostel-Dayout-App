@@ -12,7 +12,7 @@ class ProfileController {
   Future<void> initialize() async {
     state.setLoading(true);
     try {
-      final hostels = await service.fetchHostels();
+      final hostels = await service.fetchHostelInfo();
       final branches = await service.fetchBranches();
       final profile = await service.fetchProfile();
       state.setHostels(hostels);

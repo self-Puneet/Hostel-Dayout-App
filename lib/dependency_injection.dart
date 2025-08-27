@@ -9,6 +9,7 @@ Future<void> initDependencies() async {
 
   // Register LoginSession globally, loading from prefs if available
   final session = await LoginSession.loadFromPrefs();
+  print("Session loaded from prefs: $session");
   await Get.putAsync<LoginSession>(
     () async =>
         session ??

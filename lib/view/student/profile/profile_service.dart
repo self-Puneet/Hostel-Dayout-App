@@ -1,4 +1,9 @@
 import 'models.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:hostel_mgmt/core/util/crypto_utils.dart';
+import 'dart:typed_data';
+import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 
 class ProfileService {
   // Mock data
@@ -35,9 +40,53 @@ class ProfileService {
     ),
   );
 
-  Future<List<HostelModel>> fetchHostels() async {
-    await Future.delayed(Duration(milliseconds: 300));
-    return _hostels;
+  Future<List<HostelModel>> fetchHostelInfo() async {
+    // Load session
+    final session = await LoginSession.loadFromPrefs();
+    if (session == null || session.token.isEmpty) {
+      throw Exception('Invalid or missing session. Please login again.');
+    }
+
+    final url = Uri.parse('http://20.192.25.27:4141/api/student/hostel-info');
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer ${session.token}',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to fetch hostel info: ${response.statusCode}');
+    }
+
+    try {
+      // Decrypt response body
+      final encryptedBody = response.body.trim().replaceAll('"', '');
+      // Use the same secret/iv as in StudentAuthService
+      final secret = dotenv.env['CRYPTO_SECRET'] ?? '';
+      final ivString = dotenv.env['CRYPTO_IV'] ?? '';
+      final ivList = ivString
+          .split(',')
+          .map((e) => int.parse(e, radix: 16))
+          .toList();
+      final iv = Uint8List.fromList(ivList);
+      final decrypted = CryptoUtil.decryptPayload(encryptedBody, secret, iv);
+
+      // Parse to List<HostelModel>
+      final List<dynamic> hostelsJson = decrypted['hostels'] ?? decrypted;
+      print(hostelsJson);
+      return hostelsJson
+          .map(
+            (json) => HostelModel(
+              hostelId: json['hostelId'].toString(),
+              hostelName: json['hostelName'].toString(),
+            ),
+          )
+          .toList();
+    } catch (e) {
+      throw Exception('Decryption or parsing error: $e');
+    }
   }
 
   Future<List<BranchModel>> fetchBranches() async {

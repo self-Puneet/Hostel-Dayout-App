@@ -97,12 +97,14 @@ class LoginController {
       // ✅ Update DI LoginSession
       final session = Get.find<LoginSession>();
       session.token = result['token'] ?? '';
-      session.username = result['username'] ?? '';
-      session.email = result['email'];
-      session.identityId = identity;
+      session.username = result['name'] ?? '';
+      session.identityId = result['enrollment_no'] ?? '';
       session.role = actor;
+      session.imageURL = result['imageURL'];
+      await session.saveToPrefs();
 
       state.setLoggingIn(false);
+
       GoRouter.of(context).go('/home');
       AppSnackBar.show(
         context,
