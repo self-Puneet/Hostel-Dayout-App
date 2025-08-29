@@ -52,7 +52,7 @@ class RequestFormPage extends StatelessWidget {
                       child: Text(
                         state.loadedOutingRule!.isRestricted
                             ? 'Outing is restricted today.'
-                            : 'Outing allowed from ${OutingRule.formatTimeOfDay(state.loadedOutingRule!.fromTime!)} to ${OutingRule.formatTimeOfDay(state.loadedOutingRule!.toTime!)}',
+                            : 'Outing allowed from ${OutingRule.formatDuration(state.loadedOutingRule!.fromTime!)} to ${OutingRule.formatDuration(state.loadedOutingRule!.toTime!)}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

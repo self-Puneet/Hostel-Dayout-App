@@ -6,7 +6,7 @@ import 'package:hostel_mgmt/login/login_layout.dart';
 import 'package:hostel_mgmt/view/student/pages/home.dart';
 import 'package:hostel_mgmt/view/student/pages/request_form_page.dart';
 import 'package:hostel_mgmt/view/student/pages/student_layout.dart';
-import 'package:hostel_mgmt/view/student/profile/profile_page.dart';
+import 'package:hostel_mgmt/view/student/pages/profile_page.dart';
 
 class AppRouter {
   static GoRouter build() {

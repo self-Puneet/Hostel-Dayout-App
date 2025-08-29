@@ -50,6 +50,8 @@ dependencies:
   shimmer: ^3.0.0
   flutter_datetime_picker_plus: ^2.2.0
   flutter_dotenv: ^6.0.0
+  dartz: ^0.10.1
+  dotenv: ^4.2.0
 
 dev_dependencies:
   flutter_test:

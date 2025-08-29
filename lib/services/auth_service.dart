@@ -3,20 +3,9 @@ import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/core/util/crypto_utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
-import 'dart:typed_data';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class StudentAuthService {
   static const String apiUrl = "http://20.192.25.27:4141/api/student/login";
-  static String get cryptoSecret => dotenv.env['CRYPTO_SECRET'] ?? '';
-  static Uint8List get cryptoIv {
-    final ivString = dotenv.env['CRYPTO_IV'] ?? '';
-    final ivList = ivString
-        .split(',')
-        .map((e) => int.parse(e, radix: 16))
-        .toList();
-    return Uint8List.fromList(ivList);
-  }
 
   static Future<Map<String, dynamic>?> loginStudent({
     required String enrollmentNo,
@@ -25,11 +14,7 @@ class StudentAuthService {
     try {
       final payload = {"enrollment_no": enrollmentNo, "password": password};
 
-      final encrypted = CryptoUtil.encryptPayload(
-        payload,
-        cryptoSecret,
-        cryptoIv,
-      );
+      final encrypted = CryptoUtil.encryptPayload(payload);
 
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -42,11 +27,7 @@ class StudentAuthService {
       if (response.statusCode == 200) {
         try {
           final encryptedResponse = response.body.trim().replaceAll('"', '');
-          final decrypted = CryptoUtil.decryptPayload(
-            encryptedResponse,
-            cryptoSecret,
-            cryptoIv,
-          );
+          final decrypted = CryptoUtil.decryptPayload(encryptedResponse);
           return decrypted;
         } catch (e) {
           print("❌ Error decrypting: $e");
@@ -56,11 +37,7 @@ class StudentAuthService {
         try {
           print("❌ Error: ${response.body}");
           final encryptedResponse = response.body.trim().replaceAll('"', '');
-          final decrypted = CryptoUtil.decryptPayload(
-            encryptedResponse,
-            cryptoSecret,
-            cryptoIv,
-          );
+          final decrypted = CryptoUtil.decryptPayload(encryptedResponse);
           return decrypted;
         } catch (e) {
           print("❌ Error decrypting: $e");

@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'models.dart';
-import 'profile_service.dart';
-import 'profile_state.dart';
+import 'package:hostel_mgmt/models/student_profile.dart';
+// import '../../../models/hostels_model.dart';
+import '../../../services/profile_service.dart';
+import '../state/profile_state.dart';
 
 class ProfileController {
   final ProfileState state;
@@ -12,13 +15,20 @@ class ProfileController {
   Future<void> initialize() async {
     state.setLoading(true);
     try {
-      final hostels = await service.fetchHostelInfo();
-      final branches = await service.fetchBranches();
-      final profile = await service.fetchProfile();
-      state.setHostels(hostels);
-      state.setBranches(branches);
-      state.setProfile(profile);
-      state.clearError();
+      final hostels = await ProfileService.getAllHostelInfo();
+      final branches = await ProfileService.getAllBranches();
+      final profileResult = await ProfileService.getStudentProfile();
+
+      // Handle Either for StudentApiResponse
+      profileResult.fold(
+        (errorMsg) {
+          state.setErrored(errorMsg);
+        },
+        (apiResponse) {
+          state.setProfile(apiResponse.student);
+          state.clearError();
+        },
+      );
     } catch (e) {
       state.setErrored('Failed to load profile data');
     } finally {
@@ -55,19 +65,38 @@ class ProfileController {
     );
   }
 
-  Future<void> confirmEdit(StudentProfileModel updatedProfile) async {
+  Future<void> confirmEdit(
+    StudentProfileModel updatedProfile, {
+    File? profilePic,
+  }) async {
     final error = _validate(updatedProfile);
     if (error != ProfileValidationError.none) {
       state.setValidationError(error);
       return;
     }
+
     state.setLoading(true);
+
     try {
-      await service.updateProfile(updatedProfile);
-      state.setProfile(updatedProfile);
-      state.setEditing(false);
-      state.setValidationError(ProfileValidationError.none);
+      final result = await ProfileService.updateProfile(
+        profileData: updatedProfile.toJson(),
+        profilePic: profilePic,
+      );
+
+      result.fold(
+        (errorMsg) {
+          print("❌ Update failed: $errorMsg");
+          state.setErrored(errorMsg);
+        },
+        (newProfile) {
+          print("✅ Profile successfully updated!");
+          state.setProfile(newProfile); // use updated server response
+          state.setEditing(false);
+          state.setValidationError(ProfileValidationError.none);
+        },
+      );
     } catch (e) {
+      print("❌ Exception in confirmEdit: $e");
       state.setErrored('Failed to update profile');
     } finally {
       state.setLoading(false);
@@ -83,7 +112,7 @@ class ProfileController {
     }
     if (profile.semester <= 0) return ProfileValidationError.emptySemester;
     if (profile.branch.isEmpty) return ProfileValidationError.emptyBranch;
-    if (profile.parent.relation.isEmpty)
+    if (profile.parents.isEmpty || profile.parents[0].relation.isEmpty)
       return ProfileValidationError.emptyParentRelation;
     return ProfileValidationError.none;
   }

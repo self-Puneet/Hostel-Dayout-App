@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 class OutingRule {
   final bool isRestricted;
   final bool isUnrestricted;
-  final TimeOfDay? fromTime;
-  final TimeOfDay? toTime;
+  final Duration? fromTime;
+  final Duration? toTime;
 
   OutingRule.restricted()
     : isRestricted = true,
@@ -24,7 +24,7 @@ class OutingRule {
     if (fromTime == null || toTime == null) {
       throw ArgumentError("fromTime and toTime must be provided.");
     }
-    if (_compareTimeOfDay(fromTime!, toTime!) >= 0) {
+    if (fromTime! >= toTime!) {
       throw ArgumentError("fromTime must be before toTime.");
     }
   }
@@ -33,24 +33,17 @@ class OutingRule {
   bool isWithinAllowedTime(DateTime checkDateTime) {
     if (isRestricted) return false;
     if (isUnrestricted) return true;
-    final checkTime = TimeOfDay.fromDateTime(checkDateTime);
-    return _compareTimeOfDay(checkTime, fromTime!) >= 0 &&
-        _compareTimeOfDay(checkTime, toTime!) <= 0;
+    final checkTime = Duration(
+      hours: checkDateTime.hour,
+      minutes: checkDateTime.minute,
+    );
+    return checkTime >= fromTime! && checkTime <= toTime!;
   }
 
-  /// Helper: formats a TimeOfDay into a readable string like "9:30 AM"
-  static String formatTimeOfDay(TimeOfDay tod) {
-    final hour = tod.hourOfPeriod == 0 ? 12 : tod.hourOfPeriod;
-    final minute = tod.minute.toString().padLeft(2, '0');
-    final period = tod.period == DayPeriod.am ? "AM" : "PM";
-    return "$hour:$minute $period";
-  }
-
-  /// Utility: compares two TimeOfDay values
-  /// returns negative if a < b, zero if equal, positive if a > b
-  static int _compareTimeOfDay(TimeOfDay a, TimeOfDay b) {
-    final aMinutes = a.hour * 60 + a.minute;
-    final bMinutes = b.hour * 60 + b.minute;
-    return aMinutes - bMinutes;
+  /// Helper: formats a Duration into a readable string like "09:30"
+  static String formatDuration(Duration d) {
+    final hours = d.inHours;
+    final minutes = d.inMinutes % 60;
+    return "${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}";
   }
 }

@@ -33,9 +33,6 @@ migrate_working_dir/
 .pub/
 /build/
 .env
-test.dart
-test.js
-test.py
 
 # Symbolication related
 app.*.symbols

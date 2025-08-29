@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:dartz/dartz.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -81,5 +82,23 @@ class LoginSession {
   bool get isValid {
     if (expiry == null) return true;
     return DateTime.now().isBefore(expiry!);
+  }
+
+  static Future<Either<String, String>> getValidToken() async {
+    try {
+      final session = await LoginSession.loadFromPrefs();
+
+      if (session == null) {
+        return left('Session not found. Please login again.');
+      }
+
+      if (session.token.isEmpty) {
+        return left('Invalid session token. Please login again.');
+      }
+
+      return right(session.token);
+    } catch (e) {
+      return left('Error loading session: $e');
+    }
   }
 }

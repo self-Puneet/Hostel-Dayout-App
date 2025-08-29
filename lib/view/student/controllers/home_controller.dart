@@ -10,8 +10,16 @@ class HomeController {
 
   Future<void> fetchRequests() async {
     state.setLoading(true);
-    final requests = await RequestService().fetchRequests();
-    state.setRequests(requests);
+    final result = await RequestService.getAllRequests();
+    result.fold(
+      (error) {
+        state.setRequests([]); // Optionally add error handling in state
+        // You may want to add: state.setError(error);
+      },
+      (apiResponse) {
+        state.setRequests(apiResponse.requests);
+      },
+    );
     state.setLoading(false);
   }
 }
