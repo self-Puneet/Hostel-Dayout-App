@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class OutingRule {
   final bool isRestricted;
   final bool isUnrestricted;

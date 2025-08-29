@@ -15,8 +15,8 @@ class ProfileController {
   Future<void> initialize() async {
     state.setLoading(true);
     try {
-      final hostels = await ProfileService.getAllHostelInfo();
-      final branches = await ProfileService.getAllBranches();
+      // final hostels = await ProfileService.getAllHostelInfo();
+      // final branches = await ProfileService.getAllBranches();
       final profileResult = await ProfileService.getStudentProfile();
 
       // Handle Either for StudentApiResponse
