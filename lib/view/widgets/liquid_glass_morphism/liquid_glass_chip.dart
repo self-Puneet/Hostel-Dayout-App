@@ -31,7 +31,7 @@ class LiquidGlassChip extends StatelessWidget {
           thickness: 8,
           blur: 6,
           chromaticAberration: 0.01,
-          lightAngle: pi / 4,
+          lightAngle: pi * 5 / 18,
           lightIntensity: 0.5,
           refractiveIndex: 1.4,
           saturation: 1,
