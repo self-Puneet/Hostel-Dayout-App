@@ -17,7 +17,7 @@ class RequestFormController {
     result.fold(
       (error) {
         state.setOutingRule(OutingRule.restricted());
-        state.isLoadingRules = false;
+        // state.isLoadingRules = false;
       },
       (hostelResponse) {
         final rule = hostelResponse.hostel.toOutingRule();
@@ -25,7 +25,6 @@ class RequestFormController {
         state.isLoadingRules = false;
       },
     );
-    state.notifyListeners();
   }
 
   void _showSnackBar(String message) {

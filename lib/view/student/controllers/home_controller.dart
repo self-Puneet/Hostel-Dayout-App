@@ -13,8 +13,7 @@ class HomeController {
     final result = await RequestService.getAllRequests();
     result.fold(
       (error) {
-        state.setRequests([]); // Optionally add error handling in state
-        // You may want to add: state.setError(error);
+        print(error);
       },
       (apiResponse) {
         state.setRequests(apiResponse.requests);

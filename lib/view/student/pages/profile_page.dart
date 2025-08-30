@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/models/branch_model.dart';
-import 'package:hostel_mgmt/models/parent_model.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
 import 'package:provider/provider.dart';
 // import '../../../models/hostels_model.dart';
@@ -20,13 +19,6 @@ class _ProfilePageState extends State<ProfilePage> {
   late final ProfileController controller;
   late final ProfileService service;
 
-  // Controllers for editable fields
-  late TextEditingController roomNoController;
-  String? selectedHostel;
-  String? selectedBranch;
-  int? selectedSemester;
-  String? selectedRelation;
-
   @override
   void initState() {
     super.initState();
@@ -34,60 +26,11 @@ class _ProfilePageState extends State<ProfilePage> {
     service = ProfileService();
     controller = ProfileController(state: state, service: service);
     controller.initialize();
-    roomNoController = TextEditingController();
   }
 
   @override
   void dispose() {
-    roomNoController.dispose();
     super.dispose();
-  }
-
-  void _enterEditMode() {
-    final profile = state.profile;
-    if (profile != null) {
-      roomNoController.text = profile.roomNo;
-      selectedHostel = profile.hostelName;
-      selectedBranch = profile.branch;
-      selectedSemester = profile.semester;
-      // Use first parent for now (can be improved for multiple parents)
-      if (profile.parents.isNotEmpty) {
-        selectedRelation = profile.parents[0].relation;
-      }
-    }
-    controller.toggleEdit();
-  }
-
-  void _onConfirm() {
-    final profile = state.profile;
-    if (profile == null) return;
-    // Update first parent only (can be improved for multiple parents)
-    List<ParentModel> updatedParents = profile.parents.isNotEmpty
-        ? [
-            ParentModel(
-              parentId: profile.parents[0].parentId,
-              name: profile.parents[0].name,
-              relation: selectedRelation ?? profile.parents[0].relation,
-              phoneNo: profile.parents[0].phoneNo,
-              email: profile.parents[0].email,
-              languagePreference: profile.parents[0].languagePreference,
-            ),
-          ]
-        : [];
-    final updated = StudentProfileModel(
-      studentId: profile.studentId,
-      enrollmentNo: profile.enrollmentNo,
-      name: profile.name,
-      email: profile.email,
-      phoneNo: profile.phoneNo,
-      profilePic: profile.profilePic,
-      hostelName: selectedHostel ?? '',
-      roomNo: roomNoController.text,
-      semester: selectedSemester ?? 0,
-      branch: selectedBranch ?? '',
-      parents: updatedParents,
-    );
-    controller.confirmEdit(updated);
   }
 
   @override
@@ -104,12 +47,13 @@ class _ProfilePageState extends State<ProfilePage> {
           final branches = state.branches;
           final hostels = state.hostels;
           final branchModel = branches.firstWhere(
-            (b) => b.branchId == (selectedBranch ?? profile.branch),
+            (b) => b.branchId == profile.branch,
             orElse: () => branches.isNotEmpty
                 ? branches[0]
                 : BranchModel(branchId: '', name: '', maxSemester: 0),
           );
 
+          // UI only, all state and logic handled by controller/state
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -118,7 +62,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 if (!isEditing)
                   IconButton(
                     icon: const Icon(Icons.edit),
-                    onPressed: _enterEditMode,
+                    onPressed: () => controller.enterEditMode(),
                   ),
                 _ProfilePicSection(profile: profile),
                 const SizedBox(height: 16),
@@ -127,45 +71,43 @@ class _ProfilePageState extends State<ProfilePage> {
                 _infoRow('Name', profile.name),
                 _infoRow('Email', profile.email),
                 _infoRow('Phone No', profile.phoneNo),
-                _dropdownOrText(
-                  label: 'Hostel',
-                  value: isEditing ? selectedHostel : profile.hostelName,
-                  items: hostels.map((h) => h.hostelName).toList(),
-                  enabled: isEditing,
-                  onChanged: (v) => setState(() => selectedHostel = v),
-                ),
+                isEditing
+                    ? _dropdownOrText(
+                        label: 'Hostels',
+                        value: state.selectedHostel,
+                        items: hostels.map((h) => h.hostelId).toSet().toList(),
+                        enabled: true,
+                        onChanged: (v) => controller.setHostel(v),
+                      )
+                    : _infoRow('Hostel', profile.hostelName),
                 _textOrField(
                   label: 'Room No',
                   value: profile.roomNo,
-                  controller: roomNoController,
+                  controller: controller.roomNoController,
                   enabled: isEditing,
                 ),
-                _dropdownOrText(
-                  label: 'Branch',
-                  value: isEditing ? selectedBranch : profile.branch,
-                  items: branches.map((b) => b.branchId).toList(),
-                  enabled: isEditing,
-                  onChanged: (v) {
-                    setState(() {
-                      selectedBranch = v;
-                      selectedSemester = null;
-                    });
-                  },
-                ),
+                isEditing
+                    ? _dropdownOrText(
+                        label: 'Branch',
+                        value: state.selectedBranch,
+                        items: branches.map((b) => b.branchId).toSet().toList(),
+                        enabled: true,
+                        onChanged: (v) => controller.setBranch(v),
+                      )
+                    : _infoRow('Branch', profile.branch),
                 _dropdownOrText(
                   label: 'Semester',
                   value: isEditing
-                      ? (selectedSemester?.toString() ?? '')
+                      ? (state.selectedSemester?.toString() ?? '')
                       : profile.semester.toString(),
-                  items: selectedBranch == null && !isEditing
+                  items: state.selectedBranch == null && !isEditing
                       ? []
                       : List.generate(
                           branchModel.maxSemester,
                           (i) => (i + 1).toString(),
                         ),
-                  enabled: isEditing && selectedBranch != null,
-                  onChanged: (v) =>
-                      setState(() => selectedSemester = int.tryParse(v ?? '')),
+                  enabled: isEditing && state.selectedBranch != null,
+                  onChanged: (v) => controller.setSemester(v),
                 ),
                 const SizedBox(height: 24),
                 _sectionTitle('Parent Info'),
@@ -176,13 +118,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 _dropdownOrText(
                   label: 'Relation',
                   value: isEditing
-                      ? selectedRelation
+                      ? state.selectedRelation
                       : (profile.parents.isNotEmpty
                             ? profile.parents[0].relation
                             : ''),
                   items: const ['Father', 'Mother', 'Guardian'],
                   enabled: isEditing,
-                  onChanged: (v) => setState(() => selectedRelation = v),
+                  onChanged: (v) => controller.setRelation(v),
                 ),
                 _infoRow(
                   'Phone No',
@@ -205,7 +147,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: const Text('Cancel'),
                       ),
                       ElevatedButton(
-                        onPressed: _onConfirm,
+                        onPressed: () => controller.onConfirm(),
                         child: const Text('Confirm'),
                       ),
                     ],
@@ -246,6 +188,9 @@ class _ProfilePageState extends State<ProfilePage> {
     if (!enabled) {
       return _infoRow(label, value ?? '');
     }
+    print(
+      "sssssssssssssssssssssssss${value?.isNotEmpty == true ? value : null}",
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/login/login_layout.dart';
+import 'package:hostel_mgmt/test/test_page.dart';
 import 'package:hostel_mgmt/view/student/pages/home.dart';
 import 'package:hostel_mgmt/view/student/pages/request_form_page.dart';
 import 'package:hostel_mgmt/view/student/pages/student_layout.dart';
@@ -11,7 +12,7 @@ import 'package:hostel_mgmt/view/student/pages/profile_page.dart';
 class AppRouter {
   static GoRouter build() {
     return GoRouter(
-      initialLocation: '/home',
+      initialLocation: '/test',
       redirect: (context, state) {
         final session = Get.find<LoginSession>();
         final isLoggedIn = session.token.isNotEmpty && session.isValid;
@@ -26,6 +27,13 @@ class AppRouter {
         return null;
       },
       routes: [
+        // a route for test pages
+        GoRoute(
+          path: '/test',
+          name: 'test',
+          builder: (context, state) => const DemoPage(),
+        ),
+
         /// Login route (outside shell)
         GoRoute(
           path: '/login',

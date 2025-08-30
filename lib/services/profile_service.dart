@@ -4,30 +4,31 @@ import 'package:hostel_mgmt/models/student_profile.dart';
 import '../models/hostels_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:hostel_mgmt/core/util/crypto_utils.dart';
-import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:dartz/dartz.dart';
 
 class ProfileService {
+  static String token =
+      "fQS5LZW7LiTEZmhx6vzqiyr7OooQ3fRKcUKuyvzOVp6Xk1pj2qT2uGWYj8qdnhXyc/FE7y9agzIaZKBb5M5jzwK7s5skrDKIKwh4b74ZCORWVJZosE228q/ANFKIqzLSU2Oqq0wv8C26vMGoT35Q775Uc6sIaaytCFOI1dvon9CQArUki8KmljzsYOKPxg1gW9lD0hkprPwyiOVGn2vGzhCgyd4KF6tC4TBzcJ9/c0DaQSv1sfdZNUC9Lti/zErn+EU7WscojPC7lqKYRJ3uKO6XiyyFLUFJUsx4f2Nu+8PvjxQ/YsaiywpRFeqCGrYM";
   static const url = "http://20.192.25.27:4141/api";
 
   static Future<Either<String, StudentApiResponse>> getStudentProfile() async {
-    final token = await LoginSession.getValidToken();
+    // final token = await LoginSession.getValidToken();
 
-    token.fold((ifLeft) => null, (ifRight) {
-      if (ifRight.isEmpty) {
-        return left('Invalid or missing session. Please login again.');
-      }
-    });
+    // token.fold((ifLeft) => null, (ifRight) {
+    //   if (ifRight.isEmpty) {
+    //     return left('Invalid or missing session. Please login again.');
+    //   }
+    // });
 
     try {
       final response = await http.get(
         Uri.parse("$url/student/student-profile"),
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer ${token.getOrElse(() => '')}",
+          "Authorization": "Bearer $token",
         },
       );
-      print("📡 Status: ${response.statusCode}");
+      print("📡 getStudentProfile - Status: ${response.statusCode}");
       final decrypted = CryptoUtil.handleEncryptedResponse(
         response: response,
         context: "getStudentProfile",
@@ -50,13 +51,13 @@ class ProfileService {
   }
 
   static Future<Either<String, HostelSingleResponse>> getHostelInfo() async {
-    var token = await LoginSession.getValidToken();
+    // var token = await LoginSession.getValidToken();
 
-    token.fold((ifLeft) => null, (ifRight) {
-      if (ifRight.isEmpty) {
-        return left('Invalid or missing session. Please login again.');
-      }
-    });
+    // token.fold((ifLeft) => null, (ifRight) {
+    //   if (ifRight.isEmpty) {
+    //     return left('Invalid or missing session. Please login again.');
+    //   }
+    // });
 
     try {
       final response = await http.get(
@@ -66,7 +67,7 @@ class ProfileService {
           "Authorization": "Bearer $token",
         },
       );
-      print("📡 Status: ${response.statusCode}");
+      print("📡 getHostelInfo - Status: ${response.statusCode}");
       final decrypted = CryptoUtil.handleEncryptedResponse(
         response: response,
         context: "getHostelInfo",
@@ -89,13 +90,13 @@ class ProfileService {
   }
 
   static Future<Either<String, HostelResponse>> getAllHostelInfo() async {
-    final token = await LoginSession.getValidToken();
+    // final token = await LoginSession.getValidToken();
 
-    token.fold((ifLeft) => null, (ifRight) {
-      if (ifRight.isEmpty) {
-        return left('Invalid or missing session. Please login again.');
-      }
-    });
+    // token.fold((ifLeft) => null, (ifRight) {
+    //   if (ifRight.isEmpty) {
+    //     return left('Invalid or missing session. Please login again.');
+    //   }
+    // });
     try {
       final response = await http.get(
         Uri.parse("$url/student/all-hostel-info"),
@@ -104,15 +105,26 @@ class ProfileService {
           "Authorization": "Bearer $token",
         },
       );
-      print("📡 Status: ${response.statusCode}");
+      print("📡 getAllHostelInfo - Status: ${response.statusCode}");
       final decrypted = CryptoUtil.handleEncryptedResponse(
         response: response,
         context: "getAllHostelInfo",
       );
+      print(decrypted);
       if (decrypted == null || decrypted["error"] != null) {
-        return left(
-          decrypted != null ? decrypted["error"].toString() : "Unknown error",
-        );
+        // Handle both string and map error formats
+        String errorMsg;
+        if (decrypted == null) {
+          errorMsg = "Unknown error";
+        } else if (decrypted["error"] is String) {
+          errorMsg = decrypted["error"];
+        } else if (decrypted["error"] is Map &&
+            decrypted["error"]["error"] != null) {
+          errorMsg = decrypted["error"]["error"].toString();
+        } else {
+          errorMsg = "Unknown error";
+        }
+        return left(errorMsg);
       }
       try {
         final hostelResponse = HostelResponse.fromJson(decrypted);
@@ -127,13 +139,13 @@ class ProfileService {
   }
 
   static Future<Either<String, BranchResponse>> getAllBranches() async {
-    final token = await LoginSession.getValidToken();
+    // final token = await LoginSession.getValidToken();
 
-    token.fold((ifLeft) => null, (ifRight) {
-      if (ifRight.isEmpty) {
-        return left('Invalid or missing session. Please login again.');
-      }
-    });
+    // token.fold((ifLeft) => null, (ifRight) {
+    //   if (ifRight.isEmpty) {
+    //     return left('Invalid or missing session. Please login again.');
+    //   }
+    // });
     try {
       final response = await http.get(
         Uri.parse("$url/student/all-branches"),
@@ -142,7 +154,7 @@ class ProfileService {
           "Authorization": "Bearer $token",
         },
       );
-      print("📡 Status: ${response.statusCode}");
+      print("📡 getAllBranches - Status: ${response.statusCode}");
       final decrypted = CryptoUtil.handleEncryptedResponse(
         response: response,
         context: "getAllBranches",
@@ -168,13 +180,13 @@ class ProfileService {
     required Map<String, dynamic> profileData,
     File? profilePic,
   }) async {
-    final token = await LoginSession.getValidToken();
+    // final token = await LoginSession.getValidToken();
 
-    token.fold((ifLeft) => null, (ifRight) {
-      if (ifRight.isEmpty) {
-        return left('Invalid or missing session. Please login again.');
-      }
-    });
+    // token.fold((ifLeft) => null, (ifRight) {
+    //   if (ifRight.isEmpty) {
+    //     return left('Invalid or missing session. Please login again.');
+    //   }
+    // });
     try {
       final encryptedBody = CryptoUtil.encryptPayload(profileData);
       final uri = Uri.parse("$url/student/profile");
@@ -188,12 +200,12 @@ class ProfileService {
       }
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
-      print("📡 Status: ${response.statusCode}");
+      print("📡 updateProfile - Status: ${response.statusCode}");
       final decrypted = CryptoUtil.handleEncryptedResponse(
         response: response,
         context: "updateProfile",
       );
-      print(deprecated);
+      print(decrypted);
       if (decrypted == null || decrypted["error"] != null) {
         return left(
           decrypted != null ? decrypted["error"].toString() : "Unknown error",

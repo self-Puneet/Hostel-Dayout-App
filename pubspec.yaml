@@ -52,6 +52,8 @@ dependencies:
   flutter_dotenv: ^6.0.0
   dartz: ^0.10.1
   dotenv: ^4.2.0
+  glassmorphism: ^3.0.0
+  liquid_glass_renderer: ^0.1.1-dev.10
 
 dev_dependencies:
   flutter_test:
@@ -63,6 +65,9 @@ flutter:
   assets:
     - assets/spsu_logo.jpg
     - .env
+    - packages/liquid_glass_renderer/assets/shaders/liquid_glass.frag
+    - user.png
+    - home.png
 
 flutter_native_splash:
   color: "#ffffff"        

@@ -2,11 +2,80 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
-// import '../../../models/hostels_model.dart';
 import '../../../services/profile_service.dart';
+import 'package:hostel_mgmt/models/parent_model.dart';
 import '../state/profile_state.dart';
 
 class ProfileController {
+  // Expose UI state from ProfileState
+  String? get selectedHostel => state.selectedHostel;
+  String? get selectedBranch => state.selectedBranch;
+  int? get selectedSemester => state.selectedSemester;
+  String? get selectedRelation => state.selectedRelation;
+  TextEditingController get roomNoController => state.roomNoController;
+
+  // Called when edit mode is entered
+  void enterEditMode() {
+    final profile = state.profile;
+    print("jjjjjjjjjjjjjjj");
+    print(
+      state.branches.map((branch) {
+        // Print branch names
+        return branch.name;
+      }),
+    );
+    if (profile != null) {
+      state.roomNoController.text = profile.roomNo;
+      state.selectedHostel = profile.hostelName;
+      // Always set selectedBranch to branch name
+      final branchName = profile.branch;
+      state.selectedBranch = branchName;
+      state.selectedSemester = profile.semester;
+      if (profile.parents.isNotEmpty) {
+        state.selectedRelation = profile.parents[0].relation;
+      }
+    }
+    toggleEdit();
+  }
+
+  void setHostel(String? value) => state.setSelectedHostel(value);
+  // value is always branch name from dropdown
+  void setBranch(String? value) => state.setSelectedBranch(value);
+  void setSemester(String? value) => state.setSelectedSemester(value);
+  void setRelation(String? value) => state.setSelectedRelation(value);
+
+  void onConfirm() {
+    final profile = state.profile;
+    if (profile == null) return;
+    List<ParentModel> updatedParents = profile.parents.isNotEmpty
+        ? [
+            ParentModel(
+              parentId: profile.parents[0].parentId,
+              name: profile.parents[0].name,
+              relation: state.selectedRelation ?? profile.parents[0].relation,
+              phoneNo: profile.parents[0].phoneNo,
+              email: profile.parents[0].email,
+              languagePreference: profile.parents[0].languagePreference,
+            ),
+          ]
+        : [];
+    // selectedBranch is branch name, but StudentProfileModel expects branch name
+    final updated = StudentProfileModel(
+      studentId: profile.studentId,
+      enrollmentNo: profile.enrollmentNo,
+      name: profile.name,
+      email: profile.email,
+      phoneNo: profile.phoneNo,
+      profilePic: profile.profilePic,
+      hostelName: state.selectedHostel ?? '',
+      roomNo: state.roomNoController.text,
+      semester: state.selectedSemester ?? 0,
+      branch: state.selectedBranch ?? '',
+      parents: updatedParents,
+    );
+    confirmEdit(updated);
+  }
+
   final ProfileState state;
   final ProfileService service;
 
@@ -15,18 +84,48 @@ class ProfileController {
   Future<void> initialize() async {
     state.setLoading(true);
     try {
-      // final hostels = await ProfileService.getAllHostelInfo();
-      // final branches = await ProfileService.getAllBranches();
+      final hostels = await ProfileService.getAllHostelInfo();
+      final branches = await ProfileService.getAllBranches();
       final profileResult = await ProfileService.getStudentProfile();
 
       // Handle Either for StudentApiResponse
       profileResult.fold(
         (errorMsg) {
           state.setErrored(errorMsg);
+          print(errorMsg);
         },
         (apiResponse) {
           state.setProfile(apiResponse.student);
-          state.clearError();
+          // print(state.profile.);
+        },
+      );
+
+      branches.fold(
+        (errorMsg) {
+          state.setErrored(errorMsg);
+          print("left side of either - $errorMsg");
+        },
+        (apiResponse) {
+          state.setBranches(
+            apiResponse.branches.map((e) {
+              print("Branch ID: ${e.branchId}, Name: ${e.name}");
+              return e;
+            }).toList(),
+          );
+        },
+      );
+
+      // for hostels
+      hostels.fold(
+        (errorMsg) {
+          state.setErrored(errorMsg);
+        },
+        (apiResponse) {
+          state.setHostels(
+            apiResponse.hostels.map((e) {
+              return e;
+            }).toList(),
+          );
         },
       );
     } catch (e) {

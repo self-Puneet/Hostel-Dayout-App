@@ -15,6 +15,34 @@ enum ProfileValidationError {
 }
 
 class ProfileState extends ChangeNotifier {
+  // UI state for editing profile
+  String? selectedHostel;
+  String? selectedBranch;
+  int? selectedSemester;
+  String? selectedRelation;
+  TextEditingController roomNoController = TextEditingController();
+
+  void setSelectedHostel(String? value) {
+    selectedHostel = value;
+    notifyListeners();
+  }
+
+  void setSelectedBranch(String? value) {
+    selectedBranch = value;
+    selectedSemester = null;
+    notifyListeners();
+  }
+
+  void setSelectedSemester(String? value) {
+    selectedSemester = int.tryParse(value ?? '');
+    notifyListeners();
+  }
+
+  void setSelectedRelation(String? value) {
+    selectedRelation = value;
+    notifyListeners();
+  }
+
   StudentProfileModel? profile;
   List<HostelModel> hostels = [];
   List<BranchModel> branches = [];

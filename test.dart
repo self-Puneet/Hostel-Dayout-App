@@ -10,18 +10,18 @@ import 'package:hostel_mgmt/models/branch_model.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 
-// class Env {
-//   static final Map<String, String> env = {};
+class Env {
+  static final Map<String, String> env = {};
 
-//   static Future<void> load([String fileName = ".env"]) async {
-//     final lines = await File(fileName).readAsLines();
-//     for (var line in lines) {
-//       if (line.trim().isEmpty || line.startsWith('#')) continue;
-//       final parts = line.split('=');
-//       env[parts[0].trim()] = parts.sublist(1).join('=').trim();
-//     }
-//   }
-// }
+  static Future<void> load([String fileName = ".env"]) async {
+    final lines = await File(fileName).readAsLines();
+    for (var line in lines) {
+      if (line.trim().isEmpty || line.startsWith('#')) continue;
+      final parts = line.split('=');
+      env[parts[0].trim()] = parts.sublist(1).join('=').trim();
+    }
+  }
+}
 
 class CryptoUtil {
   static bool isHttpSuccess(int statusCode) =>
@@ -101,19 +101,8 @@ class CryptoUtil {
     return data.sublist(0, data.length - padLen);
   }
 
-  static Uint8List get cryptoIv {
-    final ivString = dotenv.env['CRYPTO_IV'] ?? '';
-    final ivList = ivString
-        .split(',')
-        .map((e) => int.parse(e, radix: 16))
-        .toList();
-    return Uint8List.fromList(ivList);
-  }
-
-  static String get cryptoSecret => dotenv.env['CRYPTO_SECRET'] ?? '';
-
   // static Uint8List get cryptoIv {
-  //   final ivString = Env.env['CRYPTO_IV'] ?? '';
+  //   final ivString = dotenv.env['CRYPTO_IV'] ?? '';
   //   final ivList = ivString
   //       .split(',')
   //       .map((e) => int.parse(e, radix: 16))
@@ -121,7 +110,18 @@ class CryptoUtil {
   //   return Uint8List.fromList(ivList);
   // }
 
-  // static String get cryptoSecret => Env.env['CRYPTO_SECRET'] ?? '';
+  // static String get cryptoSecret => dotenv.env['CRYPTO_SECRET'] ?? '';
+
+  static Uint8List get cryptoIv {
+    final ivString = Env.env['CRYPTO_IV'] ?? '';
+    final ivList = ivString
+        .split(',')
+        .map((e) => int.parse(e, radix: 16))
+        .toList();
+    return Uint8List.fromList(ivList);
+  }
+
+  static String get cryptoSecret => Env.env['CRYPTO_SECRET'] ?? '';
 }
 
 // Utility for HTTP status code success check
