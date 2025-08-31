@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/view/widgets/liquid_glass_morphism/liquid_glass_chip.dart';
 import 'package:intl/intl.dart';
 
 class WelcomeHeader extends StatelessWidget {
@@ -37,25 +38,20 @@ class WelcomeHeader extends StatelessWidget {
     final hasUrl = (avatarUrl != null && avatarUrl!.trim().isNotEmpty);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircleAvatar(
             radius: 22,
             backgroundColor: Colors.grey.shade300,
             // Use the network image only when available
-            foregroundImage: hasUrl ? NetworkImage(avatarUrl!) : null,
+            // foregroundImage: hasUrl ? NetworkImage(avatarUrl!) : null,
+            foregroundImage: AssetImage("assets/profile_pic_demo.png"),
             // Fallback to initials when no URL
             child: hasUrl
                 ? null
@@ -104,31 +100,32 @@ class WelcomeHeader extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(18),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x11000000),
-                  blurRadius: 6,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Text(
-              pillText,
-              style: const TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                height: 1.0,
-                letterSpacing: 0.0,
-              ),
-            ),
-          ),
+          LiquidGlassChip(label: pillText),
+          // const SizedBox(width: 12),
+          // Container(
+          //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          //   decoration: BoxDecoration(
+          //     color: Colors.grey.shade200,
+          //     borderRadius: BorderRadius.circular(18),
+          //     boxShadow: const [
+          //       BoxShadow(
+          //         color: Color(0x11000000),
+          //         blurRadius: 6,
+          //         offset: Offset(0, 2),
+          //       ),
+          //     ],
+          //   ),
+          //   child: Text(
+          //     pillText,
+          //     style: const TextStyle(
+          //       fontFamily: 'Poppins',
+          //       fontSize: 14,
+          //       fontWeight: FontWeight.w500,
+          //       height: 1.0,
+          //       letterSpacing: 0.0,
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

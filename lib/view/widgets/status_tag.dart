@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hostel_mgmt/core/enums/enum.dart';
 
 class StatusTag extends StatelessWidget {
-  final RequestStatus status;
+  final String status;
   final double fontSize;
+  final Color color;
   final bool overflow;
 
   const StatusTag({
@@ -11,6 +11,7 @@ class StatusTag extends StatelessWidget {
     required this.status,
     this.fontSize = 12,
     this.overflow = true,
+    required this.color,
   });
 
   @override
@@ -19,17 +20,14 @@ class StatusTag extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 2),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: status.statusColor.withValues(alpha: 0.15),
-
-        borderRadius: BorderRadius.circular(6),
+        color: color,
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        overflow
-            ? status.displayName.split(' ').join('\n')
-            : status.displayName,
+        overflow ? status.split(' ').join('\n') : status,
         style: TextStyle(
           fontSize: fontSize,
-          color: status.statusColor,
+          // color: color,
           fontWeight: FontWeight.w500,
         ),
       ),

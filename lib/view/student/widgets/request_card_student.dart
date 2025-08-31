@@ -3,7 +3,7 @@ import 'package:hostel_mgmt/core/enums/request_status.dart';
 import 'package:hostel_mgmt/core/enums/request_type.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 import 'package:hostel_mgmt/view/student/widgets/approval_step.dart';
-import 'package:hostel_mgmt/view/student/widgets/status_tag.dart';
+import 'package:hostel_mgmt/view/widgets/status_tag.dart';
 
 class RequestCard extends StatelessWidget {
   final String reason;
@@ -183,7 +183,7 @@ class RequestCard extends StatelessWidget {
                   ),
                 ),
 
-                StatusTag(status: status),
+                // StatusTag(status: status, statusColor),
               ],
             ),
             const SizedBox(height: 6),
