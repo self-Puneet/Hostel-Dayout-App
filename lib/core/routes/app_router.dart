@@ -12,7 +12,7 @@ import 'package:hostel_mgmt/view/student/pages/profile_page.dart';
 class AppRouter {
   static GoRouter build() {
     return GoRouter(
-      initialLocation: '/test',
+      initialLocation: '/home',
       redirect: (context, state) {
         final session = Get.find<LoginSession>();
         final isLoggedIn = session.token.isNotEmpty && session.isValid;

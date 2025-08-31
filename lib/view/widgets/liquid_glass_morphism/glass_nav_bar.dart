@@ -9,81 +9,111 @@ class LiquidGlassNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final borderRadius = BorderRadius.circular(40);
 
-    return CustomPaint(
-      painter: _OuterShadowPainter(borderRadius),
-      child: ClipRRect(
-        borderRadius: borderRadius,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            LiquidGlass(
-              shape: LiquidRoundedSuperellipse(
-                borderRadius: borderRadius.topLeft,
+    return AspectRatio(
+      aspectRatio: 340 / 65, // ✅ maintain ratio
+      child: CustomPaint(
+        painter: _OuterShadowPainter(borderRadius),
+        child: ClipRRect(
+          borderRadius: borderRadius,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Glass background
+              LiquidGlass(
+                shape: LiquidRoundedSuperellipse(
+                  borderRadius: borderRadius.topLeft,
+                ),
+                settings: const LiquidGlassSettings(
+                  thickness: 10,
+                  blur: 8,
+                  chromaticAberration: 0.01,
+                  lightAngle: pi * 5 / 18,
+                  lightIntensity: 0.5,
+                  refractiveIndex: 1.4,
+                  saturation: 1,
+                  lightness: 1,
+                ),
+                child: Container(
+                  decoration: BoxDecoration(borderRadius: borderRadius),
+                ),
               ),
-              settings: const LiquidGlassSettings(
-                thickness: 10,
-                blur: 8,
-                chromaticAberration: 0.01,
-                lightAngle: pi * 5 / 18,
-                lightIntensity: 0.5,
-                refractiveIndex: 1.4,
-                saturation: 1,
-                lightness: 1,
-              ),
-              child: Container(
-                width: 300,
-                height: 50,
-                decoration: BoxDecoration(borderRadius: borderRadius),
-              ),
-            ),
 
-            /// Foreground content (NOT refracted)
-            SizedBox(
-              width: 300,
-              // height: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              // Foreground content
+              Row(
                 children: [
-                  // Left icon
-                  IconButton(
-                    icon: const Icon(Icons.home_outlined),
-                    onPressed: () {},
-                  ),
-
-                  // Middle black "NEW" button
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Row(
-                      children: const [
-                        Icon(Icons.add, color: Colors.white, size: 18),
-                        SizedBox(width: 6),
-                        Text(
-                          "NEW",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  Expanded(
+                    flex: 97,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: IconButton(
+                        icon: Image.asset(
+                          'assets/home.png',
+                          width: 34,
+                          height: 34,
                         ),
-                      ],
+                        onPressed: () {},
+                      ),
                     ),
                   ),
 
-                  // Right icon
-                  IconButton(
-                    icon: const Icon(Icons.person_outline),
-                    onPressed: () {},
+                  // Middle NEW button → takes 1/3
+                  Expanded(
+                    flex: 143,
+                    child: Center(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        // take as much height as it can
+                        constraints: const BoxConstraints(minHeight: 80),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.add, color: Colors.white, size: 24.3),
+                            SizedBox(width: 6),
+                            Text(
+                              "NEW",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w600, // SemiBold
+                                fontStyle: FontStyle
+                                    .normal, // SemiBold is weight, not style
+                                fontSize: 20,
+                                height: 1.0, // line-height: 100%
+                                letterSpacing: 0.0, // letter-spacing: 0%
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Profile button → takes 1/3
+                  Expanded(
+                    flex: 97,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: IconButton(
+                        icon: Image.asset(
+                          'assets/user.png',
+                          width: 34,
+                          height: 34,
+                        ),
+                        onPressed: () {},
+                      ),
+                    ),
                   ),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -102,7 +132,7 @@ class _OuterShadowPainter extends CustomPainter {
 
     final paint = Paint()
       ..color = Colors.black
-          .withOpacity(0.2) // shadow color
+          .withAlpha((0.2 * 255).toInt()) // shadow color
       ..maskFilter = const MaskFilter.blur(BlurStyle.outer, 20); // only outside
 
     canvas.drawRRect(rrect, paint);
