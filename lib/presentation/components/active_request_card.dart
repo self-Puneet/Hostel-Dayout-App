@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
-import 'package:hostel_mgmt/view/widgets/status_tag.dart';
-import 'package:hostel_mgmt/view/widgets/timeline.dart';
+import 'package:hostel_mgmt/presentation/widgets/status_tag.dart';
+import 'package:hostel_mgmt/presentation/widgets/timeline.dart';
 
 extension RequestStatusX1 on RequestStatus {
   List<Checkpoint> get chceckpointState {
@@ -55,12 +55,12 @@ extension RequestStatusX1 on RequestStatus {
           Checkpoint('Parent', CheckpointState.completed),
           Checkpoint('Senior Warden', CheckpointState.completed),
         ];
-      case RequestStatus.inactive:
+      case RequestStatus.cancelledStudent:
         return [
-          Checkpoint('Requested', CheckpointState.completed),
-          Checkpoint('Assistent Warden', CheckpointState.completed),
-          Checkpoint('Parent', CheckpointState.completed),
-          Checkpoint('Senior Warden', CheckpointState.completed),
+          Checkpoint('Requested', CheckpointState.rejected),
+          Checkpoint('Assistent Warden', CheckpointState.notCompleted),
+          Checkpoint('Parent', CheckpointState.notCompleted),
+          Checkpoint('Senior Warden', CheckpointState.notCompleted),
         ];
     }
   }

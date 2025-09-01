@@ -9,7 +9,7 @@ class ClickableText extends StatelessWidget {
     Key? key,
     required this.text,
     required this.onTap,
-    this.color = Colors.black, // default clickable color
+    this.color = Colors.blue, // default clickable color
   }) : super(key: key);
 
   @override

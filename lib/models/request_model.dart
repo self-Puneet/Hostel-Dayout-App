@@ -47,8 +47,10 @@ class RequestModel {
         return RequestStatus.approved;
       case "rejected_by_warden":
         return RequestStatus.rejected;
+      case "cancelled_by_student":
+        return RequestStatus.cancelledStudent;
       default:
-        return RequestStatus.inactive;
+        return RequestStatus.requested;
     }
   }
 
@@ -69,8 +71,8 @@ class RequestModel {
         return "accepted_by_warden";
       case RequestStatus.rejected:
         return "rejected_by_warden";
-      case RequestStatus.inactive:
-        return "inactive";
+      case RequestStatus.cancelledStudent:
+        return "cancelled_by_student";
     }
   }
 

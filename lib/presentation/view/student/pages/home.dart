@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:hostel_mgmt/view/components/active_request_card.dart';
-import 'package:hostel_mgmt/view/components/simple_request_card.dart';
-import 'package:hostel_mgmt/view/student/controllers/home_controller.dart';
-import 'package:hostel_mgmt/view/student/state/home_state.dart';
-import 'package:hostel_mgmt/view/student/widgets/skeleton_loader.dart';
-import 'package:hostel_mgmt/view/widgets/clickable_text.dart';
-import 'package:hostel_mgmt/view/widgets/welcome_header.dart';
+import 'package:hostel_mgmt/presentation/components/active_request_card.dart';
+import 'package:hostel_mgmt/presentation/components/simple_request_card.dart';
+import 'package:hostel_mgmt/presentation/view/student/controllers/home_controller.dart';
+import 'package:hostel_mgmt/presentation/view/student/state/home_state.dart';
+import 'package:hostel_mgmt/presentation/widgets/clickable_text.dart';
+import 'package:hostel_mgmt/presentation/widgets/dropdown.dart';
+import 'package:hostel_mgmt/presentation/widgets/welcome_header.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart'; // Make sure to import this package
+import 'package:go_router/go_router.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -30,13 +31,31 @@ class HomePage extends StatelessWidget {
       child: Consumer<HomeState>(
         builder: (context, state, _) {
           final activeRequests =
-              state.requests; // Replace requests with your state.requests
+              state.activeRequests; // Replace requests with your state.requests
           final hasMultiple = activeRequests.length > 1;
+          final dropdown = Dropdown<String>(
+            items: state.statusOptions
+                .map(
+                  (status) =>
+                      DropdownMenuItem(value: status, child: Text(status)),
+                )
+                .toList(),
+            value: state.selectedStatus,
+            onChanged: (value) {
+              if (value != null) {
+                state.setSelectedStatus(value);
+              }
+            },
+          );
 
-          return Container(
-            child: state.isLoading
-                ? SingleChildScrollView(child: const ShimmerCard())
-                : SingleChildScrollView(
+          return Padding(
+            padding: EdgeInsetsGeometry.only(
+              top: mediaQuery.size.height * 50 / 874,
+            ),
+            child: Container(
+              child:
+                  // ? SingleChildScrollView(child: const ShimmerCard())
+                  SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -139,18 +158,30 @@ class HomePage extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                'History',
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.w500, // Medium weight
-                                  fontSize: 24,
-                                ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'History',
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontWeight:
+                                          FontWeight.w500, // Medium weight
+                                      fontSize: 24,
+                                    ),
+                                  ),
+                                  SizedBox(width: 12),
+
+                                  // our custom dropdown
+                                  dropdown,
+                                ],
                               ),
+
                               ClickableText(
                                 text: "See all",
                                 onTap: () {
-                                  null;
+                                  // go route push to history page
+                                  context.push('/history');
                                 },
                               ),
                             ],
@@ -170,18 +201,25 @@ class HomePage extends StatelessWidget {
                               ),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: SimpleRequestCard(
-                              requestType: state.requests.first.requestType,
-                              fromDate: state.requests.first.appliedFrom,
-                              toDate: state.requests.first.appliedTo,
-                              status: state.requests.first.status,
-                              statusDate: state.requests.first.lastUpdatedAt,
-                            ),
+                            // condition if the filteredRequests is empty
+                            child: state.filteredRequests == null
+                                ? Center(child: Text('No requests found'))
+                                : SimpleRequestCard(
+                                    requestType:
+                                        state.filteredRequests!.requestType,
+                                    fromDate:
+                                        state.filteredRequests!.appliedFrom,
+                                    toDate: state.filteredRequests!.appliedTo,
+                                    status: state.filteredRequests!.status,
+                                    statusDate:
+                                        state.filteredRequests!.lastUpdatedAt,
+                                  ),
                           ),
                         ),
                       ],
                     ),
                   ),
+            ),
           );
         },
       ),

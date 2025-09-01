@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/models/outing_rule_model.dart';
 import 'package:provider/provider.dart';
 import '../state/request_form_state.dart';
 import '../controllers/request_form_controller.dart';
-import '../../../models/outing_rule_model.dart';
-// Removed third-party picker, using built-in pickers
 
 class RequestFormPage extends StatelessWidget {
   const RequestFormPage({super.key});

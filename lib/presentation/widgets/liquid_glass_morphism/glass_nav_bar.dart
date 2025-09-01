@@ -17,7 +17,7 @@ class LiquidGlassNavBar extends StatelessWidget {
           borderRadius: borderRadius,
           child: Stack(
             alignment: Alignment.center,
-            children: [
+            children: [ 
               // Glass background
               LiquidGlass(
                 shape: LiquidRoundedSuperellipse(

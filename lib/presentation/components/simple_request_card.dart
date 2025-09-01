@@ -3,7 +3,7 @@ import 'package:hostel_mgmt/core/enums/request_status.dart';
 import 'package:hostel_mgmt/core/enums/request_type.dart';
 import 'package:hostel_mgmt/core/util/input_convertor.dart';
 import 'package:hostel_mgmt/core/util/string_extensions.dart';
-import 'package:hostel_mgmt/view/widgets/status_tag.dart';
+import 'package:hostel_mgmt/presentation/widgets/status_tag.dart';
 
 class SimpleRequestCard extends StatelessWidget {
   final RequestType requestType;
@@ -42,9 +42,9 @@ class SimpleRequestCard extends StatelessWidget {
                   letterSpacing: 0.0, // 0%
                 ),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 15),
               Text(
-                "${InputConverter.dateFormater(fromDate)} - ${InputConverter.dateFormater(toDate)}",
+                "${InputConverter.dateFormater(fromDate)}\n\n${InputConverter.dateFormater(toDate)}",
                 style: const TextStyle(
                   fontFamily: "Poppins",
                   fontWeight: FontWeight.w400, // 400 = regular

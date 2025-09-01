@@ -8,7 +8,7 @@ enum RequestStatus {
   parentDenied,
   rejected,
   approved,
-  inactive,
+  cancelledStudent,
 }
 
 extension RequestStatusX on RequestStatus {
@@ -28,8 +28,8 @@ extension RequestStatusX on RequestStatus {
         return 'Rejected';
       case RequestStatus.approved:
         return 'Approved';
-      case RequestStatus.inactive:
-        return 'Inactive';
+      case RequestStatus.cancelledStudent:
+        return 'Cancelled by Student';
     }
   }
 
@@ -49,8 +49,8 @@ extension RequestStatusX on RequestStatus {
         return 'Rejected';
       case RequestStatus.approved:
         return 'Approved';
-      case RequestStatus.inactive:
-        return 'Inactive';
+      case RequestStatus.cancelledStudent:
+        return 'Cancelled';
     }
   }
 
@@ -70,8 +70,8 @@ extension RequestStatusX on RequestStatus {
         return Color.fromRGBO(255, 0, 4, 0.4);
       case RequestStatus.approved:
         return Color.fromRGBO(47, 255, 0, 0.4);
-      case RequestStatus.inactive:
-        return Color.fromRGBO(255, 0, 4, 0.4);
+      case RequestStatus.cancelledStudent:
+        return Colors.grey;
     }
   }
 

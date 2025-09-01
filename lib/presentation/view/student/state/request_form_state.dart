@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../models/outing_rule_model.dart';
+import 'package:hostel_mgmt/models/outing_rule_model.dart';
 
 class RequestFormState extends ChangeNotifier {
   String reason = '';

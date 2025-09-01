@@ -1,8 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
-import '../../../services/profile_service.dart';
+import 'package:hostel_mgmt/services/profile_service.dart';
 import 'package:hostel_mgmt/models/parent_model.dart';
 import '../state/profile_state.dart';
 

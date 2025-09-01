@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hostel_mgmt/view/widgets/liquid_glass_morphism/glass_nav_bar.dart';
+import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/glass_nav_bar.dart';
 
 class StudentLayout extends StatelessWidget {
   final Widget child;
@@ -13,16 +12,11 @@ class StudentLayout extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFE9E9E9),
       body: SafeArea(
-        top: true,
+        top: false,
         bottom: true,
         child: Stack(
           children: [
-            Padding(
-              padding: EdgeInsetsGeometry.only(
-                top: mediaQuery.size.height * 32 / 874,
-              ),
-              child: child,
-            ),
+            child,
             Positioned(
               left: 0,
               right: 0,

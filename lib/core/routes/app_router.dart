@@ -4,15 +4,12 @@ import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/login/login_layout.dart';
 import 'package:hostel_mgmt/test/test_page.dart';
-import 'package:hostel_mgmt/view/student/pages/home.dart';
-import 'package:hostel_mgmt/view/student/pages/request_form_page.dart';
-import 'package:hostel_mgmt/view/student/pages/student_layout.dart';
-import 'package:hostel_mgmt/view/student/pages/profile_page.dart';
+import '../../presentation/view/student/pages/pages.dart';
 
 class AppRouter {
   static GoRouter build() {
     return GoRouter(
-      initialLocation: '/home',
+      initialLocation: '/history',
       redirect: (context, state) {
         final session = Get.find<LoginSession>();
         final isLoggedIn = session.token.isNotEmpty && session.isValid;
@@ -33,6 +30,8 @@ class AppRouter {
           name: 'test',
           builder: (context, state) => const DemoPage(),
         ),
+
+        // another route for history page
 
         /// Login route (outside shell)
         GoRoute(
@@ -55,6 +54,18 @@ class AppRouter {
               name: 'home',
               builder: (context, state) => const HomePage(),
               // Add LoginGuard middleware
+              redirect: (context, state) {
+                final session = Get.find<LoginSession>();
+                if (session.token.isEmpty || !session.isValid) {
+                  return '/login';
+                }
+                return null;
+              },
+            ),
+            GoRoute(
+              path: '/history',
+              name: 'history',
+              builder: (context, state) => const HistoryPage(),
               redirect: (context, state) {
                 final session = Get.find<LoginSession>();
                 if (session.token.isEmpty || !session.isValid) {

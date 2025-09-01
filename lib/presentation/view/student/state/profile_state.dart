@@ -1,7 +1,6 @@
 import 'package:hostel_mgmt/models/branch_model.dart';
+import 'package:hostel_mgmt/models/hostels_model.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
-
-import '../../../models/hostels_model.dart';
 import 'package:flutter/material.dart';
 
 enum ProfileValidationError {
