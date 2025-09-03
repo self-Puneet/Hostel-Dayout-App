@@ -1,57 +1,69 @@
-# :satellite: API Requirements
+## 1. update the request document structure accordingly - only these fields has to be updated
 
-## :arrows_counterclockwise: 1. Update Request Status Enum
+  **before** 
 
-Add a new status in RequestStatus  `student_canceled`
-
-## :pushpin: 2. Give me all the valid status strings. which I will pass into the status fields in upcomming apis payload and will be accepted by you api for all request status.
-
-## :pushpin: 2. Get Latest Requests
-
-**Endpoint:**
-
+  ```json
+  "parent_action" : ["accepted", "rejected"]
+  "assitent_warden_action" {
+      "action_by" : "",
+      "action": ["cancelled", "accepted"], 
+  },
+  "senior_warden_action" {
+      "action_by": "",
+      "action": ["rejected" , "accepted"],
+  },
+  "security_guard_action" {
+      "action_by" : "",
+      "action" :["in" , "out"],
+  }
+  "student_action" {
+      "action": ["cancelled" ]
+  }
+  ```
+**after** 
+```json
+"parent_action" : {
+  "action_by" : "", 
+  "action" : ["accepted", "rejected"],
+  "action_at" : "", //timestamp
+}
+"assitent_warden_action" :{
+  "action_by" : "", 
+  "action" : ["accepted", "rejected"],
+  "action_at" : "", //timestamp
+},
+"senior_warden_action" :{
+  "action_by" : "", 
+  "action" : ["accepted", "rejected"],
+  "action_at" : "", //timestamp
+},
+"security_guard_action": {
+  "action_by" : "", 
+  "action" : ["accepted", "rejected"],
+  "action_at" : "", //timestamp
+}
+"student_action": {
+  "action" : ["cancecanl"],
+  "action_at" : "", //timestamp
+}
 ```
-GET /api/requests/latest
-```
+actions enums terminologies can be changed as you wish
 
-**Requirement:**
+## 2. inform about enums possible values for maintaining frontend and backend consistency
 
-* Return the **most recent** request of each type:
+following fields of different collection which you have to share 
+- request collection
+  - parent_action's action
+  - security_guard_action's action
+  - assistent_warden_action's action
+  - senior_warden_action's action
+  - student_action's action
+  - request_type
+  - request_status (de diya)
+  - security_status
+- warden collection
+  - warden_role
 
-  * accepted
-  * rejected
-  * student\_canceled
+## 3. warden login - dynamically understanding if the warden i ssenior or assitent
 
-
-## :pushpin: 3. Get All Active Requests
-
-**Endpoint:**
-
-```
-GET /api/requests/active
-```
-
-**Requirement:**
-
-* Return all **active requests** of a student.
-
----
-
-## :pushpin: 4. Get Requests by Status List
-
-**Endpoint:**
-
-```
-POST /api/requests/by-status
-```
-
-**Requirement:**
-
-* Accept a list of statuses.
-* Return all requests whose status is in that list.
-* If list is `null` or empty → return **all requests**.
-* I will pass valid status string as given by you.
-
-## parent login
-
-## reset password functionality - uss gande se password se mai thak gaya
+## 4. 

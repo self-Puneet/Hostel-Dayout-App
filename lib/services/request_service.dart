@@ -5,26 +5,21 @@ import 'package:hostel_mgmt/core/util/crypto_utils.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
+import 'package:get/get.dart';
 
 class RequestService {
   static const url = "http://20.192.25.27:4141/api";
 
   static Future<Either<String, RequestApiResponse>> getAllRequests() async {
-    final token = await LoginSession.getValidToken();
-
-    token.fold((ifLeft) => null, (ifRight) {
-      if (ifRight.isEmpty) {
-        return left('Invalid or missing session. Please login again.');
-      }
-    });
+    final session = Get.find<LoginSession>();
+    final token = session.token;
     try {
       print(token);
       final response = await http.get(
         Uri.parse("$url/student/requests"),
         headers: {
           "Content-Type": "application/json",
-          "Authorization":
-              "Bearer ${"fQS5LZW7LiTEZmhx6vzqiyr7OooQ3fRKcUKuyvzOVp6Xk1pj2qT2uGWYj8qdnhXyc/FE7y9agzIaZKBb5M5jzwK7s5skrDKIKwh4b74ZCORWVJZosE228q/ANFKIqzLSU2Oqq0wv8C26vMGoT35Q775Uc6sIaaytCFOI1dvon9CQArUki8KmljzsYOKPxg1gW9lD0hkprPwyiOVGn2vGzhCgyd4KF6tC4TBzcJ9/c0DaQSv1sfdZNUC9Lti/zErn+EU7WscojPC7lqKYRJ3uKO6XiyyFLUFJUsx4f2Nu+8PvjxQ/YsaiywpRFeqCGrYM"}",
+          "Authorization": "Bearer $token",
         },
       );
       print("📡 Status: ${response.statusCode}");
@@ -52,13 +47,11 @@ class RequestService {
   static Future<Either<String, RequestModel>> getRequestById({
     required String requestId,
   }) async {
-    final token = await LoginSession.getValidToken();
-
-    token.fold((ifLeft) => null, (ifRight) {
-      if (ifRight.isEmpty) {
-        return left('Invalid or missing session. Please login again.');
-      }
-    });
+    final session = Get.find<LoginSession>();
+    final token = session.token;
+    print(requestId);
+    print(token);
+    // requestId = "68aef2e9fab1a5ff077eebed";
     try {
       final response = await http.get(
         Uri.parse("$url/student/requests/$requestId"),
@@ -67,12 +60,14 @@ class RequestService {
           "Authorization": "Bearer $token",
         },
       );
-      print("📡 Status: ${response.statusCode}");
+      print("📡 Status of get request by id: ${response.statusCode}");
       final decrypted = CryptoUtil.handleEncryptedResponse(
         response: response,
         context: "getRequestById",
       );
       if (decrypted == null || decrypted["error"] != null) {
+        print(decrypted);
+        print("7777777777777777777777777777");
         return left(
           decrypted != null ? decrypted["error"].toString() : "Unknown error",
         );
@@ -92,13 +87,8 @@ class RequestService {
   static Future<Either<String, RequestModel>> createRequest({
     required Map<String, dynamic> requestData,
   }) async {
-    final token = await LoginSession.getValidToken();
-
-    token.fold((ifLeft) => null, (ifRight) {
-      if (ifRight.isEmpty) {
-        return left('Invalid or missing session. Please login again.');
-      }
-    });
+    final session = Get.find<LoginSession>();
+    final token = session.token;
 
     try {
       final encryptedBody = CryptoUtil.encryptPayload(requestData);

@@ -72,6 +72,8 @@ class LoginController {
     try {
       Map<String, dynamic>? result;
       if (actor == TimelineActor.student) {
+        print(identity);
+        print(verification);
         result = await StudentAuthService.loginStudent(
           enrollmentNo: identity,
           password: verification,
@@ -134,6 +136,18 @@ class LoginController {
     }
   }
 
+  /// Logout service
+  static Future<void> logout(BuildContext context) async {
+    LoginSession.clearPrefs();
+    // go navigation to login screen
+    GoRouter.of(context).go('/login');
+    AppSnackBar.show(
+      context,
+      message: "Logged out successfully.",
+      type: AppSnackBarType.success,
+    );
+  }
+
   void forgotPassword(BuildContext context, TimelineActor actor) {
     AppSnackBar.show(
       context,
@@ -143,12 +157,69 @@ class LoginController {
     );
   }
 
-  void resetPassword(BuildContext context, TimelineActor actor) {
-    AppSnackBar.show(
-      context,
-      message: "Reset Password pressed for ${actor.name}",
-      type: AppSnackBarType.info,
-      icon: Icons.info,
+  static void resetPassword(BuildContext context, TimelineActor actor) async {
+    // Retrieve the old and new passwords from text fields.
+    // Adjust the field keys as appropriate for your UI.
+    // final oldPassword = state.textFieldMap[actor]?[FieldsType.identityField]?.text.trim() ?? "";
+    // final newPassword = state.textFieldMap[actor]?[FieldsType.verificationField]?.text.trim() ?? "";
+
+    // if (oldPassword.isEmpty || newPassword.isEmpty) {
+    //   AppSnackBar.show(
+    //     context,
+    //     message: "Please enter both your old and new passwords.",
+    //     type: AppSnackBarType.alert,
+    //     icon: Icons.warning,
+    //   );
+    //   return;
+    // }
+
+    // Get the current session token
+    final session = Get.find<LoginSession>();
+    final token = session.token;
+    if (token.isEmpty) {
+      AppSnackBar.show(
+        context,
+        message: "User is not authenticated.",
+        type: AppSnackBarType.error,
+        icon: Icons.error,
+      );
+      return;
+    }
+
+    // Call the resetPassword service method.
+    final result = await StudentAuthService.resetPassword(
+      oldPassword: "MP8XS0GJRE",
+      newPassword: "test",
+      token: token,
+    );
+
+    // Handle the result using functional Either style.
+    result.fold(
+      (error) {
+        AppSnackBar.show(
+          context,
+          message: error,
+          type: AppSnackBarType.error,
+          icon: Icons.error,
+        );
+      },
+      (success) {
+        if (success) {
+          AppSnackBar.show(
+            context,
+            message: "Password reset successful.",
+            type: AppSnackBarType.success,
+            icon: Icons.check,
+          );
+        } else {
+          AppSnackBar.show(
+            context,
+            message: "Password reset failed.",
+            type: AppSnackBarType.error,
+            icon: Icons.error,
+          );
+        }
+      },
     );
   }
 }

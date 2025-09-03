@@ -21,4 +21,13 @@ class InputConverter {
       throw InputFormatException("Invalid date format");
     }
   }
+
+  static String formatDate(DateTime date) {
+    return DateFormat("MMM d, y").format(date);
+  }
+
+  /// Returns formatted time like "10:25 AM"
+  static String formatTime(DateTime date) {
+    return DateFormat("h:mm a").format(date);
+  }
 }

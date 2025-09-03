@@ -37,7 +37,7 @@ class LoginState extends ChangeNotifier with WidgetsBindingObserver {
       FieldsType.identityField: TextEditingController(),
       FieldsType.verificationField: TextEditingController(),
     },
-    TimelineActor.warden: {
+    TimelineActor.assistentWarden: {
       FieldsType.model: LoginPageModel(
         loginTitle: "Warden Login",
         identityFieldName: "Employee ID",

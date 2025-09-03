@@ -1,12 +1,9 @@
-// create a demo history Page
-import 'package:animated_segmented_tab_control/animated_segmented_tab_control.dart';
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/presentation/view/student/state/history_state.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/liquid_back_button.dart';
-import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
+import 'package:hostel_mgmt/presentation/widgets/segmented_button.dart';
 import 'package:provider/provider.dart';
-import 'dart:math';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({super.key});
@@ -74,95 +71,14 @@ class _HistoryPageView extends StatelessWidget {
                   child: // consumer of Home state
                   Consumer<HistoryState>(
                     builder: (context, historyState, child) {
-                      return DefaultTabController(
-                        length:
-                            historyState.filterOptions.length, // number of tabs
-                        child: Column(
-                          children: [
-                            Stack(
-                              children: [
-                                // Glass background (fills Stack size)
-                                Positioned.fill(
-                                  child: LiquidGlass(
-                                    shape: LiquidRoundedSuperellipse(
-                                      borderRadius: BorderRadius.circular(
-                                        40,
-                                      ).topLeft,
-                                    ),
-                                    settings: const LiquidGlassSettings(
-                                      thickness: 10,
-                                      blur: 8,
-                                      chromaticAberration: 0.01,
-                                      lightAngle: pi * 5 / 18,
-                                      lightIntensity: 0.5,
-                                      refractiveIndex: 1.4,
-                                      saturation: 1,
-                                      lightness: 1,
-                                    ),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(40),
-                                        color: Colors.white.withAlpha(
-                                          (0.05 * 225).toInt(),
-                                        ), // subtle tint
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                // Foreground (tabs) drives the size of the Stack
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 4,
-                                  ),
-                                  child: SegmentedTabControl(
-                                    indicatorPadding:
-                                        const EdgeInsets.symmetric(vertical: 4),
-                                    barDecoration: BoxDecoration(
-                                      color: Colors.transparent,
-                                      borderRadius: BorderRadius.circular(999),
-                                    ),
-                                    indicatorDecoration: BoxDecoration(
-                                      color: Colors.black,
-                                      borderRadius: BorderRadius.circular(999),
-                                    ),
-                                    textStyle: const TextStyle(fontSize: 12),
-                                    selectedTextStyle: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                    ),
-                                    tabTextColor: Colors.black,
-                                    selectedTabTextColor: Colors.white,
-                                    squeezeIntensity: 2,
-                                    tabs: [
-                                      ...historyState.filterOptions.map((
-                                        option,
-                                      ) {
-                                        return SegmentTab(
-                                          label: option,
-                                          splashColor: Colors.transparent,
-                                          splashHighlightColor:
-                                              Colors.transparent,
-                                        );
-                                      }),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            const Expanded(
-                              child: TabBarView(
-                                children: [
-                                  Center(child: Text('Student History')),
-                                  Center(child: Text('Warden History')),
-                                  Center(child: Text('Parent History')),
-                                  Center(child: Text('Admin History')),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                      return GlassSegmentedTabs(
+                        options: historyState.filterOptions,
+                        views: [
+                          Center(child: Text("Student History")),
+                          Center(child: Text("Warden History")),
+                          Center(child: Text("Parent History")),
+                          Center(child: Text("Admin History")),
+                        ],
                       );
                     },
                   ),

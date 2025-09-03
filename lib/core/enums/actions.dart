@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 
 class RequestActionDialogParam {
   final String title;
@@ -15,6 +16,21 @@ class RequestActionDialogParam {
 enum RequestAction { refer, cancel, approve, reject, none }
 
 extension RequestActionX on RequestAction {
+  static List<RequestAction> actorActions(TimelineActor actor) {
+    switch (actor) {
+      case TimelineActor.student:
+        return [RequestAction.cancel];
+      case TimelineActor.parent:
+        return [RequestAction.approve, RequestAction.reject];
+      case TimelineActor.assistentWarden:
+        return [RequestAction.cancel, RequestAction.refer];
+      case TimelineActor.security:
+        return [RequestAction.approve, RequestAction.reject];
+      case TimelineActor.seniorWarden:
+        return [RequestAction.approve, RequestAction.reject];
+    }
+  }
+
   String get name {
     switch (this) {
       case RequestAction.refer:

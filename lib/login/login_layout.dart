@@ -54,7 +54,7 @@ class LoginLayout extends StatelessWidget {
                     child: TabBarView(
                       children: const [
                         LoginPage(actor: TimelineActor.student),
-                        LoginPage(actor: TimelineActor.warden),
+                        LoginPage(actor: TimelineActor.assistentWarden),
                         LoginPage(actor: TimelineActor.parent),
                       ],
                     ),

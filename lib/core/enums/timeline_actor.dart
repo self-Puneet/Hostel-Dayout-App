@@ -1,4 +1,4 @@
-enum TimelineActor { student, parent, warden, security, server, seniorWarden }
+enum TimelineActor { student, parent, assistentWarden, security, seniorWarden }
 
 extension TimelineActorX on TimelineActor {
   String get displayName {
@@ -7,14 +7,12 @@ extension TimelineActorX on TimelineActor {
         return 'Student';
       case TimelineActor.parent:
         return 'Parent';
-      case TimelineActor.warden:
+      case TimelineActor.assistentWarden:
         return 'Warden';
       case TimelineActor.seniorWarden:
         return 'Senior Warden';
       case TimelineActor.security:
         return 'Security';
-      case TimelineActor.server:
-        return 'Server';
     }
   }
 
@@ -25,16 +23,15 @@ extension TimelineActorX on TimelineActor {
         return 'student';
       case TimelineActor.parent:
         return 'parent';
-      case TimelineActor.warden:
+      case TimelineActor.assistentWarden:
         return 'warden';
       case TimelineActor.seniorWarden:
         return 'senior_warden';
       case TimelineActor.security:
         return 'security';
-      case TimelineActor.server:
-        return 'server';
     }
   }
+
   static TimelineActor fromString(String role) {
     switch (role.toLowerCase()) {
       case 'student':
@@ -42,13 +39,11 @@ extension TimelineActorX on TimelineActor {
       case 'parent':
         return TimelineActor.parent;
       case 'warden':
-        return TimelineActor.warden;
+        return TimelineActor.assistentWarden;
       case 'senior_warden':
         return TimelineActor.seniorWarden;
       case 'security':
         return TimelineActor.security;
-      case 'server':
-        return TimelineActor.server;
       default:
         throw ArgumentError('Invalid role string: $role');
     }

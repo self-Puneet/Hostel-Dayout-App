@@ -5,10 +5,11 @@ import 'package:crypto/crypto.dart';
 import 'package:dartz/dartz.dart';
 import 'package:http/http.dart' as http;
 import 'package:pointycastle/export.dart';
-import 'package:hostel_mgmt/models/hostels_model.dart';
-import 'package:hostel_mgmt/models/branch_model.dart';
-import 'package:hostel_mgmt/models/student_profile.dart';
-import 'package:hostel_mgmt/models/request_model.dart';
+// import 'package:hostel_mgmt/models/hostels_model.dart';
+// import 'package:hostel_mgmt/models/branch_model.dart';
+// import 'package:hostel_mgmt/models/student_profile.dart';
+// import 'package:hostel_mgmt/models/request_model.dart';
+// import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class Env {
   static final Map<String, String> env = {};
@@ -32,10 +33,11 @@ class CryptoUtil {
     String? context,
   }) {
     final encryptedBody = response.body.trim().replaceAll('"', '');
-
+    print(encryptedBody);
     if (isHttpSuccess(response.statusCode)) {
       try {
         final decrypted = CryptoUtil.decryptPayload(encryptedBody);
+        print(decrypted);
         return decrypted;
       } catch (e) {
         // return {"error": "Failed to decrypt success response"};
@@ -129,7 +131,68 @@ class CryptoUtil {
 // Centralized HTTP response handler
 
 class Services {
+  /// Reset password service method
+  static Future<Either<String, bool>> resetPassword({
+    required String oldPassword,
+    required String newPassword,
+    required String token,
+  }) async {
+    try {
+      final encryptedPayload = CryptoUtil.encryptPayload({
+        'oldPassword': oldPassword,
+        'newPassword': newPassword,
+      });
+      final response = await http.put(
+        Uri.parse("$url/admin/reset-password"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({"encrypted": encryptedPayload}),
+      );
+      print("📡 Status: ${response.statusCode}");
+      final decrypted = CryptoUtil.handleEncryptedResponse(
+        response: response,
+        context: "resetPassword",
+      );
+      if (decrypted == null || decrypted["error"] != null) {
+        return left(
+          decrypted != null ? decrypted["error"].toString() : "Unknown error",
+        );
+      }
+      // If success, return true
+      return right(true);
+    } catch (e) {
+      print("❌ Exception: $e");
+      return left("Exception: $e");
+    }
+  }
+
   static const url = "http://20.192.25.27:4141/api";
+
+  static Future<Map<String, dynamic>> login(
+    String enrollmentNo,
+    String password,
+  ) async {
+    print(enrollmentNo);
+    print(password);
+    final payload = {"enrollment_no": enrollmentNo, "password": password};
+    final encrypted = CryptoUtil.encryptPayload(payload);
+    final response = await http.post(
+      Uri.parse("$url/student/login"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"encrypted": encrypted}),
+    );
+    print("📡 Status: ${response.statusCode}");
+    final decrypted = CryptoUtil.handleEncryptedResponse(
+      response: response,
+      context: "login",
+    );
+    if (decrypted == null) {
+      return {"error": "Failed to decrypt response"};
+    }
+    return decrypted;
+  }
 
   // static Future<Either<String, String>> getValidToken() async {
   // try {
@@ -154,178 +217,211 @@ class Services {
   static String token =
       "fQS5LZW7LiTEZmhx6vzqiyr7OooQ3fRKcUKuyvzOVp6Xk1pj2qT2uGWYj8qdnhXyc/FE7y9agzIaZKBb5M5jzwK7s5skrDKIKwh4b74ZCORWVJZosE228q/ANFKIqzLSU2Oqq0wv8C26vMGoT35Q775Uc6sIaaytCFOI1dvon9CQArUki8KmljzsYOKPxg1gW9lD0hkprPwyiOVGn2vGzhCgyd4KF6tC4TBzcJ9/c0DaQSv1sfdZNUC9Lti/zErn+EU7WscojPC7lqKYRJ3uKO6XiyyFLUFJUsx4f2Nu+8PvjxQ/YsaiywpRFeqCGrYM";
 
-  static Future<Either<String, HostelResponse>> getAllHostelInfo() async {
-    try {
-      final response = await http.get(
-        Uri.parse("$url/student/all-hostel-info"),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
-        },
-      );
-      print("📡 Status: ${response.statusCode}");
-      final decrypted = CryptoUtil.handleEncryptedResponse(
-        response: response,
-        context: "getAllHostelInfo",
-      );
-      if (decrypted == null || decrypted["error"] != null) {
-        return left(
-          decrypted != null ? decrypted["error"].toString() : "Unknown error",
-        );
-      }
-      try {
-        final hostelResponse = HostelResponse.fromJson(decrypted);
-        return right(hostelResponse);
-      } catch (e) {
-        return left("Failed to parse hostel response: $e");
-      }
-    } catch (e) {
-      print("❌ Exception: $e");
-      return left("Exception: $e");
-    }
-  }
+  // static Future<Either<String, HostelResponse>> getAllHostelInfo() async {
+  //   try {
+  //     final response = await http.get(
+  //       Uri.parse("$url/student/all-hostel-info"),
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "Authorization": "Bearer $token",
+  //       },
+  //     );
+  //     print("📡 Status: ${response.statusCode}");
+  //     final decrypted = CryptoUtil.handleEncryptedResponse(
+  //       response: response,
+  //       context: "getAllHostelInfo",
+  //     );
+  //     if (decrypted == null || decrypted["error"] != null) {
+  //       return left(
+  //         decrypted != null ? decrypted["error"].toString() : "Unknown error",
+  //       );
+  //     }
+  //     try {
+  //       final hostelResponse = HostelResponse.fromJson(decrypted);
+  //       return right(hostelResponse);
+  //     } catch (e) {
+  //       return left("Failed to parse hostel response: $e");
+  //     }
+  //   } catch (e) {
+  //     print("❌ Exception: $e");
+  //     return left("Exception: $e");
+  //   }
+  // }
 
-  static Future<Either<String, BranchResponse>> getAllBranches() async {
-    try {
-      final response = await http.get(
-        Uri.parse("$url/student/all-branches"),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
-        },
-      );
-      print("📡 Status: ${response.statusCode}");
-      final decrypted = CryptoUtil.handleEncryptedResponse(
-        response: response,
-        context: "getAllBranches",
-      );
-      if (decrypted == null || decrypted["error"] != null) {
-        return left(
-          decrypted != null ? decrypted["error"].toString() : "Unknown error",
-        );
-      }
-      try {
-        final branchResponse = BranchResponse.fromJson(decrypted);
-        return right(branchResponse);
-      } catch (e) {
-        return left("Failed to parse branch response: $e");
-      }
-    } catch (e) {
-      print("❌ Exception: $e");
-      return left("Exception: $e");
-    }
-  }
+  // static Future<Either<String, BranchResponse>> getAllBranches() async {
+  //   try {
+  //     final response = await http.get(
+  //       Uri.parse("$url/student/all-branches"),
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "Authorization": "Bearer $token",
+  //       },
+  //     );
+  //     print("📡 Status: ${response.statusCode}");
+  //     final decrypted = CryptoUtil.handleEncryptedResponse(
+  //       response: response,
+  //       context: "getAllBranches",
+  //     );
+  //     if (decrypted == null || decrypted["error"] != null) {
+  //       return left(
+  //         decrypted != null ? decrypted["error"].toString() : "Unknown error",
+  //       );
+  //     }
+  //     try {
+  //       final branchResponse = BranchResponse.fromJson(decrypted);
+  //       return right(branchResponse);
+  //     } catch (e) {
+  //       return left("Failed to parse branch response: $e");
+  //     }
+  //   } catch (e) {
+  //     print("❌ Exception: $e");
+  //     return left("Exception: $e");
+  //   }
+  // }
 
-  static Future<Either<String, StudentApiResponse>> getStudentProfile() async {
-    try {
-      final response = await http.get(
-        Uri.parse("$url/student/student-profile"),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
-        },
-      );
-      print("📡 Status: ${response.statusCode}");
-      final decrypted = CryptoUtil.handleEncryptedResponse(
-        response: response,
-        context: "getStudentProfile",
-      );
-      if (decrypted == null || decrypted["error"] != null) {
-        return left(
-          decrypted != null ? decrypted["error"].toString() : "Unknown error",
-        );
-      }
-      try {
-        final apiResponse = StudentApiResponse.fromJson(decrypted);
-        return right(apiResponse);
-      } catch (e) {
-        return left("Failed to parse student profile response: $e");
-      }
-    } catch (e) {
-      print("❌ Exception: $e");
-      return left("Exception: $e");
-    }
-  }
+  // static Future<Either<String, StudentApiResponse>> getStudentProfile() async {
+  //   try {
+  //     final response = await http.get(
+  //       Uri.parse("$url/student/student-profile"),
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "Authorization": "Bearer $token",
+  //       },
+  //     );
+  //     print("📡 Status: ${response.statusCode}");
+  //     final decrypted = CryptoUtil.handleEncryptedResponse(
+  //       response: response,
+  //       context: "getStudentProfile",
+  //     );
+  //     if (decrypted == null || decrypted["error"] != null) {
+  //       return left(
+  //         decrypted != null ? decrypted["error"].toString() : "Unknown error",
+  //       );
+  //     }
+  //     try {
+  //       final apiResponse = StudentApiResponse.fromJson(decrypted);
+  //       return right(apiResponse);
+  //     } catch (e) {
+  //       return left("Failed to parse student profile response: $e");
+  //     }
+  //   } catch (e) {
+  //     print("❌ Exception: $e");
+  //     return left("Exception: $e");
+  //   }
+  // }
 
-  static Future<Either<String, HostelSingleResponse>> getHostelInfo() async {
-    try {
-      final response = await http.get(
-        Uri.parse("$url/student/hostel-info"),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
-        },
-      );
-      print("📡 Status: ${response.statusCode}");
-      final decrypted = CryptoUtil.handleEncryptedResponse(
-        response: response,
-        context: "getHostelInfo",
-      );
-      if (decrypted == null || decrypted["error"] != null) {
-        return left(
-          decrypted != null ? decrypted["error"].toString() : "Unknown error",
-        );
-      }
-      try {
-        final hostelResponse = HostelSingleResponse.fromJson(decrypted);
-        return right(hostelResponse);
-      } catch (e) {
-        return left("Failed to parse hostel info response: $e");
-      }
-    } catch (e) {
-      print("❌ Exception: $e");
-      return left("Exception: $e");
-    }
-  }
+  // static Future<Either<String, HostelSingleResponse>> getHostelInfo() async {
+  //   try {
+  //     final response = await http.get(
+  //       Uri.parse("$url/student/hostel-info"),
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "Authorization": "Bearer $token",
+  //       },
+  //     );
+  //     print("📡 Status: ${response.statusCode}");
+  //     final decrypted = CryptoUtil.handleEncryptedResponse(
+  //       response: response,
+  //       context: "getHostelInfo",
+  //     );
+  //     if (decrypted == null || decrypted["error"] != null) {
+  //       return left(
+  //         decrypted != null ? decrypted["error"].toString() : "Unknown error",
+  //       );
+  //     }
+  //     try {
+  //       final hostelResponse = HostelSingleResponse.fromJson(decrypted);
+  //       return right(hostelResponse);
+  //     } catch (e) {
+  //       return left("Failed to parse hostel info response: $e");
+  //     }
+  //   } catch (e) {
+  //     print("❌ Exception: $e");
+  //     return left("Exception: $e");
+  //   }
+  // }
 
-  static Future<Either<String, StudentProfileModel>> updateProfile({
-    required Map<String, dynamic> profileData,
-    File? profilePic,
-  }) async {
-    try {
-      final encryptedBody = CryptoUtil.encryptPayload(profileData);
-      final uri = Uri.parse("$url/student/profile");
-      final request = http.MultipartRequest("PUT", uri);
-      request.headers["Authorization"] = "Bearer $token";
-      request.fields["encrypted"] = encryptedBody;
-      if (profilePic != null) {
-        request.files.add(
-          await http.MultipartFile.fromPath("profile_pic", profilePic.path),
-        );
-      }
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      print("📡 Status: ${response.statusCode}");
-      final decrypted = CryptoUtil.handleEncryptedResponse(
-        response: response,
-        context: "updateProfile",
-      );
-      print(deprecated);
-      if (decrypted == null || decrypted["error"] != null) {
-        return left(
-          decrypted != null ? decrypted["error"].toString() : "Unknown error",
-        );
-      }
-      try {
-        final profile = StudentProfileModel.fromJson(decrypted["student"]);
-        print(profile.name);
-        return right(profile);
-      } catch (e) {
-        return left("Failed to parse updated profile: $e");
-      }
-    } catch (e) {
-      print("❌ Exception: $e");
-      return left("Exception: $e");
-    }
-  }
+  // static Future<Either<String, StudentProfileModel>> updateProfile({
+  //   required Map<String, dynamic> profileData,
+  //   File? profilePic,
+  // }) async {
+  //   try {
+  //     final encryptedBody = CryptoUtil.encryptPayload(profileData);
+  //     final uri = Uri.parse("$url/student/profile");
+  //     final request = http.MultipartRequest("PUT", uri);
+  //     request.headers["Authorization"] = "Bearer $token";
+  //     request.fields["encrypted"] = encryptedBody;
+  //     if (profilePic != null) {
+  //       request.files.add(
+  //         await http.MultipartFile.fromPath("profile_pic", profilePic.path),
+  //       );
+  //     }
+  //     final streamedResponse = await request.send();
+  //     final response = await http.Response.fromStream(streamedResponse);
+  //     print("📡 Status: ${response.statusCode}");
+  //     final decrypted = CryptoUtil.handleEncryptedResponse(
+  //       response: response,
+  //       context: "updateProfile",
+  //     );
+  //     print(deprecated);
+  //     if (decrypted == null || decrypted["error"] != null) {
+  //       return left(
+  //         decrypted != null ? decrypted["error"].toString() : "Unknown error",
+  //       );
+  //     }
+  //     try {
+  //       final profile = StudentProfileModel.fromJson(decrypted["student"]);
+  //       print(profile.name);
+  //       return right(profile);
+  //     } catch (e) {
+  //       return left("Failed to parse updated profile: $e");
+  //     }
+  //   } catch (e) {
+  //     print("❌ Exception: $e");
+  //     return left("Exception: $e");
+  //   }
+  // }
 
-  static Future<Either<String, RequestApiResponse>> getAllRequests() async {
+  // static Future<Either<String, RequestApiResponse>> getAllRequests() async {
+  //   try {
+  //     final response = await http.get(
+  //       Uri.parse("$url/student/requests"),
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "Authorization": "Bearer $token",
+  //       },
+  //     );
+  //     print("📡 Status: ${response.statusCode}");
+  //     final decrypted = CryptoUtil.handleEncryptedResponse(
+  //       response: response,
+  //       context: "getAllRequests",
+  //     );
+  //     print(decrypted);
+  //     if (decrypted == null || decrypted["error"] != null) {
+  //       return left(
+  //         decrypted != null ? decrypted["error"].toString() : "Unknown error",
+  //       );
+  //     }
+  //     try {
+  //       final apiResponse = RequestApiResponse.fromJson(decrypted);
+  //       // print(apiResponse);
+  //       return right(apiResponse);
+  //     } catch (e) {
+  //       return left("Failed to parse requests: $e");
+  //     }
+  //   } catch (e) {
+  //     print("❌ Exception: $e");
+  //     return left("Exception: $e");
+  //   }
+  // }
+
+  static Future<Either<String, dynamic>> getAllRequests({required String token_}) async {
     try {
       final response = await http.get(
         Uri.parse("$url/student/requests"),
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
+          "Authorization": "Bearer $token_",
         },
       );
       print("📡 Status: ${response.statusCode}");
@@ -333,14 +429,15 @@ class Services {
         response: response,
         context: "getAllRequests",
       );
+      print(decrypted);
       if (decrypted == null || decrypted["error"] != null) {
         return left(
           decrypted != null ? decrypted["error"].toString() : "Unknown error",
         );
       }
       try {
-        final apiResponse = RequestApiResponse.fromJson(decrypted);
-        return right(apiResponse);
+        // print(apiResponse);
+        return right(decrypted);
       } catch (e) {
         return left("Failed to parse requests: $e");
       }
@@ -350,15 +447,49 @@ class Services {
     }
   }
 
-  static Future<Either<String, RequestModel>> getRequestById({
+  // static Future<Either<String, RequestModel>> getRequestById({
+  //   required String requestId,
+  //   required String token_,
+  // }) async {
+  //   try {
+  //     final response = await http.get(
+  //       Uri.parse("$url/student/requests/$requestId"),
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "Authorization": "Bearer $token_",
+  //       },
+  //     );
+  //     print("📡 Status: ${response.statusCode}");
+  //     final decrypted = CryptoUtil.handleEncryptedResponse(
+  //       response: response,
+  //       context: "getRequestById",
+  //     );
+  //     if (decrypted == null || decrypted["error"] != null) {
+  //       return left(
+  //         decrypted != null ? decrypted["error"].toString() : "Unknown error",
+  //       );
+  //     }
+  //     try {
+  //       final request = RequestModel.fromJson(decrypted["request"] ?? {});
+  //       return right(request);
+  //     } catch (e) {
+  //       return left("Failed to parse request: $e");
+  //     }
+  //   } catch (e) {
+  //     print("❌ Exception: $e");
+  //     return left("Exception: $e");
+  //   }
+  // }
+  static Future<Either<String, dynamic>> getRequestById({
     required String requestId,
+    required String token_,
   }) async {
     try {
       final response = await http.get(
         Uri.parse("$url/student/requests/$requestId"),
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
+          "Authorization": "Bearer $token_",
         },
       );
       print("📡 Status: ${response.statusCode}");
@@ -372,8 +503,7 @@ class Services {
         );
       }
       try {
-        final request = RequestModel.fromJson(decrypted["request"] ?? {});
-        return right(request);
+        return right(decrypted);
       } catch (e) {
         return left("Failed to parse request: $e");
       }
@@ -383,44 +513,58 @@ class Services {
     }
   }
 
-  static Future<Either<String, RequestModel>> createRequest({
-    required Map<String, dynamic> requestData,
-  }) async {
-    try {
-      final encryptedBody = CryptoUtil.encryptPayload(requestData);
-      final response = await http.post(
-        Uri.parse("$url/student/create-request"),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
-        },
-        body: jsonEncode({"encrypted": encryptedBody}),
-      );
-      print("📡 Status: ${response.statusCode}");
-      final decrypted = CryptoUtil.handleEncryptedResponse(
-        response: response,
-        context: "createRequest",
-      );
-      if (decrypted == null || decrypted["error"] != null) {
-        return left(
-          decrypted != null ? decrypted["error"].toString() : "Unknown error",
-        );
-      }
-      try {
-        final request = RequestModel.fromJson(decrypted["request"] ?? {});
-        return right(request);
-      } catch (e) {
-        return left("Failed to parse created request: $e");
-      }
-    } catch (e) {
-      print("❌ Exception: $e");
-      return left("Exception: $e");
-    }
-  }
+  // static Future<Either<String, RequestModel>> createRequest({
+  //   required Map<String, dynamic> requestData,
+  // }) async {
+  //   try {
+  //     final encryptedBody = CryptoUtil.encryptPayload(requestData);
+  //     final response = await http.post(
+  //       Uri.parse("$url/student/create-request"),
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "Authorization": "Bearer $token",
+  //       },
+  //       body: jsonEncode({"encrypted": encryptedBody}),
+  //     );
+  //     print("📡 Status: ${response.statusCode}");
+  //     final decrypted = CryptoUtil.handleEncryptedResponse(
+  //       response: response,
+  //       context: "createRequest",
+  //     );
+  //     if (decrypted == null || decrypted["error"] != null) {
+  //       return left(
+  //         decrypted != null ? decrypted["error"].toString() : "Unknown error",
+  //       );
+  //     }
+  //     try {
+  //       final request = RequestModel.fromJson(decrypted["request"] ?? {});
+  //       return right(request);
+  //     } catch (e) {
+  //       return left("Failed to parse created request: $e");
+  //     }
+  //   } catch (e) {
+  //     print("❌ Exception: $e");
+  //     return left("Exception: $e");
+  //   }
+  // }
+
+  // create a reset password service method static
+  //  const encryptedPayload = encryptData({
+  //     oldPassword: "BigjoD3rCL",
+  //     newPassword: "NewPassword123"
+  //   });
+
+  //   console.log("Encrypted Request:", encryptedPayload);
+  //   // use token in header
+  //   const res = await axios.put("http://20.192.25.27:4141/api/admin/reset-password", { encrypted: encryptedPayload }, {
+  //     headers: {
+  //       Authorization: `Bearer ${rawToken}`,
+  //     },
+  //   });
 }
 
 Future<void> main() async {
-  // await Env.load();
+  await Env.load();
 
   // final hehe = await Services.getAllHostelInfo();
   // hehe.fold(
@@ -459,7 +603,6 @@ Future<void> main() async {
   //   (data) => print("✅ Success: ${data.name}"),
   // );
 
-  // print(await Services.getAllRequests());
   // final requestData = {
   //   "request_type": "outing",
   //   "applied_from": "2025-06-12T10:00:00Z",
@@ -468,4 +611,14 @@ Future<void> main() async {
   // };
   // print(await Services.createRequest(requestData: requestData));
   // print(await Services.getRequestById(requestId: "68aef4b26ce427e7a490d781"));
+
+  final thing = await Services.login("22EC002584", "test1");
+  // print(thing);
+  final token = thing['token'];
+  print(
+    await Services.getAllRequests(
+      // requestId: "68b5bbf224cd43a5078b94c9",
+      token_: token,
+    ),
+  );
 }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:dartz/dartz.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/core/util/crypto_utils.dart';
 import 'package:http/http.dart' as http;
@@ -12,6 +13,8 @@ class StudentAuthService {
     required String password,
   }) async {
     try {
+      print(enrollmentNo);
+      print(password);
       final payload = {"enrollment_no": enrollmentNo, "password": password};
 
       final encrypted = CryptoUtil.encryptPayload(payload);
@@ -67,5 +70,41 @@ class StudentAuthService {
       diSession.role = session.role;
     }
     return session;
+  }
+
+  static Future<Either<String, bool>> resetPassword({
+    required String oldPassword,
+    required String newPassword,
+    required String token,
+  }) async {
+    try {
+      final encryptedPayload = CryptoUtil.encryptPayload({
+        'oldPassword': oldPassword,
+        'newPassword': newPassword,
+      });
+      final response = await http.put(
+        Uri.parse("http://20.192.25.27:4141/api/admin/reset-password"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({"encrypted": encryptedPayload}),
+      );
+      print("📡 Status: ${response.statusCode}");
+      final decrypted = CryptoUtil.handleEncryptedResponse(
+        response: response,
+        context: "resetPassword",
+      );
+      if (decrypted == null || decrypted["error"] != null) {
+        return left(
+          decrypted != null ? decrypted["error"].toString() : "Unknown error",
+        );
+      }
+      // If success, return true
+      return right(true);
+    } catch (e) {
+      print("❌ Exception: $e");
+      return left("Exception: $e");
+    }
   }
 }
