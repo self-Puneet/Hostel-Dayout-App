@@ -339,25 +339,32 @@ class RequestApiResponse {
   }
 }
 
+// seniorWarden, assistantWarden, studentId
+
 class RequestDetailApiResponse {
   final String message;
   final RequestModel request;
   final WardenModel assistentWarden;
   final WardenModel seniorWarden;
+  final StudentProfileModel studentId;
 
   RequestDetailApiResponse({
     required this.message,
     required this.request,
     required this.assistentWarden,
     required this.seniorWarden,
+    required this.studentId,
   });
 
   factory RequestDetailApiResponse.fromJson(Map<String, dynamic> json) {
     return RequestDetailApiResponse(
       message: json['message'] ?? '',
       request: RequestModel.fromJson(json['request'] ?? {}),
-      assistentWarden: WardenModel.fromJson(json['assistent_warden'] ?? {}),
-      seniorWarden: WardenModel.fromJson(json['senior_warden'] ?? {}),
+      assistentWarden: WardenModel.fromJson(json['assistantWarden']),
+      seniorWarden: WardenModel.fromJson(json['seniorWarden']),
+      studentId: StudentProfileModel.fromJson(
+        json['studentId']['student'] ?? {},
+      ),
     );
   }
 
@@ -365,8 +372,9 @@ class RequestDetailApiResponse {
     return {
       "message": message,
       "request": request.toJson(),
-      "assistent_warden": assistentWarden.toJson(),
-      "senior_warden": seniorWarden.toJson(),
+      "assistantWarden": assistentWarden.toJson(),
+      "seniorWarden": seniorWarden.toJson(),
+      "student_id": studentId.toJson(),
     };
   }
 }

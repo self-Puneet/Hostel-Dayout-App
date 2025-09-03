@@ -64,7 +64,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: const Icon(Icons.edit),
                     onPressed: () => controller.enterEditMode(),
                   ),
-                _ProfilePicSection(profile: profile),
+                // _ProfilePicSection(profile: profile),
                 const SizedBox(height: 16),
                 _sectionTitle('Student Info'),
                 _infoRow('Enrollment No', profile.enrollmentNo),
@@ -259,22 +259,22 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
-class _ProfilePicSection extends StatelessWidget {
-  final StudentProfileModel profile;
-  const _ProfilePicSection({required this.profile});
+// class _ProfilePicSection extends StatelessWidget {
+//   final StudentProfileModel profile;
+//   const _ProfilePicSection({required this.profile});
 
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: CircleAvatar(
-        radius: 48,
-        backgroundImage: profile.profilePic.isNotEmpty
-            ? NetworkImage(profile.profilePic)
-            : null,
-        child: profile.profilePic.isEmpty
-            ? const Icon(Icons.person, size: 48)
-            : null,
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Center(
+//       child: CircleAvatar(
+//         radius: 48,
+//         backgroundImage: profile.profilePic.isNotEmpty
+//             ? NetworkImage(profile.profilePic)
+//             : null,
+//         child: profile.profilePic.isEmpty
+//             ? const Icon(Icons.person, size: 48)
+//             : null,
+//       ),
+//     );
+//   }
+// }

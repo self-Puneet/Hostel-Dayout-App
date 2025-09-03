@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/presentation/widgets/call_button.dart';
 
 class ContactCard extends StatelessWidget {
   final String name;
   final String role;
-  final VoidCallback? onCall;
+  final String phoneNumber;
 
   const ContactCard({
     Key? key,
     required this.name,
     required this.role,
-    this.onCall,
+    required this.phoneNumber,
   }) : super(key: key);
 
   /// Get initials from name
@@ -24,6 +25,7 @@ class ContactCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -71,19 +73,7 @@ class ContactCard extends StatelessWidget {
             ),
           ),
           // Call button
-          if (onCall != null)
-            InkWell(
-              onTap: onCall,
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.call, color: Colors.blue, size: 20),
-              ),
-            ),
+          CallButton(phoneNumber: phoneNumber),
         ],
       ),
     );

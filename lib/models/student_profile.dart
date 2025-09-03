@@ -6,7 +6,7 @@ class StudentProfileModel {
   final String name;
   final String email;
   final String phoneNo;
-  final String profilePic;
+  final String? profilePic;
   String hostelName;
   String roomNo;
   int semester;
@@ -19,7 +19,7 @@ class StudentProfileModel {
     required this.name,
     required this.email,
     required this.phoneNo,
-    required this.profilePic,
+    this.profilePic,
     required this.hostelName,
     required this.roomNo,
     required this.semester,

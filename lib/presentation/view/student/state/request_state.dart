@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 
 class RequestState extends ChangeNotifier {
-  bool isLoading = false;
-  RequestModel? request;
+  bool isLoading = true;
+  RequestDetailApiResponse? request;
   bool isErrored = false;
   String errorMessage = '';
 
@@ -12,7 +12,7 @@ class RequestState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setRequest(RequestModel req) {
+  void setRequest(RequestDetailApiResponse req) {
     request = req;
     notifyListeners();
   }

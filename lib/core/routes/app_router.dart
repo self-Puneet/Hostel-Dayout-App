@@ -93,8 +93,9 @@ class AppRouter {
                   name: 'request-detail',
                   builder: (context, state) {
                     final requestId = state.pathParameters['id'] ?? '';
-                    return RequestPage(requestId: requestId);
-                  },
+                    final role = Get.find<LoginSession>().role;
+                    return RequestPage(actor: role, requestId: requestId);
+                    },
                   redirect: (context, state) {
                     final session = Get.find<LoginSession>();
                     if (session.token.isEmpty || !session.isValid) {

@@ -2,12 +2,23 @@ import 'package:hostel_mgmt/models/hostels_model.dart';
 
 enum WardenRole { assitentWarden, seniorWarden }
 
+extension WardenRoleX on WardenRole {
+  String get displayName {
+    switch (this) {
+      case WardenRole.assitentWarden:
+        return "Assistent Warden";
+      case WardenRole.seniorWarden:
+        return "Senior Warden";
+    }
+  }
+}
+
 class WardenModel {
   final String wardenId;
   final String empId;
   final String name;
   final String phoneNo;
-  final HostelModel hostelModel;
+  final HostelModel? hostelModel;
   final String? profilePicUrl;
   final WardenRole wardenRole;
   final String? email;
@@ -18,7 +29,7 @@ class WardenModel {
     required this.empId,
     required this.name,
     required this.phoneNo,
-    required this.hostelModel,
+    this.hostelModel,
     this.profilePicUrl,
     required this.wardenRole,
     this.email,
@@ -29,7 +40,7 @@ class WardenModel {
     switch (status) {
       case "senior_warden":
         return WardenRole.seniorWarden;
-      case "assistent_warden":
+      case "warden":
         return WardenRole.assitentWarden;
       default:
         return WardenRole.assitentWarden;
@@ -38,12 +49,12 @@ class WardenModel {
 
   factory WardenModel.fromJson(Map<String, dynamic> json) {
     return WardenModel(
-      wardenId: json['warden_id'] ?? '',
-      empId: json['emp_id'] ?? '',
-      name: json['name'] ?? '',
+      wardenId: json['warden_id'],
+      empId: json['emp_id'],
+      name: json['name'],
       wardenRole: _roleFromString(json['role']),
-      hostelModel: HostelModel.fromJson(json['hostel']),
-      profilePicUrl: json['profile_pic'] ?? '',
+      // hostelModel: HostelModel.fromJson(json['hostel']),
+      profilePicUrl: json['profile_pic'],
       phoneNo: json['phone_no'] ?? '',
       email: json['email'],
       languagePreference: json['language_preference'],
@@ -58,7 +69,7 @@ class WardenModel {
       'role': wardenRole,
       if (profilePicUrl != null) 'profile_pic': profilePicUrl,
       'phone_no': phoneNo,
-      'hostel_id': hostelModel.hostelId,
+      'hostel_id': hostelModel!.hostelId,
       if (email != null) 'email': email,
       if (languagePreference != null) 'language_preference': languagePreference,
     };
