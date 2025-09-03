@@ -84,9 +84,9 @@ class RequestService {
       }
       try {
         // await writeToFile("content.txt", decrypted.toString());
-        final mapping = decrypted.keys.map((key) {
-          print("$key -> ${decrypted[key]}");
-        }).toList();
+        // final mapping = decrypted.keys.map((key) {
+        //   print("$key -> ${decrypted[key]}");
+        // }).toList();
 
         // print(mapping);
 
