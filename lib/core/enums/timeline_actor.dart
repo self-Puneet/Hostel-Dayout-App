@@ -8,7 +8,7 @@ extension TimelineActorX on TimelineActor {
       case TimelineActor.parent:
         return 'Parent';
       case TimelineActor.assistentWarden:
-        return 'Warden';
+        return 'Assistant Warden';
       case TimelineActor.seniorWarden:
         return 'Senior Warden';
       case TimelineActor.security:

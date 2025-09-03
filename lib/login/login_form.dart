@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/helpers/unfocus.dart';
 import 'package:hostel_mgmt/core/theme/elevated_button_theme.dart';
 import 'package:hostel_mgmt/login/login_state.dart';
-import 'package:hostel_mgmt/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'login_controller.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';

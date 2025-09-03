@@ -95,4 +95,25 @@ extension RequestStatusX on RequestStatus {
         return Colors.grey;
     }
   }
+
+  IconData get minimalStatusIcon {
+    switch (this) {
+      case RequestStatus.requested:
+        return Icons.hourglass_top_rounded;
+      case RequestStatus.referred:
+        return Icons.hourglass_top_rounded;
+      case RequestStatus.cancelled:
+        return Icons.cancel_outlined;
+      case RequestStatus.parentApproved:
+        return Icons.hourglass_top_rounded;
+      case RequestStatus.parentDenied:
+        return Icons.cancel_outlined;
+      case RequestStatus.rejected:
+        return Icons.cancel_outlined;
+      case RequestStatus.approved:
+        return Icons.check_circle;
+      case RequestStatus.cancelledStudent:
+        return Icons.remove_circle;
+    }
+  }
 }

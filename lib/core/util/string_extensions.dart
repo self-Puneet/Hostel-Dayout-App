@@ -1,8 +1,13 @@
 extension StringCasingExtension on String {
   String get capitalizeFirst {
-    if (isEmpty) return this;
-    this.split(" ".)
-    return this[0].toUpperCase() + substring(1);
+    if (trim().isEmpty) return this;
+
+    return split(" ")
+        .map(
+          (word) =>
+              word.isEmpty ? "" : word[0].toUpperCase() + word.substring(1),
+        )
+        .join(" ");
   }
 
   String get initials {

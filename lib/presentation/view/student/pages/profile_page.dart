@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/models/branch_model.dart';
-import 'package:hostel_mgmt/models/student_profile.dart';
 import 'package:hostel_mgmt/services/profile_service.dart';
 import 'package:provider/provider.dart';
-// import '../../../models/hostels_model.dart';
 import '../state/profile_state.dart';
 import '../controllers/profile_controller.dart';
 

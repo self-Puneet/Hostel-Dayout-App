@@ -31,7 +31,7 @@ class SimpleRequestCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                requestType.name.capitalizeFirst(),
+                requestType.name.capitalizeFirst,
                 style: const TextStyle(
                   fontFamily: "Poppins",
                   fontWeight: FontWeight.w500, // 500 = Medium

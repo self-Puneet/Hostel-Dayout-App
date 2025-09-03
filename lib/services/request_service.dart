@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/core/util/crypto_utils.dart';
@@ -7,7 +6,6 @@ import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:get/get.dart';
-import 'package:flutter/foundation.dart';
 
 // void printFullText(String text) {
 //   final pattern = RegExp('.{1,800}'); // split into chunks of 800 chars
