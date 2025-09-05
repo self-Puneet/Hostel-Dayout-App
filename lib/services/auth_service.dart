@@ -4,11 +4,12 @@ import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/core/util/crypto_utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
+import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 
-class StudentAuthService {
+class AuthService {
   static const String apiUrl = "http://20.192.25.27:4141/api/student/login";
 
-  static Future<Map<String, dynamic>?> loginStudent({
+  static Future<Either<String, LoginSession>> loginStudent({
     required String enrollmentNo,
     required String password,
   }) async {
@@ -16,7 +17,6 @@ class StudentAuthService {
       print(enrollmentNo);
       print(password);
       final payload = {"enrollment_no": enrollmentNo, "password": password};
-
       final encrypted = CryptoUtil.encryptPayload(payload);
 
       final response = await http.post(
@@ -27,38 +27,89 @@ class StudentAuthService {
 
       print("📡 Status: ${response.statusCode}");
 
-      if (response.statusCode == 200) {
-        try {
-          final encryptedResponse = response.body.trim().replaceAll('"', '');
-          final decrypted = CryptoUtil.decryptPayload(encryptedResponse);
-          return decrypted;
-        } catch (e) {
-          print("❌ Error decrypting: $e");
-          print("Raw response: ${response.body}");
-        }
-      } else {
-        try {
-          print("❌ Error: ${response.body}");
-          final encryptedResponse = response.body.trim().replaceAll('"', '');
-          final decrypted = CryptoUtil.decryptPayload(encryptedResponse);
-          return decrypted;
-        } catch (e) {
-          print("❌ Error decrypting: $e");
-          print("Raw response: ${response.body}");
-        }
+      final decrypted = CryptoUtil.handleEncryptedResponse(
+        response: response,
+        context: "loginStudent",
+      );
+      if (decrypted == null) {
+        return left("Unknown error");
       }
+      if (decrypted["error"] != null) {
+        return left(decrypted["error"].toString());
+      }
+      // If token is missing, treat as error
+      if ((decrypted['token'] ?? '').toString().isEmpty) {
+        return left(decrypted['message']?.toString() ?? "Login failed");
+      }
+      // Build LoginSession from response
+      final session = LoginSession(
+        token: decrypted['token'],
+        username: decrypted['name'],
+        email: decrypted['email'],
+        identityId: decrypted['enrollment_no'],
+        role: TimelineActor.student,
+        imageURL: decrypted['imageURL'],
+      );
+      await session.saveToPrefs();
+      return right(session);
     } catch (e) {
       print("❌ Exception: $e");
+      return left("Exception: $e");
     }
-    return null;
   }
 
-  /// Student Logout - clears the saved session
+  static const String apiBaseWarden = "http://20.192.25.27:4141/api/warden";
+
+  static Future<Either<String, LoginSession>> loginAssistentWarden({
+    required String empId,
+    required String password,
+  }) async {
+    try {
+      final payload = {
+        "emp_id": empId,
+        "wardenType": "assistant",
+        "password": password,
+      };
+      final encrypted = CryptoUtil.encryptPayload(payload);
+      final response = await http.post(
+        Uri.parse("$apiBaseWarden/login/warden"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"encrypted": encrypted}),
+      );
+      print("📡 Status: ${response.statusCode}");
+      final decrypted = CryptoUtil.handleEncryptedResponse(
+        response: response,
+        context: "loginAssistentWarden",
+      );
+      if (decrypted == null) {
+        return left("Unknown error");
+      }
+      if (decrypted["error"] != null) {
+        return left(decrypted["error"].toString());
+      }
+      if ((decrypted['token'] ?? '').toString().isEmpty) {
+        return left(decrypted['message']?.toString() ?? "Login failed");
+      }
+      final session = LoginSession(
+        token: decrypted['token'],
+        username: decrypted['name'],
+        email: decrypted['email'],
+        identityId: decrypted['emp_id'],
+        role: TimelineActor.assistentWarden,
+        imageURL: decrypted['imageURL'],
+      );
+      await session.saveToPrefs();
+      return right(session);
+    } catch (e) {
+      print("❌ Exception: $e");
+      return left("Exception: $e");
+    }
+  }
+
   static Future<void> logoutStudent() async {
     await LoginSession.clearPrefs();
   }
 
-  /// Load existing student session
   static Future<LoginSession?> getSavedStudentSession() async {
     final session = await LoginSession.loadFromPrefs();
     if (session != null && Get.isRegistered<LoginSession>()) {

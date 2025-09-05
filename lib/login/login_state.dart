@@ -5,6 +5,16 @@ import 'package:hostel_mgmt/login/login_page_model.dart';
 enum FieldsType { identityField, verificationField, model }
 
 class LoginState extends ChangeNotifier with WidgetsBindingObserver {
+  // Warden type selection state
+  String _wardenType = 'assistant'; // 'assistant' or 'senior'
+  String get wardenType => _wardenType;
+  void setWardenType(String value) {
+    if (_wardenType != value) {
+      _wardenType = value;
+      notifyListeners();
+    }
+  }
+
   LoginState() {
     WidgetsBinding.instance.addObserver(this);
   }

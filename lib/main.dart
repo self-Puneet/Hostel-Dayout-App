@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       title: "Hostel Mgmt",
       theme: AppTheme.lightTheme,
-      routerConfig: router, // 👈 just pass the GoRouter here
+      routerConfig: router,
     );
   }
 }

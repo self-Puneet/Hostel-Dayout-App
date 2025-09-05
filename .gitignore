@@ -44,3 +44,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+
+test.dart
+test.py
+output.json
+test_controller.dart
+requests.json
+test1.dart
+test.dart

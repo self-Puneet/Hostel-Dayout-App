@@ -50,7 +50,6 @@ class LoginController {
 
   Future<void> login(BuildContext context, TimelineActor actor) async {
     state.setLoggingIn(true);
-    await Future.delayed(const Duration(milliseconds: 500));
 
     final identity =
         state.textFieldMap[actor]?[FieldsType.identityField]?.text.trim() ?? "";
@@ -70,61 +69,93 @@ class LoginController {
     }
 
     try {
-      Map<String, dynamic>? result;
-      if (actor == TimelineActor.student) {
-        print(identity);
-        print(verification);
-        result = await StudentAuthService.loginStudent(
-          enrollmentNo: identity,
-          password: verification,
-        );
-      } else {
-        // TODO: Implement other actor logins
-        throw Exception("Unsupported actor type");
+      switch (actor) {
+        case TimelineActor.student:
+          final result = await AuthService.loginStudent(
+            enrollmentNo: identity,
+            password: verification,
+          );
+          result.fold(
+            (error) {
+              state.setLoggingIn(false);
+              AppSnackBar.show(
+                context,
+                message: error,
+                type: AppSnackBarType.error,
+                icon: LoginSnackBarType.loginFailed.icon,
+              );
+            },
+            (session) async {
+              final diSession = Get.find<LoginSession>();
+              diSession.token = session.token;
+              diSession.username = session.username;
+              diSession.identityId = session.identityId;
+              diSession.role = session.role;
+              diSession.imageURL = session.imageURL;
+              await diSession.saveToPrefs();
+              state.setLoggingIn(false);
+              GoRouter.of(context).go('/home');
+              AppSnackBar.show(
+                context,
+                message: LoginSnackBarType.success.message,
+                type: AppSnackBarType.success,
+                icon: LoginSnackBarType.success.icon,
+              );
+            },
+          );
+          break;
+        case TimelineActor.assistentWarden:
+          final result = await AuthService.loginAssistentWarden(
+            empId: identity,
+            password: verification,
+          );
+          result.fold(
+            (error) {
+              state.setLoggingIn(false);
+              AppSnackBar.show(
+                context,
+                message: error,
+                type: AppSnackBarType.error,
+                icon: LoginSnackBarType.loginFailed.icon,
+              );
+            },
+            (session) async {
+              final diSession = Get.find<LoginSession>();
+              diSession.token = session.token;
+              diSession.username = session.username;
+              diSession.identityId = session.identityId;
+              diSession.role = session.role;
+              diSession.imageURL = session.imageURL;
+              await diSession.saveToPrefs();
+              state.setLoggingIn(false);
+              GoRouter.of(context).go('/home');
+              AppSnackBar.show(
+                context,
+                message: LoginSnackBarType.success.message,
+                type: AppSnackBarType.success,
+                icon: LoginSnackBarType.success.icon,
+              );
+            },
+          );
+          break;
+        case TimelineActor.parent:
+        case TimelineActor.seniorWarden:
+        default:
+          state.setLoggingIn(false);
+          AppSnackBar.show(
+            context,
+            message: "Login for this actor is not implemented yet.",
+            type: AppSnackBarType.info,
+            icon: Icons.info,
+          );
+          break;
       }
-
-      // Handle null or missing token
-      if (result == null || (result['token'] ?? '').toString().isEmpty) {
-        state.setLoggingIn(false);
-        final backendMsg = result?['message'] ?? result?['error'];
-        AppSnackBar.show(
-          context,
-          message: backendMsg ?? LoginSnackBarType.loginFailed.message,
-          type: AppSnackBarType.error,
-          icon: LoginSnackBarType.loginFailed.icon,
-        );
-        return;
-      }
-
-      // ✅ Update DI LoginSession
-      final session = Get.find<LoginSession>();
-      session.token = result['token'] ?? '';
-      session.username = result['name'] ?? '';
-      session.identityId = result['enrollment_no'] ?? '';
-      session.role = actor;
-      session.imageURL = result['imageURL'];
-      await session.saveToPrefs();
-
-      state.setLoggingIn(false);
-
-      GoRouter.of(context).go('/home');
-      AppSnackBar.show(
-        context,
-        message: result['message'] ?? LoginSnackBarType.success.message,
-        type: AppSnackBarType.success,
-        icon: LoginSnackBarType.success.icon,
-      );
-
-      // TODO: Navigate to home page (based on actor)
     } catch (e) {
       state.setLoggingIn(false);
-
       String errorMessage = e.toString();
-      // try to extract backend error if StudentAuthService throws response body
       if (errorMessage.contains("Exception:")) {
         errorMessage = errorMessage.replaceFirst("Exception:", "").trim();
       }
-
       AppSnackBar.show(
         context,
         message: errorMessage.isNotEmpty
@@ -157,23 +188,7 @@ class LoginController {
     );
   }
 
-  static void resetPassword(BuildContext context, TimelineActor actor) async {
-    // Retrieve the old and new passwords from text fields.
-    // Adjust the field keys as appropriate for your UI.
-    // final oldPassword = state.textFieldMap[actor]?[FieldsType.identityField]?.text.trim() ?? "";
-    // final newPassword = state.textFieldMap[actor]?[FieldsType.verificationField]?.text.trim() ?? "";
-
-    // if (oldPassword.isEmpty || newPassword.isEmpty) {
-    //   AppSnackBar.show(
-    //     context,
-    //     message: "Please enter both your old and new passwords.",
-    //     type: AppSnackBarType.alert,
-    //     icon: Icons.warning,
-    //   );
-    //   return;
-    // }
-
-    // Get the current session token
+  static void doResetPassword(BuildContext context, TimelineActor actor) async {
     final session = Get.find<LoginSession>();
     final token = session.token;
     if (token.isEmpty) {
@@ -186,8 +201,8 @@ class LoginController {
       return;
     }
 
-    // Call the resetPassword service method.
-    final result = await StudentAuthService.resetPassword(
+    // Call the doResetPassword service method.
+    final result = await AuthService.resetPassword(
       oldPassword: "MP8XS0GJRE",
       newPassword: "test",
       token: token,

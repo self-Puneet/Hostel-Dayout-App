@@ -1,11 +1,20 @@
 // app_router.dart
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/login/login_layout.dart';
 import 'package:hostel_mgmt/presentation/view/student/pages/request_page.dart';
-import 'package:hostel_mgmt/test/test_page.dart';
 import '../../presentation/view/student/pages/pages.dart';
+
+// Helper for route guards
+String? _requireAuthRedirect(BuildContext context, GoRouterState state) {
+  final session = Get.find<LoginSession>();
+  if (session.token.isEmpty || !session.isValid) {
+    return '/login';
+  }
+  return null;
+}
 
 class AppRouter {
   static GoRouter build() {
@@ -25,68 +34,36 @@ class AppRouter {
         return null;
       },
       routes: [
-        // a route for test pages
-        GoRoute(
-          path: '/test',
-          name: 'test',
-          builder: (context, state) => const DemoPage(),
-        ),
 
-        // another route for history page
-
-        /// Login route (outside shell)
         GoRoute(
           path: '/login',
           name: 'login',
           builder: (context, state) => const LoginLayout(),
         ),
 
-        /// Shell route provides layout for authenticated area
         ShellRoute(
           builder: (context, state, child) {
             return StudentLayout(child: child);
-            // 👆 StudentLayout should take a `child` widget
-            // and wrap it with shared layout (AppBar, Drawer, BottomNav, etc.)
           },
           routes: [
-            /// Home is the first route after login
             GoRoute(
               path: '/home',
               name: 'home',
               builder: (context, state) => const HomePage(),
-              // Add LoginGuard middleware
-              redirect: (context, state) {
-                final session = Get.find<LoginSession>();
-                if (session.token.isEmpty || !session.isValid) {
-                  return '/login';
-                }
-                return null;
-              },
+              redirect: _requireAuthRedirect,
             ),
             GoRoute(
               path: '/history',
               name: 'history',
               builder: (context, state) => const HistoryPage(),
-              redirect: (context, state) {
-                final session = Get.find<LoginSession>();
-                if (session.token.isEmpty || !session.isValid) {
-                  return '/login';
-                }
-                return null;
-              },
+              redirect: _requireAuthRedirect,
             ),
 
             GoRoute(
               path: '/request',
               name: 'request',
               builder: (context, state) => const RequestFormPage(),
-              redirect: (context, state) {
-                final session = Get.find<LoginSession>();
-                if (session.token.isEmpty || !session.isValid) {
-                  return '/login';
-                }
-                return null;
-              },
+              redirect: _requireAuthRedirect,
               routes: [
                 GoRoute(
                   path: ':id',
@@ -95,14 +72,8 @@ class AppRouter {
                     final requestId = state.pathParameters['id'] ?? '';
                     final role = Get.find<LoginSession>().role;
                     return RequestPage(actor: role, requestId: requestId);
-                    },
-                  redirect: (context, state) {
-                    final session = Get.find<LoginSession>();
-                    if (session.token.isEmpty || !session.isValid) {
-                      return '/login';
-                    }
-                    return null;
                   },
+                  redirect: _requireAuthRedirect,
                 ),
               ],
             ),
@@ -110,13 +81,7 @@ class AppRouter {
               path: '/profile',
               name: 'profile',
               builder: (context, state) => const ProfilePage(),
-              redirect: (context, state) {
-                final session = Get.find<LoginSession>();
-                if (session.token.isEmpty || !session.isValid) {
-                  return '/login';
-                }
-                return null;
-              },
+              redirect: _requireAuthRedirect,
             ),
           ],
         ),

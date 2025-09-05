@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
@@ -415,7 +416,9 @@ class Services {
   //   }
   // }
 
-  static Future<Either<String, dynamic>> getAllRequests({required String token_}) async {
+  static Future<Either<String, dynamic>> getAllRequests({
+    required String token_,
+  }) async {
     try {
       final response = await http.get(
         Uri.parse("$url/student/requests"),
@@ -563,62 +566,90 @@ class Services {
   //   });
 }
 
-Future<void> main() async {
+// Future<void> main() async {
+//   await Env.load();
+
+// final hehe = await Services.getAllHostelInfo();
+// hehe.fold(
+//   (error) => print("❌ Error: $error"),
+//   (data) => data.hostels.forEach((hostel) {
+//     print("✅ Success: ${hostel.hostelName}");
+//   }),
+// );
+
+// final branches = await Services.getAllBranches();
+// branches.fold(
+//   (error) => print("❌ Error: $error"),
+//   (data) => data.branches.forEach((branch) {
+//     print("✅ Success: ${branch.name}");
+//   }),
+// );
+
+// final studentProfile = await Services.getStudentProfile();
+// studentProfile.fold(
+//   (error) => print("❌ Error: $error"),
+//   (data) => print("✅ Success: ${data.student.name}"),
+// );
+
+// final hostelInfo = await Services.getHostelInfo();
+// hostelInfo.fold(
+//   (error) => print("❌ Error: $error"),
+//   (data) => print("✅ Success: ${data.hostel.hostelName}"),
+// );
+
+// final updateProfile = await Services.updateProfile(
+//   profileData: {"name": "test", "email": "test@spsu.ac.in"},
+//   profilePic: File("C:\\Users\\punee\\OneDrive\\Desktop\\download.jpeg"),
+// );
+// updateProfile.fold(
+//   (error) => print("❌ Error: $error"),
+//   (data) => print("✅ Success: ${data.name}"),
+// );
+
+// final requestData = {
+//   "request_type": "outing",
+//   "applied_from": "2025-06-12T10:00:00Z",
+//   "applied_to": "2025-06-15T18:00:00Z",
+//   "reason": "Family function",
+// };
+// print(await Services.createRequest(requestData: requestData));
+// print(await Services.getRequestById(requestId: "68aef4b26ce427e7a490d781"));
+
+//   final thing = await Services.login("22EC002584", "test1");
+//   // print(thing);
+//   final token = thing['token'];
+//   print(
+//     await Services.getAllRequests(
+//       // requestId: "68b5bbf224cd43a5078b94c9",
+//       token_: token,
+//     ),
+//   );
+// }
+void main() async {
   await Env.load();
 
-  // final hehe = await Services.getAllHostelInfo();
-  // hehe.fold(
-  //   (error) => print("❌ Error: $error"),
-  //   (data) => data.hostels.forEach((hostel) {
-  //     print("✅ Success: ${hostel.hostelName}");
-  //   }),
-  // );
+  // Example usage of the login function
+  // final empId = "W12345";
+  // final password = "wardenPass";
 
-  // final branches = await Services.getAllBranches();
-  // branches.fold(
-  //   (error) => print("❌ Error: $error"),
-  //   (data) => data.branches.forEach((branch) {
-  //     print("✅ Success: ${branch.name}");
-  //   }),
-  // );
+  final loginResponse = await Services.login("22EC002584", "test1");
+  print(loginResponse);
 
-  // final studentProfile = await Services.getStudentProfile();
-  // studentProfile.fold(
-  //   (error) => print("❌ Error: $error"),
-  //   (data) => print("✅ Success: ${data.student.name}"),
-  // );
-
-  // final hostelInfo = await Services.getHostelInfo();
-  // hostelInfo.fold(
-  //   (error) => print("❌ Error: $error"),
-  //   (data) => print("✅ Success: ${data.hostel.hostelName}"),
-  // );
-
-  // final updateProfile = await Services.updateProfile(
-  //   profileData: {"name": "test", "email": "test@spsu.ac.in"},
-  //   profilePic: File("C:\\Users\\punee\\OneDrive\\Desktop\\download.jpeg"),
-  // );
-  // updateProfile.fold(
-  //   (error) => print("❌ Error: $error"),
-  //   (data) => print("✅ Success: ${data.name}"),
-  // );
-
-  // final requestData = {
-  //   "request_type": "outing",
-  //   "applied_from": "2025-06-12T10:00:00Z",
-  //   "applied_to": "2025-06-15T18:00:00Z",
-  //   "reason": "Family function",
-  // };
-  // print(await Services.createRequest(requestData: requestData));
-  // print(await Services.getRequestById(requestId: "68aef4b26ce427e7a490d781"));
-
-  final thing = await Services.login("22EC002584", "test1");
-  // print(thing);
-  final token = thing['token'];
-  print(
-    await Services.getAllRequests(
-      // requestId: "68b5bbf224cd43a5078b94c9",
-      token_: token,
-    ),
+  final payload = {
+    "emp_id": "W002",
+    "wardenType": "warden",
+    "password": "l5wq+D701/",
+  };
+  final encrypted = CryptoUtil.encryptPayload(payload);
+  final response = await http.post(
+    Uri.parse("http://20.192.25.27:4141/api/warden/login/warden"),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode({"encrypted": encrypted}),
   );
+  print("📡 Status: ${response.statusCode}");
+  final decrypted = CryptoUtil.handleEncryptedResponse(
+    response: response,
+    context: "loginAssistentWarden",
+  );
+  print(decrypted);
 }

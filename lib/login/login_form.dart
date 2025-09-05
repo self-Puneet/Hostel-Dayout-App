@@ -33,7 +33,8 @@ class LoginPage extends StatelessWidget {
             : const SizedBox.shrink(),
         loginModel.showResetPassword
             ? TextButton(
-                onPressed: () => LoginController.resetPassword(context, actor),
+                onPressed: () =>
+                    LoginController.doResetPassword(context, actor),
                 child: const Text("Reset Password"),
               )
             : const SizedBox.shrink(),
@@ -66,6 +67,41 @@ class LoginPage extends StatelessWidget {
       style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
     );
 
+    // Warden type selector row (only for assistentWarden)
+    final wardenTypeSelector = actor == TimelineActor.assistentWarden
+        ? (!state.isKeyboardOpen)
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Row(
+                      children: [
+                        Radio<String>(
+                          value: 'assistant',
+                          groupValue: state.wardenType,
+                          onChanged: (val) {
+                            if (val != null) state.setWardenType(val);
+                          },
+                        ),
+                        const Text('Assistant\nWarden'),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Radio<String>(
+                          value: 'senior',
+                          groupValue: state.wardenType,
+                          onChanged: (val) {
+                            if (val != null) state.setWardenType(val);
+                          },
+                        ),
+                        const Text('Senior\nWarden'),
+                      ],
+                    ),
+                  ],
+                )
+              : const SizedBox.shrink()
+        : const SizedBox.shrink();
+
     final loginButton = !state.isLoggingIn
         ? ElevatedButton(
             onPressed: () => controller.login(context, actor), // 👈 pass actor
@@ -77,7 +113,6 @@ class LoginPage extends StatelessWidget {
         : DisabledElevatedButton(text: loginModel.disabledButtonText);
 
     return Scaffold(
-      // backgroundColor: Colors.grey.shade100,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(0),
@@ -94,6 +129,8 @@ class LoginPage extends StatelessWidget {
                   children: [
                     formTitle,
                     const SizedBox(height: 24),
+                    wardenTypeSelector,
+                    const SizedBox(height: 16),
                     identityField,
                     const SizedBox(height: 16),
                     varificationField,
