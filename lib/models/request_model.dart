@@ -313,6 +313,52 @@ class RequestModel {
           : null,
     };
   }
+
+  RequestModel copyWith({
+    String? id,
+    String? requestId,
+    RequestType? requestType,
+    String? studentEnrollmentNumber,
+    DateTime? appliedFrom,
+    DateTime? appliedTo,
+    String? reason,
+    RequestStatus? status,
+    bool? active,
+    String? createdBy,
+    DateTime? appliedAt,
+    DateTime? lastUpdatedAt,
+    SecurityStatus? securityStatus,
+    String? parentRemark,
+    StudentAction? studentAction,
+    ParentAction? parentAction,
+    AssistantWardenAction? assistantWardenAction,
+    SeniorWardenAction? seniorWardenAction,
+    SecurityGuardAction? securityGuardAction,
+  }) {
+    return RequestModel(
+      id: id ?? this.id,
+      requestId: requestId ?? this.requestId,
+      requestType: requestType ?? this.requestType,
+      studentEnrollmentNumber:
+          studentEnrollmentNumber ?? this.studentEnrollmentNumber,
+      appliedFrom: appliedFrom ?? this.appliedFrom,
+      appliedTo: appliedTo ?? this.appliedTo,
+      reason: reason ?? this.reason,
+      status: status ?? this.status,
+      active: active ?? this.active,
+      createdBy: createdBy ?? this.createdBy,
+      appliedAt: appliedAt ?? this.appliedAt,
+      lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
+      securityStatus: securityStatus ?? this.securityStatus,
+      parentRemark: parentRemark ?? this.parentRemark,
+      studentAction: studentAction ?? this.studentAction,
+      parentAction: parentAction ?? this.parentAction,
+      assistantWardenAction:
+          assistantWardenAction ?? this.assistantWardenAction,
+      seniorWardenAction: seniorWardenAction ?? this.seniorWardenAction,
+      securityGuardAction: securityGuardAction ?? this.securityGuardAction,
+    );
+  }
 }
 
 class RequestApiResponse {

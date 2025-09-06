@@ -215,6 +215,11 @@ class HomePage extends StatelessWidget {
                             child: state.filteredRequests == null
                                 ? Center(child: Text('No requests found'))
                                 : SimpleRequestCard(
+                                    name: state
+                                        .filteredRequests!
+                                        .studentAction!
+                                        .studentProfileModel
+                                        .name,
                                     requestType:
                                         state.filteredRequests!.requestType,
                                     fromDate:

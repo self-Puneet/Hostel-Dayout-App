@@ -6,7 +6,7 @@ import 'package:hostel_mgmt/core/enums/request_type.dart';
 import 'package:hostel_mgmt/core/enums/security_status.dart';
 import 'package:hostel_mgmt/core/enums/actions.dart';
 
-dynamic mockRequestApiResponse = RequestApiResponse(
+RequestApiResponse mockRequestApiResponse = RequestApiResponse(
   message: 'Mock data loaded',
   requests: [
     RequestModel(

@@ -7,6 +7,9 @@ import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/login/login_layout.dart';
 import 'package:hostel_mgmt/presentation/view/student/pages/request_page.dart';
+import 'package:hostel_mgmt/presentation/view/warden/pages/warden_home.dart';
+import 'package:hostel_mgmt/presentation/view/warden/state/warden_home_state.dart';
+import 'package:provider/provider.dart';
 import '../../presentation/view/student/pages/pages.dart';
 
 // Helper for route guards
@@ -37,6 +40,15 @@ class AppRouter {
         return _requireAuthRedirect(context, state);
       },
       routes: [
+        GoRoute(
+          path: AppRoutes.seniorWardenHome,
+          name: 'warden-home',
+          builder: (context, state) => ChangeNotifierProvider(
+            create: (_) => WardenHomeState(),
+            child: const WardenHomePage(),
+          ),
+          redirect: _requireAuthRedirect,
+        ),
         GoRoute(
           path: AppRoutes.login,
           name: 'login',

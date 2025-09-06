@@ -11,6 +11,7 @@ class LoginState extends ChangeNotifier with WidgetsBindingObserver {
   void setWardenType(String value) {
     if (_wardenType != value) {
       _wardenType = value;
+      print(_wardenType);
       notifyListeners();
     }
   }

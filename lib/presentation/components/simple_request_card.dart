@@ -6,15 +6,17 @@ import 'package:hostel_mgmt/core/util/string_extensions.dart';
 import 'package:hostel_mgmt/presentation/widgets/status_tag.dart';
 
 class SimpleRequestCard extends StatelessWidget {
-  final RequestType requestType;
+  final String name;
+  final RequestType? requestType;
   final DateTime fromDate;
   final DateTime toDate;
   final RequestStatus status; // e.g., "Approved"
   final DateTime statusDate; // e.g., "22/08"
 
   const SimpleRequestCard({
+    required this.name,
     Key? key,
-    required this.requestType,
+    this.requestType,
     required this.fromDate,
     required this.toDate,
     required this.status,
@@ -31,7 +33,7 @@ class SimpleRequestCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                requestType.name.capitalizeFirst,
+                name,
                 style: const TextStyle(
                   fontFamily: "Poppins",
                   fontWeight: FontWeight.w500, // 500 = Medium

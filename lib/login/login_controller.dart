@@ -105,10 +105,13 @@ class LoginController {
           );
           break;
         case TimelineActor.assistentWarden || TimelineActor.seniorWarden:
+          final role = (state.wardenType == "assistent")
+              ? TimelineActor.assistentWarden
+              : TimelineActor.seniorWarden;
           final result = await AuthService.loginWarden(
             empId: identity,
             password: verification,
-            actor: actor,
+            actor: role,
           );
           result.fold(
             (error) {

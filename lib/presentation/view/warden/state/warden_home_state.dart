@@ -15,7 +15,7 @@ class WardenHomeState extends ChangeNotifier {
 
   // Request data
   RequestApiResponse? _allRequests;
-  List<dynamic> currentOnScreenRequests = [];
+  List<RequestModel> currentOnScreenRequests = [];
 
   // Search controller
   final TextEditingController filterController = TextEditingController();
@@ -43,14 +43,17 @@ class WardenHomeState extends ChangeNotifier {
   void setRequests(RequestApiResponse response) {
     _allRequests = response;
     _filterRequests();
+    notifyListeners();
   }
 
   void _filterRequests() {
     final query = filterController.text.trim().toLowerCase();
     if (_allRequests == null) {
       currentOnScreenRequests = [];
+      notifyListeners();
     } else if (query.isEmpty) {
       currentOnScreenRequests = List.from(_allRequests!.requests);
+      notifyListeners();
     } else {
       currentOnScreenRequests = _allRequests!.requests
           .where(
@@ -59,8 +62,8 @@ class WardenHomeState extends ChangeNotifier {
                 .contains(query),
           )
           .toList();
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   @override
