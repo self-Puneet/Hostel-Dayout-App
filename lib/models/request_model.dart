@@ -2,7 +2,7 @@ import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/enums/request_status.dart';
 import 'package:hostel_mgmt/core/enums/request_type.dart';
 import 'package:hostel_mgmt/core/enums/security_status.dart';
-import 'package:hostel_mgmt/models/assistant_w_model.dart';
+import 'package:hostel_mgmt/models/warden_model.dart';
 import 'package:hostel_mgmt/models/parent_model.dart';
 import 'package:hostel_mgmt/models/security_guard_model.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
@@ -20,11 +20,11 @@ class ParentAction {
 
 class StudentAction {
   final DateTime actionAt;
-  final RequestAction action;
+  final RequestAction? action;
   final StudentProfileModel studentProfileModel;
 
   const StudentAction({
-    required this.action,
+    this.action,
     required this.actionAt,
     required this.studentProfileModel,
   });
@@ -179,19 +179,16 @@ class RequestModel {
             )
           : null,
       parentRemark: json['parent_remark'],
-      studentAction: json['student_action'] != null
-          ? StudentAction(
-              studentProfileModel: StudentProfileModel.fromJson(
-                json['student_action']['action_by'],
-              ),
-              action: RequestAction.values.firstWhere(
-                (e) =>
-                    e.toString().split('.').last ==
-                    json['student_action']['action'],
-              ),
-              actionAt: DateTime.parse(json['student_action']['action_at']),
-            )
-          : null,
+      studentAction: StudentAction(
+        studentProfileModel: StudentProfileModel.fromJson(
+          json['student_action']['action_by'],
+        ),
+        action: RequestAction.values.firstWhere(
+          (e) =>
+              e.toString().split('.').last == json['student_action']['action'],
+        ),
+        actionAt: DateTime.parse(json['student_action']['action_at']),
+      ),
       parentAction: json['parent_action'] != null
           ? ParentAction(
               parentModel: ParentModel.fromJson(
@@ -273,7 +270,9 @@ class RequestModel {
       "student_action": studentAction != null
           ? {
               "action_by": studentAction!.studentProfileModel.toJson(),
-              "action": studentAction!.action.toString().split('.').last,
+              "action": (studentAction!.action != null)
+                  ? studentAction!.action!.name.toString().split('.').last
+                  : null,
               "action_at": studentAction!.actionAt.toIso8601String(),
             }
           : null,

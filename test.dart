@@ -566,81 +566,89 @@ class Services {
   //   });
 }
 
-// Future<void> main() async {
-//   await Env.load();
-
-// final hehe = await Services.getAllHostelInfo();
-// hehe.fold(
-//   (error) => print("❌ Error: $error"),
-//   (data) => data.hostels.forEach((hostel) {
-//     print("✅ Success: ${hostel.hostelName}");
-//   }),
-// );
-
-// final branches = await Services.getAllBranches();
-// branches.fold(
-//   (error) => print("❌ Error: $error"),
-//   (data) => data.branches.forEach((branch) {
-//     print("✅ Success: ${branch.name}");
-//   }),
-// );
-
-// final studentProfile = await Services.getStudentProfile();
-// studentProfile.fold(
-//   (error) => print("❌ Error: $error"),
-//   (data) => print("✅ Success: ${data.student.name}"),
-// );
-
-// final hostelInfo = await Services.getHostelInfo();
-// hostelInfo.fold(
-//   (error) => print("❌ Error: $error"),
-//   (data) => print("✅ Success: ${data.hostel.hostelName}"),
-// );
-
-// final updateProfile = await Services.updateProfile(
-//   profileData: {"name": "test", "email": "test@spsu.ac.in"},
-//   profilePic: File("C:\\Users\\punee\\OneDrive\\Desktop\\download.jpeg"),
-// );
-// updateProfile.fold(
-//   (error) => print("❌ Error: $error"),
-//   (data) => print("✅ Success: ${data.name}"),
-// );
-
-// final requestData = {
-//   "request_type": "outing",
-//   "applied_from": "2025-06-12T10:00:00Z",
-//   "applied_to": "2025-06-15T18:00:00Z",
-//   "reason": "Family function",
-// };
-// print(await Services.createRequest(requestData: requestData));
-// print(await Services.getRequestById(requestId: "68aef4b26ce427e7a490d781"));
-
-//   final thing = await Services.login("22EC002584", "test1");
-//   // print(thing);
-//   final token = thing['token'];
-//   print(
-//     await Services.getAllRequests(
-//       // requestId: "68b5bbf224cd43a5078b94c9",
-//       token_: token,
-//     ),
-//   );
-// }
-void main() async {
+Future<void> main() async {
   await Env.load();
 
-  // Example usage of the login function
-  // final empId = "W12345";
-  // final password = "wardenPass";
+  // final hehe = await Services.getAllHostelInfo();
+  // hehe.fold(
+  //   (error) => print("❌ Error: $error"),
+  //   (data) => data.hostels.forEach((hostel) {
+  //     print("✅ Success: ${hostel.hostelName}");
+  //   }),
+  // );
 
-  final loginResponse = await Services.login("22EC002584", "test1");
-  print(loginResponse);
+  // final branches = await Services.getAllBranches();
+  // branches.fold(
+  //   (error) => print("❌ Error: $error"),
+  //   (data) => data.branches.forEach((branch) {
+  //     print("✅ Success: ${branch.name}");
+  //   }),
+  // );
+
+  // final studentProfile = await Services.getStudentProfile();
+  // studentProfile.fold(
+  //   (error) => print("❌ Error: $error"),
+  //   (data) => print("✅ Success: ${data.student.name}"),
+  // );
+
+  // final hostelInfo = await Services.getHostelInfo();
+  // hostelInfo.fold(
+  //   (error) => print("❌ Error: $error"),
+  //   (data) => print("✅ Success: ${data.hostel.hostelName}"),
+  // );
+
+  // final updateProfile = await Services.updateProfile(
+  //   profileData: {"name": "test", "email": "test@spsu.ac.in"},
+  //   profilePic: File("C:\\Users\\punee\\OneDrive\\Desktop\\download.jpeg"),
+  // );
+  // updateProfile.fold(
+  //   (error) => print("❌ Error: $error"),
+  //   (data) => print("✅ Success: ${data.name}"),
+  // );
+
+  // final requestData = {
+  //   "request_type": "outing",
+  //   "applied_from": "2025-06-12T10:00:00Z",
+  //   "applied_to": "2025-06-15T18:00:00Z",
+  //   "reason": "Family function",
+  // };
+  // print(await Services.createRequest(requestData: requestData));
+  // print(await Services.getRequestById(requestId: "68aef4b26ce427e7a490d781"));
+
+  //   final thing = await Services.login("22EC002584", "test1");
+  //   // print(thing);
+  //   final token = thing['token'];
+  //   final final_thing = await Services.getAllRequests(token_: token);
+  //   // store this final_thing in the json file please
+  //   const encoder = JsonEncoder.withIndent('  ');
+  //   String jsonString = encoder.convert(final_thing);
+
+  //   // Write JSON to a file
+  //   File file = File('student.json');
+  //   await file.writeAsString(jsonString);
+  // }
+  // void main() async {
+  //   await Env.load();
+
+  //   // Example usage of the login function
+  //   // final empId = "W12345";
+  //   // final password = "wardenPass";
+
+  //   final loginResponse = await Services.login("22EC002584", "test1");
+  //   print(loginResponse);
 
   final payload = {
     "emp_id": "W002",
     "wardenType": "warden",
     "password": "l5wq+D701/",
   };
-  final encrypted = CryptoUtil.encryptPayload(payload);
+
+  final payload1 = {
+    "emp_id": "W001",
+    "wardenType": "senior_warden",
+    "password": "kMKaH5l6Go",
+  };
+  final encrypted = CryptoUtil.encryptPayload(payload1);
   final response = await http.post(
     Uri.parse("http://20.192.25.27:4141/api/warden/login/warden"),
     headers: {"Content-Type": "application/json"},
@@ -653,3 +661,30 @@ void main() async {
   );
   print(decrypted);
 }
+
+
+
+// void main() async {
+//   await Env.load();
+
+//   final thing = await Services.login("22EC002584", "test1");
+//   final token = thing['token'];
+
+//   final finalThingEither = await Services.getAllRequests(token_: token);
+
+//   // Extract value from Either (assuming it's Right on success)
+//   final finalThing = finalThingEither.fold(
+//     (left) => throw Exception("Error: $left"),
+//     (right) => right, // <- this is your Map/List
+//   );
+
+//   // Convert to JSON string
+//   const encoder = JsonEncoder.withIndent('  ');
+//   String jsonString = encoder.convert(finalThing);
+
+//   // Write to file
+//   File file = File('student.json');
+//   await file.writeAsString(jsonString);
+
+//   print("✅ Stored API response in student.json");
+// }

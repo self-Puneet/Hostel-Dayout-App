@@ -60,14 +60,17 @@ class AuthService {
 
   static const String apiBaseWarden = "http://20.192.25.27:4141/api/warden";
 
-  static Future<Either<String, LoginSession>> loginAssistentWarden({
+  static Future<Either<String, LoginSession>> loginWarden({
     required String empId,
     required String password,
+    required TimelineActor actor,
   }) async {
     try {
       final payload = {
         "emp_id": empId,
-        "wardenType": "assistant",
+        "wardenType": actor == TimelineActor.assistentWarden
+            ? "senior_warden"
+            : "warden",
         "password": password,
       };
       final encrypted = CryptoUtil.encryptPayload(payload);
@@ -79,7 +82,7 @@ class AuthService {
       print("📡 Status: ${response.statusCode}");
       final decrypted = CryptoUtil.handleEncryptedResponse(
         response: response,
-        context: "loginAssistentWarden",
+        context: "loginWarden",
       );
       if (decrypted == null) {
         return left("Unknown error");
@@ -92,10 +95,16 @@ class AuthService {
       }
       final session = LoginSession(
         token: decrypted['token'],
-        username: decrypted['name'],
-        email: decrypted['email'],
-        identityId: decrypted['emp_id'],
-        role: TimelineActor.assistentWarden,
+        username: (decrypted.containsKey('name'))
+            ? decrypted['name']
+            : "Puneet Dhankar",
+        email: decrypted.containsKey('email')
+            ? decrypted['email']
+            : "puneet.btech2023@spsu.ac.in",
+        identityId: decrypted.containsKey('emp_id')
+            ? decrypted['emp_id']
+            : "W001",
+        role: actor,
         imageURL: decrypted['imageURL'],
       );
       await session.saveToPrefs();

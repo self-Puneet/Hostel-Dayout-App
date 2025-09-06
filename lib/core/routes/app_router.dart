@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get/get.dart';
+import 'package:hostel_mgmt/core/enums/enum.dart';
+import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/login/login_layout.dart';
 import 'package:hostel_mgmt/presentation/view/student/pages/request_page.dart';
@@ -11,56 +13,54 @@ import '../../presentation/view/student/pages/pages.dart';
 String? _requireAuthRedirect(BuildContext context, GoRouterState state) {
   final session = Get.find<LoginSession>();
   if (session.token.isEmpty || !session.isValid) {
-    return '/login';
+    return AppRoutes.login;
   }
-  return null;
+  switch (session.role) {
+    case TimelineActor.student:
+      return AppRoutes.studentHome;
+    case TimelineActor.assistentWarden:
+      return AppRoutes.wardenHome;
+    case TimelineActor.seniorWarden:
+      return AppRoutes.seniorWardenHome;
+    case TimelineActor.parent:
+      return AppRoutes.parentHome;
+    default:
+      return AppRoutes.login;
+  }
 }
 
 class AppRouter {
   static GoRouter build() {
     return GoRouter(
-      initialLocation: '/home',
+      initialLocation: AppRoutes.studentHome,
       redirect: (context, state) {
-        final session = Get.find<LoginSession>();
-        final isLoggedIn = session.token.isNotEmpty && session.isValid;
-        final goingToLogin = state.matchedLocation == '/login';
-
-        if (!isLoggedIn && !goingToLogin) {
-          return '/login';
-        }
-        if (isLoggedIn && goingToLogin) {
-          return '/home';
-        }
-        return null;
+        return _requireAuthRedirect(context, state);
       },
       routes: [
-
         GoRoute(
-          path: '/login',
+          path: AppRoutes.login,
           name: 'login',
           builder: (context, state) => const LoginLayout(),
         ),
-
         ShellRoute(
           builder: (context, state, child) {
             return StudentLayout(child: child);
           },
           routes: [
             GoRoute(
-              path: '/home',
+              path: AppRoutes.studentHome,
               name: 'home',
               builder: (context, state) => const HomePage(),
               redirect: _requireAuthRedirect,
             ),
             GoRoute(
-              path: '/history',
+              path: AppRoutes.history,
               name: 'history',
               builder: (context, state) => const HistoryPage(),
               redirect: _requireAuthRedirect,
             ),
-
             GoRoute(
-              path: '/request',
+              path: AppRoutes.requestForm,
               name: 'request',
               builder: (context, state) => const RequestFormPage(),
               redirect: _requireAuthRedirect,
@@ -78,7 +78,7 @@ class AppRouter {
               ],
             ),
             GoRoute(
-              path: '/profile',
+              path: AppRoutes.profile,
               name: 'profile',
               builder: (context, state) => const ProfilePage(),
               redirect: _requireAuthRedirect,

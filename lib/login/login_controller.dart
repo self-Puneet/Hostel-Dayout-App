@@ -104,10 +104,11 @@ class LoginController {
             },
           );
           break;
-        case TimelineActor.assistentWarden:
-          final result = await AuthService.loginAssistentWarden(
+        case TimelineActor.assistentWarden || TimelineActor.seniorWarden:
+          final result = await AuthService.loginWarden(
             empId: identity,
             password: verification,
+            actor: actor,
           );
           result.fold(
             (error) {
@@ -139,7 +140,6 @@ class LoginController {
           );
           break;
         case TimelineActor.parent:
-        case TimelineActor.seniorWarden:
         default:
           state.setLoggingIn(false);
           AppSnackBar.show(

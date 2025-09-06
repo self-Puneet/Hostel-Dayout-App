@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/util/input_convertor.dart';
-import 'package:hostel_mgmt/models/assistant_w_model.dart';
+import 'package:hostel_mgmt/models/warden_model.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:hostel_mgmt/presentation/components/contact_card.dart';
 import 'package:hostel_mgmt/presentation/components/request_timeline.dart';
