@@ -5,7 +5,7 @@ import 'package:hostel_mgmt/core/util/input_convertor.dart';
 import 'package:hostel_mgmt/presentation/widgets/status_tag.dart';
 
 class SimpleRequestCard extends StatelessWidget {
-  final RequestType? requestType;
+  final RequestType requestType;
   final DateTime fromDate;
   final DateTime toDate;
   final RequestStatus status; // e.g., "Approved"
@@ -30,7 +30,7 @@ class SimpleRequestCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                requestType,
+                requestType.displayName,
                 style: const TextStyle(
                   fontFamily: "Poppins",
                   fontWeight: FontWeight.w500, // 500 = Medium

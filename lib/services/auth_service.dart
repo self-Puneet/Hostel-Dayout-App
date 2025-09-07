@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/core/util/crypto_utils.dart';
+import 'package:hostel_mgmt/services/warden_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
@@ -93,22 +94,26 @@ class AuthService {
       if ((decrypted['token'] ?? '').toString().isEmpty) {
         return left(decrypted['message']?.toString() ?? "Login failed");
       }
-      final session = LoginSession(
-        token: decrypted['token'],
-        username: (decrypted.containsKey('name'))
-            ? decrypted['name']
-            : "Puneet Dhankar",
-        email: decrypted.containsKey('email')
-            ? decrypted['email']
-            : "puneet.btech2023@spsu.ac.in",
-        identityId: decrypted.containsKey('emp_id')
-            ? decrypted['emp_id']
-            : "W001",
-        role: actor,
-        imageURL: decrypted['imageURL'],
-      );
-      await session.saveToPrefs();
-      return right(session);
+
+      // using get get thelogin session instance of the dependency injection
+      final diSession = Get.find<LoginSession>();
+      WardenService.getWardenProfile(token: decrypted['token']).then((result) {
+        result.fold(
+          (error) => print("Failed to fetch warden profile: $error"),
+          (warden) {
+            print(warden);
+            diSession.token = decrypted['token'];
+
+            diSession.role = actor;
+            // diSession.imageURL = warden.profilePicUrl;
+            diSession.identityId = warden.empId;
+            diSession.username = warden.name;
+            diSession.email = warden.email;
+          },
+        );
+      });
+      await diSession.saveToPrefs();
+      return right(diSession);
     } catch (e) {
       print("❌ Exception: $e");
       return left("Exception: $e");
@@ -117,6 +122,7 @@ class AuthService {
 
   static Future<void> logoutStudent() async {
     await LoginSession.clearPrefs();
+    
   }
 
   static Future<LoginSession?> getSavedStudentSession() async {

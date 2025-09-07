@@ -2,7 +2,6 @@ import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/enums/request_status.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
-import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:hostel_mgmt/presentation/view/warden/controller/mock_data.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_home_state.dart';
 
@@ -15,6 +14,7 @@ class WardenHomeController {
     try {
       state.setRequests(mockRequestApiResponse);
     } catch (e) {
+      print(e);
       state.setError(true, 'Failed to load requests');
     } finally {
       state.setIsLoading(false);
@@ -28,11 +28,13 @@ class WardenHomeController {
     state.setIsActioning(true);
     try {
       // Simulate API call
-      state.currentOnScreenRequests.map((RequestModel req) {
+      state.currentOnScreenRequests.map((onScreenRequest req) {
         req.copyWith(
-          status: role == TimelineActor.assistentWarden
-              ? RequestStatus.referred
-              : RequestStatus.approved,
+          request: req.request.copyWith(
+            status: role == TimelineActor.assistentWarden
+                ? RequestStatus.referred
+                : RequestStatus.approved,
+          ),
         );
       });
       await fetchRequests();
@@ -48,11 +50,13 @@ class WardenHomeController {
     final role = session.role;
     state.setIsActioning(true);
     try {
-      state.currentOnScreenRequests.map((RequestModel req) {
+      state.currentOnScreenRequests.map((onScreenRequest req) {
         req.copyWith(
-          status: role == TimelineActor.assistentWarden
-              ? RequestStatus.cancelled
-              : RequestStatus.rejected,
+          request: req.request.copyWith(
+            status: role == TimelineActor.assistentWarden
+                ? RequestStatus.cancelled
+                : RequestStatus.rejected,
+          ),
         );
       });
       await fetchRequests();
@@ -60,6 +64,69 @@ class WardenHomeController {
       // CustomSnackbar.showError('Failed to reject request');
     } finally {
       state.setIsActioning(false);
+    }
+  }
+
+  Future<void> acceptRequestbyId(String id) async {
+    final session = Get.find<LoginSession>();
+    final role = session.role;
+
+    state.setIsActioningbyId(id, true);
+    try {
+      // simulate API call by updating the specific request
+      state.currentOnScreenRequests = state.currentOnScreenRequests.map((
+        onScreenRequest req,
+      ) {
+        if (req.request.id == id) {
+          return req.copyWith(
+            request: req.request.copyWith(
+              status: role == TimelineActor.assistentWarden
+                  ? RequestStatus.referred
+                  : RequestStatus.approved,
+            ),
+          );
+        }
+        return req;
+      }).toList();
+      await fetchRequests();
+    } catch (e) {
+      // CustomSnackbar.showError('Failed to reject request');
+    } finally {
+      state.setIsActioningbyId(id, false);
+    }
+  }
+
+  // a controller for getting the request by id - only for info
+  Future<void> getRequestbyId(String id) async {
+    state.currentOnScreenRequests.removeWhere(
+      (req) => req.request.requestId == id,
+    );
+  }
+
+  Future<void> rejectRequestbyId(String id) async {
+    final session = Get.find<LoginSession>();
+    final role = session.role;
+    state.setIsActioningbyId(id, true);
+    try {
+      state.currentOnScreenRequests = state.currentOnScreenRequests.map((
+        onScreenRequest req,
+      ) {
+        if (req.request.id == id) {
+          return req.copyWith(
+            request: req.request.copyWith(
+              status: role == TimelineActor.assistentWarden
+                  ? RequestStatus.cancelled
+                  : RequestStatus.rejected,
+            ),
+          );
+        }
+        return req;
+      }).toList();
+      await fetchRequests();
+    } catch (e) {
+      // CustomSnackbar.showError('Failed to reject request');
+    } finally {
+      state.setIsActioningbyId(id, false);
     }
   }
 }

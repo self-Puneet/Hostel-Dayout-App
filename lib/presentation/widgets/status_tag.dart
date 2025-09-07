@@ -23,12 +23,15 @@ class StatusTag extends StatelessWidget {
         color: color,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(
-        overflow ? status.split(' ').join('\n') : status,
-        style: TextStyle(
-          fontSize: fontSize,
-          // color: color,
-          fontWeight: FontWeight.w500,
+      child: Center(
+        child: Text(
+          textAlign: TextAlign.center,
+          overflow ? status.split(' ').join('\n') : status,
+          style: TextStyle(
+            fontSize: fontSize,
+            // color: color,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
     );

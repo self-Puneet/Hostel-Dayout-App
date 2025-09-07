@@ -1,6 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 
+class onScreenRequest {
+  final RequestModel request;
+  bool isActioning;
+
+  onScreenRequest({required this.request, this.isActioning = false});
+  
+  // copyWith method to create a modified copy
+  onScreenRequest copyWith({RequestModel? request, bool? isActioning}) {
+    return onScreenRequest(
+      request: request ?? this.request,
+      isActioning: isActioning ?? this.isActioning,
+    );
+  }
+}
+
 class WardenHomeState extends ChangeNotifier {
   // Loading and error state
   bool _isLoading = false;
@@ -15,7 +30,7 @@ class WardenHomeState extends ChangeNotifier {
 
   // Request data
   RequestApiResponse? _allRequests;
-  List<RequestModel> currentOnScreenRequests = [];
+  List<onScreenRequest> currentOnScreenRequests = [];
 
   // Search controller
   final TextEditingController filterController = TextEditingController();
@@ -46,22 +61,33 @@ class WardenHomeState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setIsActioningbyId(String id, bool value) {
+    final index = currentOnScreenRequests.indexWhere((req) => req.request.id == id);
+    if (index != -1) {
+      currentOnScreenRequests[index] = currentOnScreenRequests[index].copyWith(isActioning: value);
+      notifyListeners();
+    }
+  }
+
   void _filterRequests() {
     final query = filterController.text.trim().toLowerCase();
     if (_allRequests == null) {
       currentOnScreenRequests = [];
       notifyListeners();
     } else if (query.isEmpty) {
-      currentOnScreenRequests = List.from(_allRequests!.requests);
+      // _requests is of type RequestApiResponse and onScreenRequest is a wrapper class
+      currentOnScreenRequests = _allRequests!.requests.map((req) {
+        return onScreenRequest(request: req);
+      }).toList();
       notifyListeners();
     } else {
-      currentOnScreenRequests = _allRequests!.requests
-          .where(
-            (req) => req.studentAction!.studentProfileModel.name
-                .toLowerCase()
-                .contains(query),
-          )
-          .toList();
+      currentOnScreenRequests = _allRequests!.requests.map((req) {
+        return onScreenRequest(request: req);
+      }).where(
+        (req) => req.request.studentAction!.studentProfileModel.name
+            .toLowerCase()
+            .contains(query),
+      ).toList();
       notifyListeners();
     }
   }

@@ -53,19 +53,19 @@ class WelcomeHeader extends StatelessWidget {
             // foregroundImage: hasUrl ? NetworkImage(avatarUrl!) : null,
             foregroundImage: AssetImage("assets/profile_pic_demo.png"),
             // Fallback to initials when no URL
-            child: hasUrl
-                ? null
-                : Text(
-                    _initials(name),
-                    style: const TextStyle(
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                      height: 1.0,
-                      letterSpacing: 0.0,
-                      color: Colors.black87,
-                    ),
-                  ),
+            // child: hasUrl
+            //     ? null
+            //     : Text(
+            //         _initials(name),
+            //         style: const TextStyle(
+            //           fontFamily: 'Poppins',
+            //           fontWeight: FontWeight.w600,
+            //           fontSize: 14,
+            //           height: 1.0,
+            //           letterSpacing: 0.0,
+            //           color: Colors.black87,
+            //         ),
+            //       ),
           ),
           const SizedBox(width: 12),
           Expanded(

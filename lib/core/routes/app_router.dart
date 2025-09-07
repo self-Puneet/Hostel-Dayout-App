@@ -8,7 +8,9 @@ import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/login/login_layout.dart';
 import 'package:hostel_mgmt/presentation/view/student/pages/request_page.dart';
 import 'package:hostel_mgmt/presentation/view/warden/pages/warden_home.dart';
+import 'package:hostel_mgmt/presentation/view/warden/pages/warden_layout.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_home_state.dart';
+import 'package:hostel_mgmt/presentation/view/warden/state/warden_profile_state.dart';
 import 'package:provider/provider.dart';
 import '../../presentation/view/student/pages/pages.dart';
 
@@ -18,6 +20,7 @@ String? _requireAuthRedirect(BuildContext context, GoRouterState state) {
   if (session.token.isEmpty || !session.isValid) {
     return AppRoutes.login;
   }
+  print("User role: ${session.role}");
   switch (session.role) {
     case TimelineActor.student:
       return AppRoutes.studentHome;
@@ -41,19 +44,22 @@ class AppRouter {
       },
       routes: [
         ShellRoute(
-          builder: (context, state, child) {
-            // Replace with your actual WardenLayout widget
-            return WardenLayout(child: child);
-          },
+          builder: (context, profileState, child) => ChangeNotifierProvider(
+            create: (_) => WardenProfileState(),
+            child: WardenLayout(child: child),
+          ),
+          redirect: _requireAuthRedirect,
           routes: [
             GoRoute(
               path: AppRoutes.seniorWardenHome,
               name: 'warden-home',
-              builder: (context, state) => ChangeNotifierProvider(
-                create: (_) => WardenHomeState(),
-                child: WardenHomePage(),
-              ),
-              redirect: _requireAuthRedirect,
+              builder: (context, state) {
+                final profile = context.read<WardenProfileState>();
+                return ChangeNotifierProvider(
+                  create: (_) => WardenHomeState(),
+                  child: WardenHomePage(actor: profile.loginSession.role),
+                );
+              },
             ),
           ],
         ),

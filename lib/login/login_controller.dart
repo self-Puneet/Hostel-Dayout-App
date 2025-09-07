@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/helpers/app_snackbar.dart';
 import 'package:hostel_mgmt/core/enums/ui_eums/snackbar_type.dart';
+import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/services/auth_service.dart';
 import 'package:hostel_mgmt/login/login_state.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
@@ -94,7 +95,7 @@ class LoginController {
               diSession.imageURL = session.imageURL;
               await diSession.saveToPrefs();
               state.setLoggingIn(false);
-              GoRouter.of(context).go('/home');
+              GoRouter.of(context).go(AppRoutes.studentHome);
               AppSnackBar.show(
                 context,
                 message: LoginSnackBarType.success.message,
@@ -132,7 +133,11 @@ class LoginController {
               diSession.imageURL = session.imageURL;
               await diSession.saveToPrefs();
               state.setLoggingIn(false);
-              GoRouter.of(context).go('/home');
+              GoRouter.of(context).go(
+                actor == TimelineActor.assistentWarden
+                    ? AppRoutes.wardenHome
+                    : AppRoutes.seniorWardenHome,
+              );
               AppSnackBar.show(
                 context,
                 message: LoginSnackBarType.success.message,
@@ -174,7 +179,7 @@ class LoginController {
   static Future<void> logout(BuildContext context) async {
     LoginSession.clearPrefs();
     // go navigation to login screen
-    GoRouter.of(context).go('/login');
+    GoRouter.of(context).go(AppRoutes.login);
     AppSnackBar.show(
       context,
       message: "Logged out successfully.",

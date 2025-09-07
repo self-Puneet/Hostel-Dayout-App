@@ -659,11 +659,35 @@ Future<void> main() async {
     response: response,
     context: "loginAssistentWarden",
   );
-  print(decrypted);
+
+  // final response_profile = await http.get(
+  //   Uri.parse("http://20.192.25.27:4141/api/warden/profile"),
+  //   headers: {
+  //     "Authorization": "Bearer ${decrypted!['token']}",
+  //     "Content-Type": "application/json",
+  //   },
+  // );
+  // if (response_profile.statusCode == 200) {
+  //   // If the response is encrypted like login
+  //   final decrypted_profile = CryptoUtil.handleEncryptedResponse(
+  //     response: response_profile,
+  //     context: "wardenProfile",
+  //   );
+  // }
+  final response_allRequest = await http.get(
+    Uri.parse("http://20.192.25.27:4141/api/warden/allRequest"),
+    headers: {
+      "Authorization": "Bearer ${decrypted!['token']}",
+      "Content-Type": "application/json",
+    },
+  );
+
+  final decrypted_allRequest = CryptoUtil.handleEncryptedResponse(
+    response: response_allRequest,
+    context: "allRequest",
+  );
+  print(decrypted_allRequest);
 }
-
-
-
 // void main() async {
 //   await Env.load();
 
