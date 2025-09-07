@@ -40,14 +40,22 @@ class AppRouter {
         return _requireAuthRedirect(context, state);
       },
       routes: [
-        GoRoute(
-          path: AppRoutes.seniorWardenHome,
-          name: 'warden-home',
-          builder: (context, state) => ChangeNotifierProvider(
-            create: (_) => WardenHomeState(),
-            child: const WardenHomePage(),
-          ),
-          redirect: _requireAuthRedirect,
+        ShellRoute(
+          builder: (context, state, child) {
+            // Replace with your actual WardenLayout widget
+            return WardenLayout(child: child);
+          },
+          routes: [
+            GoRoute(
+              path: AppRoutes.seniorWardenHome,
+              name: 'warden-home',
+              builder: (context, state) => ChangeNotifierProvider(
+                create: (_) => WardenHomeState(),
+                child: WardenHomePage(),
+              ),
+              redirect: _requireAuthRedirect,
+            ),
+          ],
         ),
         GoRoute(
           path: AppRoutes.login,

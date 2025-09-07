@@ -19,7 +19,7 @@ class HomePage extends StatelessWidget {
     final mediaQuery = MediaQuery.of(context);
 
     // Use a PageController for the PageView
-    final pageController = PageController();
+    final pageController = PageController();  
     final padding = EdgeInsets.symmetric(
       horizontal: 31 * mediaQuery.size.width / 402,
     );
@@ -215,11 +215,6 @@ class HomePage extends StatelessWidget {
                             child: state.filteredRequests == null
                                 ? Center(child: Text('No requests found'))
                                 : SimpleRequestCard(
-                                    name: state
-                                        .filteredRequests!
-                                        .studentAction!
-                                        .studentProfileModel
-                                        .name,
                                     requestType:
                                         state.filteredRequests!.requestType,
                                     fromDate:

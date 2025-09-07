@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/core/enums/actions.dart';
+import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:provider/provider.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_home_state.dart';
@@ -6,7 +8,8 @@ import 'package:hostel_mgmt/presentation/view/warden/controller/warden_home_cont
 import 'package:hostel_mgmt/presentation/components/simple_request_card.dart';
 
 class WardenHomePage extends StatelessWidget {
-  const WardenHomePage({Key? key}) : super(key: key);
+  final TimelineActor actor;
+  WardenHomePage({Key? key, required this.actor}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +80,9 @@ class WardenHomePage extends StatelessWidget {
                                 : Colors.black,
                           ),
                           onPressed: () => controller.acceptRequest(),
-                          child: const Text('Rejected'),
+                          child: actor == TimelineActor.assistentWarden
+                              ? Text(RequestAction.cancel.name)
+                              : Text(RequestAction.reject.name),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -92,7 +97,9 @@ class WardenHomePage extends StatelessWidget {
                                 : Colors.black,
                           ),
                           onPressed: () => controller.rejectRequest(),
-                          child: const Text('Approved'),
+                          child: actor == TimelineActor.assistentWarden
+                              ? Text(RequestAction.refer.name)
+                              : Text(RequestAction.approve.name),
                         ),
                       ),
                     ],
@@ -102,6 +109,8 @@ class WardenHomePage extends StatelessWidget {
                 Expanded(
                   child: requests.isEmpty
                       ? const Center(child: Text('No requests found.'))
+                      : state.isActioning
+                      ? Center(child: CircularProgressIndicator())
                       : ListView.builder(
                           itemCount: requests.length,
                           itemBuilder: (context, index) {
