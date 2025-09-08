@@ -72,9 +72,9 @@ class LoginController {
     try {
       switch (actor) {
         case TimelineActor.student:
-          final result = await AuthService.loginStudent(
+          final result = await AuthService.loginParent(
             enrollmentNo: identity,
-            password: verification,
+            phoneNo: verification,
           );
           result.fold(
             (error) {
@@ -93,9 +93,10 @@ class LoginController {
               diSession.identityId = session.identityId;
               diSession.role = session.role;
               diSession.imageURL = session.imageURL;
+              diSession.email = session.email;
               await diSession.saveToPrefs();
               state.setLoggingIn(false);
-              GoRouter.of(context).go(AppRoutes.studentHome);
+              GoRouter.of(context).go(AppRoutes.parentHome);
               AppSnackBar.show(
                 context,
                 message: LoginSnackBarType.success.message,
@@ -148,6 +149,36 @@ class LoginController {
           );
           break;
         case TimelineActor.parent:
+          final result = await AuthService.loginParent(
+            phoneNo: verification,
+            enrollmentNo: identity,
+          );
+
+          result.fold(
+            (error) {
+              state.setLoggingIn(false);
+              AppSnackBar.show(
+                context,
+                message: error,
+                type: AppSnackBarType.error,
+                icon: LoginSnackBarType.loginFailed.icon,
+              );
+            },
+            (profile) async {
+              state.setLoggingIn(false);
+
+              GoRouter.of(context).go(AppRoutes.parentHome);
+
+              AppSnackBar.show(
+                context,
+                message: LoginSnackBarType.success.message,
+                type: AppSnackBarType.success,
+                icon: LoginSnackBarType.success.icon,
+              );
+            },
+          );
+          break;
+
         default:
           state.setLoggingIn(false);
           AppSnackBar.show(

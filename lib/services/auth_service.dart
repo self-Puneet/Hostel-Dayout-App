@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/core/util/crypto_utils.dart';
+import 'package:hostel_mgmt/services/parent_service.dart';
 import 'package:hostel_mgmt/services/warden_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
@@ -120,9 +121,65 @@ class AuthService {
     }
   }
 
+  static Future<Either<String, LoginSession>> loginParent({
+    required String phoneNo,
+    required String enrollmentNo,
+  }) async {
+    try {
+      final payload = {
+        "phone_no": phoneNo,
+        "student_enrollment_no": enrollmentNo,
+      };
+      print(payload);
+      print("pleaseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+      final encrypted = CryptoUtil.encryptPayload(payload);
+      final response = await http.post(
+        Uri.parse("http://20.192.25.27:4141/api/parent/login"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"encrypted": encrypted}),
+      );
+      print(
+        "📡 Parent Login Status: ${response.statusCode} - ${response.body}",
+      );
+      // final decrypted = CryptoUtil.handleEncryptedResponse(
+      //   response: response,
+      //   context: "loginParent",
+      // );
+      final decrypted = response.body.isNotEmpty
+          ? jsonDecode(response.body) as Map<String, dynamic>
+          : null;
+      print(decrypted);
+      if (decrypted == null) {
+        return left("Unknown error during login");
+      }
+      if (decrypted["error"] != null) {
+        return left(decrypted["error"].toString());
+      }
+      if ((decrypted['token'] ?? '').toString().isEmpty) {
+        return left(decrypted['message']?.toString() ?? "Login failed");
+      }
+      final diSession = Get.find<LoginSession>();
+      final token = decrypted['token'];
+      // diSession.token = token;
+      // Fetch parent profile
+      final profileResult = await ParentService.getParentProfile(token: token);
+      return profileResult.fold((profileError) => left(profileError), (parent) {
+        diSession.token = token;
+        diSession.role = TimelineActor.parent;
+        diSession.identityId = parent.phoneNo;
+        diSession.username = parent.name;
+        diSession.email = parent.email ?? '';
+        diSession.phone = parent.phoneNo;
+        diSession.imageURL = null; // if your backend has no profilePic
+        return right(diSession);
+      });
+    } catch (e) {
+      return left("Exception: $e");
+    }
+  }
+
   static Future<void> logoutStudent() async {
     await LoginSession.clearPrefs();
-    
   }
 
   static Future<LoginSession?> getSavedStudentSession() async {
