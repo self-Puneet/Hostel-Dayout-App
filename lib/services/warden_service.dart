@@ -1,10 +1,47 @@
 import 'package:dartz/dartz.dart';
+import 'package:get/get.dart';
+import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/core/util/crypto_utils.dart';
 import 'package:hostel_mgmt/models/warden_model.dart';
+import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:http/http.dart' as http;
 
 class WardenService {
   static const url = "http://20.192.25.27:4141/api";
+
+  static Future<Either<String, RequestApiResponse>>
+  getAllRequestsForWarden() async {
+    final session = Get.find<LoginSession>();
+    final token = session.token;
+
+    try {
+      final response = await http.get(
+        Uri.parse("$url/warden/allRequest"),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+      );
+      final decrypted = CryptoUtil.handleEncryptedResponse(
+        response: response,
+        context: "getAllRequestsForWarden",
+      );
+      print("Decrypted Response: $decrypted");
+      if (decrypted == null || decrypted["error"] != null) {
+        return left(
+          decrypted != null ? decrypted["error"].toString() : "Unknown error",
+        );
+      }
+      try {
+        final apiResponse = RequestApiResponse.fromJson(decrypted);
+        return right(apiResponse);
+      } catch (e) {
+        return left("Failed to parse requests: $e");
+      }
+    } catch (e) {
+      return left("Exception: $e");
+    }
+  }
 
   static Future<Either<String, WardenModel>> getWardenProfile({
     required String token,
@@ -36,4 +73,4 @@ class WardenService {
       return left("Exception: $e");
     }
   }
-}     
+}

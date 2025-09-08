@@ -4,8 +4,29 @@ import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/presentation/view/warden/controller/mock_data.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_home_state.dart';
+import 'package:hostel_mgmt/services/warden_service.dart';
 
 class WardenHomeController {
+  Future<void> fetchRequestsFromApi() async {
+    state.setIsLoading(true);
+    state.setError(false, '');
+    try {
+      final result = await WardenService.getAllRequestsForWarden();
+      result.fold(
+        (error) {
+          state.setError(true, error);
+        },
+        (response) {
+          state.setRequests(response);
+        },
+      );
+    } catch (e) {
+      state.setError(true, 'Failed to load requests: $e');
+    } finally {
+      state.setIsLoading(false);
+    }
+  }
+
   final WardenHomeState state;
   WardenHomeController(this.state);
 

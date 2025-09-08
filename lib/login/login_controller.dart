@@ -110,6 +110,8 @@ class LoginController {
           final role = (state.wardenType == "assistent")
               ? TimelineActor.assistentWarden
               : TimelineActor.seniorWarden;
+          print(role);
+          print("aaaaaaaaaaaaaah");
           final result = await AuthService.loginWarden(
             empId: identity,
             password: verification,
@@ -126,13 +128,6 @@ class LoginController {
               );
             },
             (session) async {
-              final diSession = Get.find<LoginSession>();
-              diSession.token = session.token;
-              diSession.username = session.username;
-              diSession.identityId = session.identityId;
-              diSession.role = session.role;
-              diSession.imageURL = session.imageURL;
-              await diSession.saveToPrefs();
               state.setLoggingIn(false);
               GoRouter.of(context).go(
                 actor == TimelineActor.assistentWarden

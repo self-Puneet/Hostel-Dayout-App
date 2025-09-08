@@ -28,7 +28,7 @@ String? _requireAuthRedirect(BuildContext context, GoRouterState state) {
   }
 
   final allowedRoutes = AppRoutes.routeAllowence[session.role] ?? [];
-
+  print(allowedRoutes);
   // Already on allowed route → no redirect
   if (allowedRoutes.contains(state.matchedLocation)) {
     return null;
@@ -49,10 +49,34 @@ String? _requireAuthRedirect(BuildContext context, GoRouterState state) {
   }
 }
 
+String? _initialRoute() {
+  final session = Get.find<LoginSession>();
+
+  // Not logged in → go to login
+  if (session.token.isEmpty || !session.isValid) {
+    return AppRoutes.login;
+  }
+
+  final role = session.role;
+
+  switch (role) {
+    case TimelineActor.student:
+      return AppRoutes.studentHome;
+    case TimelineActor.assistentWarden:
+      return AppRoutes.wardenHome;
+    case TimelineActor.seniorWarden:
+      return AppRoutes.seniorWardenHome;
+    case TimelineActor.parent:
+      return AppRoutes.parentHome;
+    default:
+      return AppRoutes.login;
+  }
+}
+
 class AppRouter {
   static GoRouter build() {
     return GoRouter(
-      initialLocation: AppRoutes.wardenHome,
+      initialLocation: _initialRoute(),
       redirect: _requireAuthRedirect,
       routes: [
         /// Warden shell

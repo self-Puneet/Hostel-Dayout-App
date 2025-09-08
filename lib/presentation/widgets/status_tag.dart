@@ -29,7 +29,7 @@ class StatusTag extends StatelessWidget {
           overflow ? status.split(' ').join('\n') : status,
           style: TextStyle(
             fontSize: fontSize,
-            // color: color,
+            color: Colors.white,
             fontWeight: FontWeight.w500,
           ),
         ),

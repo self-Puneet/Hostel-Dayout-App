@@ -15,6 +15,7 @@ class AuthService {
     required String enrollmentNo,
     required String password,
   }) async {
+    print("Attempting student login for $enrollmentNo");
     try {
       print(enrollmentNo);
       print(password);
@@ -102,17 +103,19 @@ class AuthService {
         result.fold(
           (error) => print("Failed to fetch warden profile: $error"),
           (warden) {
-            print(warden);
+            print(actor);
+            print("aaaaaaaaaaaaaah");
+            // print(decrypted['token']);
             diSession.token = decrypted['token'];
-
             diSession.role = actor;
-            // diSession.imageURL = warden.profilePicUrl;
+            diSession.imageURL = warden.profilePicUrl;
             diSession.identityId = warden.empId;
             diSession.username = warden.name;
             diSession.email = warden.email;
           },
         );
       });
+      print("this time please${diSession.token}");
       await diSession.saveToPrefs();
       return right(diSession);
     } catch (e) {
