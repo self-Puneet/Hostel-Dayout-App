@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
-import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/core/util/crypto_utils.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
