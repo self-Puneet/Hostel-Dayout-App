@@ -72,8 +72,8 @@ class AuthService {
       final payload = {
         "emp_id": empId,
         "wardenType": actor == TimelineActor.assistentWarden
-            ? "senior_warden"
-            : "warden",
+            ? "warden"
+            : "senior_warden",
         "password": password,
       };
       final encrypted = CryptoUtil.encryptPayload(payload);
@@ -82,44 +82,46 @@ class AuthService {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"encrypted": encrypted}),
       );
-      print("📡 Status: ${response.statusCode}");
       final decrypted = CryptoUtil.handleEncryptedResponse(
         response: response,
         context: "loginWarden",
       );
-      if (decrypted == null) {
-        return left("Unknown error");
-      }
-      if (decrypted["error"] != null) {
-        return left(decrypted["error"].toString());
-      }
+      if (decrypted == null) return left("Unknown error");
+      if (decrypted["error"] != null)
+        return left(decrypted["error"]['error'].toString());
       if ((decrypted['token'] ?? '').toString().isEmpty) {
         return left(decrypted['message']?.toString() ?? "Login failed");
       }
 
-      // using get get thelogin session instance of the dependency injection
       final diSession = Get.find<LoginSession>();
-      WardenService.getWardenProfile(token: decrypted['token']).then((result) {
-        result.fold(
-          (error) => print("Failed to fetch warden profile: $error"),
-          (warden) {
-            print(actor);
-            print("aaaaaaaaaaaaaah");
-            // print(decrypted['token']);
-            diSession.token = decrypted['token'];
-            diSession.role = actor;
-            diSession.imageURL = warden.profilePicUrl;
-            diSession.identityId = warden.empId;
-            diSession.username = warden.name;
-            diSession.email = warden.email;
-          },
-        );
-      });
-      print("this time please${diSession.token}");
+
+      // Synchronously set critical fields BEFORE awaiting anything
+      diSession.token = decrypted['token'];
+      diSession.role = actor; // ensure role is correct immediately
+      diSession.identityId = empId; // provisional until profile fills
+      diSession.username = ''; // optional provisional
+      diSession.email = ''; // optional provisional
+      diSession.imageURL = null;
+
+      // Await the profile fetch so we return a fully populated session
+      final profileResult = await WardenService.getWardenProfile(
+        token: diSession.token,
+      );
+      profileResult.fold(
+        (error) {
+          // Keep provisional fields; optionally log
+        },
+        (warden) {
+          diSession.imageURL = warden.profilePicUrl;
+          diSession.identityId = warden.empId;
+          diSession.username = warden.name;
+          diSession.email = warden.email;
+        },
+      );
+
       await diSession.saveToPrefs();
       return right(diSession);
     } catch (e) {
-      print("❌ Exception: $e");
       return left("Exception: $e");
     }
   }

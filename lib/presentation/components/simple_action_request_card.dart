@@ -6,13 +6,14 @@ import 'package:hostel_mgmt/core/util/input_convertor.dart';
 import 'package:hostel_mgmt/presentation/widgets/status_tag.dart';
 
 class SimpleActionRequestCard extends StatelessWidget {
+  final String reason;
   final String name;
   final RequestStatus status;
   final RequestType leaveType;
   final DateTime fromDate;
   final DateTime toDate;
-  final VoidCallback? onCancel; // null => disabled (handled by parent)
-  final VoidCallback? onReferToParent; // null => disabled (handled by parent)
+  final VoidCallback? onRejection; // null => disabled (handled by parent)
+  final VoidCallback? onAcceptence; // null => disabled (handled by parent)
 
   // Selection UI + gestures
   final bool selected;
@@ -21,13 +22,14 @@ class SimpleActionRequestCard extends StatelessWidget {
 
   const SimpleActionRequestCard({
     super.key,
+    required this.reason,
     required this.name,
     required this.status,
     required this.leaveType,
     required this.fromDate,
     required this.toDate,
-    this.onCancel,
-    this.onReferToParent,
+    this.onRejection,
+    this.onAcceptence,
     this.selected = false,
     this.onLongPress,
     this.onTap,
@@ -96,7 +98,9 @@ class SimpleActionRequestCard extends StatelessWidget {
         child: Ink(
           decoration: ShapeDecoration(
             color: selected
-                ? selectedColor.withOpacity(0.08) // subtle blue tint
+                ? selectedColor.withAlpha(
+                    (0.08 * 255).toInt(),
+                  ) // subtle blue tint
                 : theme.colorScheme.surface,
             shape: RoundedRectangleBorder(
               borderRadius: radius,
@@ -111,8 +115,8 @@ class SimpleActionRequestCard extends StatelessWidget {
             onLongPress: onLongPress,
             // ensure ink uses the same rounded shape for ripple
             customBorder: RoundedRectangleBorder(borderRadius: radius),
-            splashColor: selectedColor.withOpacity(0.12),
-            highlightColor: selectedColor.withOpacity(0.06),
+            splashColor: selectedColor.withAlpha((0.12 * 255).toInt()),
+            highlightColor: selectedColor.withAlpha((0.06 * 255).toInt()),
             child: Stack(
               children: [
                 // Main content
@@ -155,6 +159,17 @@ class SimpleActionRequestCard extends StatelessWidget {
                         ],
                       ),
 
+                      const SizedBox(height: 12),
+                      Text(
+                        "\"$reason\"",
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 14,
+                        ),
+                      ),
                       const SizedBox(height: 12),
 
                       // Bottom: Row< Column(in/out), Row(icon-only buttons) >
@@ -202,13 +217,13 @@ class SimpleActionRequestCard extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               ElevatedButton(
-                                onPressed: onCancel, // null => disabled
+                                onPressed: onRejection, // null => disabled
                                 style: dangerStyle,
                                 child: const Icon(Icons.close, size: 20),
                               ),
                               const SizedBox(width: 8),
                               ElevatedButton(
-                                onPressed: onReferToParent, // null => disabled
+                                onPressed: onAcceptence, // null => disabled
                                 style: successStyle,
                                 child: const Icon(Icons.check, size: 20),
                               ),

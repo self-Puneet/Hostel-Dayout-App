@@ -107,42 +107,53 @@ class LoginController {
           );
           break;
         case TimelineActor.assistentWarden || TimelineActor.seniorWarden:
-          final role = (state.wardenType == "assistent")
-              ? TimelineActor.assistentWarden
-              : TimelineActor.seniorWarden;
-          print(role);
-          print("aaaaaaaaaaaaaah");
-          final result = await AuthService.loginWarden(
-            empId: identity,
-            password: verification,
-            actor: role,
-          );
-          result.fold(
-            (error) {
-              state.setLoggingIn(false);
-              AppSnackBar.show(
-                context,
-                message: error,
-                type: AppSnackBarType.error,
-                icon: LoginSnackBarType.loginFailed.icon,
-              );
-            },
-            (session) async {
-              state.setLoggingIn(false);
-              GoRouter.of(context).go(
-                actor == TimelineActor.assistentWarden
-                    ? AppRoutes.wardenHome
-                    : AppRoutes.seniorWardenHome,
-              );
-              AppSnackBar.show(
-                context,
-                message: LoginSnackBarType.success.message,
-                type: AppSnackBarType.success,
-                icon: LoginSnackBarType.success.icon,
-              );
-            },
-          );
-          break;
+          {
+            final fields = state.textFieldMap[TimelineActor.assistentWarden]!;
+            final identity =
+                (fields[FieldsType.identityField] as TextEditingController).text
+                    .trim();
+            final verification =
+                (fields[FieldsType.verificationField] as TextEditingController)
+                    .text
+                    .trim();
+
+            final role = state.selectedWardenRole; // assistant by default
+
+            final result = await AuthService.loginWarden(
+              empId: identity,
+              password: verification,
+              actor: role,
+            );
+
+            result.fold(
+              (error) {
+                state.setLoggingIn(false);
+                AppSnackBar.show(
+                  context,
+                  message: error,
+                  type: AppSnackBarType.error,
+                  icon: LoginSnackBarType.loginFailed.icon,
+                );
+              },
+              (session) async {
+                state.setLoggingIn(false);
+                // Prefer routing by 'role' (known) instead of relying on session.role
+                GoRouter.of(context).go(
+                  role == TimelineActor.assistentWarden
+                      ? AppRoutes.wardenHome
+                      : AppRoutes.seniorWardenHome,
+                );
+                AppSnackBar.show(
+                  context,
+                  message: LoginSnackBarType.success.message,
+                  type: AppSnackBarType.success,
+                  icon: LoginSnackBarType.success.icon,
+                );
+              },
+            );
+            break;
+          }
+
         case TimelineActor.parent:
           final result = await AuthService.loginParent(
             phoneNo: verification,

@@ -88,6 +88,20 @@ class AppRouter {
           routes: [
             GoRoute(
               path: AppRoutes.seniorWardenHome,
+              name: 'senior-warden-home',
+              pageBuilder: (context, state) {
+                final profile = context.read<WardenProfileState>();
+                return AppTransitionPage(
+                  key: state.pageKey,
+                  child: ChangeNotifierProvider(
+                    create: (_) => WardenHomeState(),
+                    child: WardenHomePage(actor: profile.loginSession.role),
+                  ),
+                );
+              },
+            ),
+            GoRoute(
+              path: AppRoutes.wardenHome,
               name: 'warden-home',
               pageBuilder: (context, state) {
                 final profile = context.read<WardenProfileState>();

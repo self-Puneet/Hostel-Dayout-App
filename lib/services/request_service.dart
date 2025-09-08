@@ -1,22 +1,12 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
+import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/core/util/crypto_utils.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:get/get.dart';
-
-// void printFullText(String text) {
-//   final pattern = RegExp('.{1,800}'); // split into chunks of 800 chars
-//   for (final match in pattern.allMatches(text)) {
-//     print(match.group(0));
-//   }
-// }
-
-// Future<void> writeToFile(String path, String text) async {
-//   await File(path).writeAsString(text);
-// }
 
 class RequestService {
   static const url = "http://20.192.25.27:4141/api";
@@ -44,6 +34,7 @@ class RequestService {
         );
       }
       try {
+        print(decrypted['requests'].map((e) => e['request_status']).toList());
         final apiResponse = RequestApiResponse.fromJson(decrypted);
         return right(apiResponse);
       } catch (e) {
@@ -130,6 +121,60 @@ class RequestService {
       }
       final request = RequestModel.fromJson(decrypted["request"] ?? {});
       return right(request);
+    } catch (e) {
+      print("❌ Exception: $e");
+      return left("Exception: $e");
+    }
+  }
+
+  static Future<Either<String, RequestModel>> updateRequestStatus({
+    required String requestId,
+    required String status,
+    required String remark,
+  }) async {
+    final session = Get.find<LoginSession>();
+    final token = session.token;
+
+    try {
+      // Build and encrypt payload
+      final Map<String, dynamic> requestData = {
+        "requestId": requestId,
+        "status": status,
+        "remark": remark,
+      };
+      final encryptedBody = CryptoUtil.encryptPayload(requestData);
+
+      // Send PUT request
+      final response = await http.put(
+        Uri.parse("$url/request/update-status"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({"encrypted": encryptedBody}),
+      );
+      print("📡 Update Status: ${response.statusCode}");
+
+      // Decrypt and basic error handling
+      final decrypted = CryptoUtil.handleEncryptedResponse(
+        response: response,
+        context: "updateRequestStatus",
+      );
+
+      if (decrypted == null || decrypted["error"] != null) {
+        return left(
+          decrypted != null ? decrypted["error"].toString() : "Unknown error",
+        );
+      }
+
+      // Parse updated request (support both {request: {...}} or top-level {...})
+      try {
+        final dynamic payload = decrypted["request"] ?? decrypted;
+        final updated = RequestModel.fromJson(payload as Map<String, dynamic>);
+        return right(updated);
+      } catch (e) {
+        return left("Failed to parse updated request: $e");
+      }
     } catch (e) {
       print("❌ Exception: $e");
       return left("Exception: $e");

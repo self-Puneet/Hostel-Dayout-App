@@ -78,8 +78,9 @@ class LoginPage extends StatelessWidget {
                     Row(
                       children: [
                         Radio<String>(
-                          value: 'warden',
-                          groupValue: state.wardenType,
+                          value: 'warden', // was 'warden'
+                          groupValue:
+                              state.wardenType, // default should be 'assistant'
                           onChanged: (val) {
                             if (val != null) state.setWardenType(val);
                           },
@@ -90,7 +91,7 @@ class LoginPage extends StatelessWidget {
                     Row(
                       children: [
                         Radio<String>(
-                          value: 'senior_warden',
+                          value: 'senior_warden', // was 'senior_warden'
                           groupValue: state.wardenType,
                           onChanged: (val) {
                             if (val != null) state.setWardenType(val);

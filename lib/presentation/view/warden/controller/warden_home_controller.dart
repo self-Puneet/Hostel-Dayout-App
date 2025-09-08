@@ -1,24 +1,27 @@
+// warden_home_controller.dart
+
 import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/enums/request_status.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
+import 'package:hostel_mgmt/core/enums/actions.dart'; // your RequestAction enum
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
-import 'package:hostel_mgmt/presentation/view/warden/controller/mock_data.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_home_state.dart';
-import 'package:hostel_mgmt/services/warden_service.dart';
+import 'package:hostel_mgmt/services/request_service.dart';
+import 'package:hostel_mgmt/services/warden_service.dart'; // expose updateStatus here that wraps RequestService
+// If you call RequestService directly, import that instead.
 
 class WardenHomeController {
+  final WardenHomeState state;
+  WardenHomeController(this.state);
+
   Future<void> fetchRequestsFromApi() async {
     state.setIsLoading(true);
     state.setError(false, '');
     try {
       final result = await WardenService.getAllRequestsForWarden();
       result.fold(
-        (error) {
-          state.setError(true, error);
-        },
-        (response) {
-          state.setRequests(response);
-        },
+        (error) => state.setError(true, error),
+        (response) => state.setRequests(response),
       );
     } catch (e) {
       state.setError(true, 'Failed to load requests: $e');
@@ -27,127 +30,72 @@ class WardenHomeController {
     }
   }
 
-  final WardenHomeState state;
-  WardenHomeController(this.state);
+  // NEW: single per-item action method
+  Future<void> actionRequestById({
+    required String requestId,
+    required RequestAction action,
+  }) async {
+    final session = Get.find<LoginSession>();
+    final TimelineActor actor = session.role;
 
-  Future<void> fetchRequests() async {
-    state.setIsLoading(true);
+    state.setIsActioningbyId(requestId, true);
+
     try {
-      state.setRequests(mockRequestApiResponse);
+      // 1) Compute target status via your enum extension
+      final RequestStatus targetStatus = action.statusAfterAction(
+        actor,
+      ); // extension on RequestAction
+      final String statusApi =
+          targetStatus.statusToApiString; // extension on RequestStatus
+
+      // 2) Call API (via WardenService or RequestService)
+      final result = await RequestService.updateRequestStatus(
+        requestId: requestId,
+        status: statusApi,
+        remark: 'ok done',
+      );
+
+      // 3) Handle response and update local state
+      result.fold(
+        (error) {
+          state.setError(true, error);
+        },
+        (updatedRequestModel) {
+          // Update the specific item locally
+          state.currentOnScreenRequests = state.currentOnScreenRequests.map((
+            w,
+          ) {
+            if (w.request.requestId == requestId) {
+              return w.copyWith(request: updatedRequestModel);
+            }
+            return w;
+          }).toList();
+        },
+      );
+
+      // 4) Optionally refresh from server to stay in sync
+      await fetchRequestsFromApi();
     } catch (e) {
-      print(e);
-      state.setError(true, 'Failed to load requests');
+      state.setError(true, 'Action failed: $e');
     } finally {
-      state.setIsLoading(false);
+      state.setIsActioningbyId(requestId, false);
     }
   }
 
-  Future<void> acceptRequest() async {
-    final session = Get.find<LoginSession>();
-    final role = session.role;
-
+  // OPTIONAL: bulk variants can reuse the same method
+  Future<void> bulkActionSelected({required RequestAction action}) async {
+    if (!state.hasSelection) return;
+    // Mark global actioning to show spinner if desired
     state.setIsActioning(true);
     try {
-      // Simulate API call
-      state.currentOnScreenRequests.map((onScreenRequest req) {
-        req.copyWith(
-          request: req.request.copyWith(
-            status: role == TimelineActor.assistentWarden
-                ? RequestStatus.referred
-                : RequestStatus.approved,
-          ),
-        );
-      });
-      await fetchRequests();
-    } catch (e) {
-      // CustomSnackbar.showError('Failed to reject request');
+      final ids = state.selectedRequests.map((r) => r.requestId).toList();
+      for (final id in ids) {
+        await actionRequestById(requestId: id, action: action);
+      }
+      state.clearSelection();
+      await fetchRequestsFromApi();
     } finally {
       state.setIsActioning(false);
-    }
-  }
-
-  Future<void> rejectRequest() async {
-    final session = Get.find<LoginSession>();
-    final role = session.role;
-    state.setIsActioning(true);
-    try {
-      state.currentOnScreenRequests.map((onScreenRequest req) {
-        req.copyWith(
-          request: req.request.copyWith(
-            status: role == TimelineActor.assistentWarden
-                ? RequestStatus.cancelled
-                : RequestStatus.rejected,
-          ),
-        );
-      });
-      await fetchRequests();
-    } catch (e) {
-      // CustomSnackbar.showError('Failed to reject request');
-    } finally {
-      state.setIsActioning(false);
-    }
-  }
-
-  Future<void> acceptRequestbyId(String id) async {
-    final session = Get.find<LoginSession>();
-    final role = session.role;
-
-    state.setIsActioningbyId(id, true);
-    try {
-      // simulate API call by updating the specific request
-      state.currentOnScreenRequests = state.currentOnScreenRequests.map((
-        onScreenRequest req,
-      ) {
-        if (req.request.id == id) {
-          return req.copyWith(
-            request: req.request.copyWith(
-              status: role == TimelineActor.assistentWarden
-                  ? RequestStatus.referred
-                  : RequestStatus.approved,
-            ),
-          );
-        }
-        return req;
-      }).toList();
-      await fetchRequests();
-    } catch (e) {
-      // CustomSnackbar.showError('Failed to reject request');
-    } finally {
-      state.setIsActioningbyId(id, false);
-    }
-  }
-
-  // a controller for getting the request by id - only for info
-  Future<void> getRequestbyId(String id) async {
-    state.currentOnScreenRequests.removeWhere(
-      (req) => req.request.requestId == id,
-    );
-  }
-
-  Future<void> rejectRequestbyId(String id) async {
-    final session = Get.find<LoginSession>();
-    final role = session.role;
-    state.setIsActioningbyId(id, true);
-    try {
-      state.currentOnScreenRequests = state.currentOnScreenRequests.map((
-        onScreenRequest req,
-      ) {
-        if (req.request.id == id) {
-          return req.copyWith(
-            request: req.request.copyWith(
-              status: role == TimelineActor.assistentWarden
-                  ? RequestStatus.cancelled
-                  : RequestStatus.rejected,
-            ),
-          );
-        }
-        return req;
-      }).toList();
-      await fetchRequests();
-    } catch (e) {
-      // CustomSnackbar.showError('Failed to reject request');
-    } finally {
-      state.setIsActioningbyId(id, false);
     }
   }
 }

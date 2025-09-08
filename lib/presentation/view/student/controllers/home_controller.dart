@@ -32,6 +32,9 @@ class HomeController {
       },
       (apiResponse) {
         // Separate active and history requests
+        print(
+          "All Requests status from controller: ${apiResponse.requests.map((e) => e.status).toList()}",
+        );
         final active = apiResponse.requests.where((r) => r.active).toList();
         final history = apiResponse.requests;
         state.setRequests(active);
@@ -68,20 +71,6 @@ class HomeController {
         appliedAt: DateTime.now().subtract(Duration(days: 2)),
         lastUpdatedAt: DateTime.now(),
       ),
-      // RequestModel(
-      //   id: '3',
-      //   requestId: 'REQ3',
-      //   requestType: RequestType.leave,
-      //   studentEnrollmentNumber: 'ENR003',
-      //   appliedFrom: DateTime.now().subtract(Duration(days: 4)),
-      //   appliedTo: DateTime.now().subtract(Duration(days: 3)),
-      //   reason: 'Cancelled request',
-      //   status: RequestStatus.cancelledStudent,
-      //   active: false,
-      //   createdBy: 'student',
-      //   appliedAt: DateTime.now().subtract(Duration(days: 3)),
-      //   lastUpdatedAt: DateTime.now(),
-      // ),
     ]);
     state.setLoading(false);
   }

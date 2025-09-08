@@ -116,7 +116,7 @@ class RequestModel {
         return RequestStatus.requested;
       case "referred_to_parent":
         return RequestStatus.referred;
-      case "cancelled_assitent_warden":
+      case "cancelled_assistent_warden":
         return RequestStatus.cancelled;
       case "accepted_by_parent":
         return RequestStatus.parentApproved;
@@ -157,6 +157,7 @@ class RequestModel {
 
   /// Deserialize from JSON
   factory RequestModel.fromJson(Map<String, dynamic> json) {
+    print("Parsing request with status: ${json['request_status']} -> ${json['request_status']}");
     return RequestModel(
       id: json['_id'] ?? '',
       requestId: json['request_id'] ?? '',

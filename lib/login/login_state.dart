@@ -5,16 +5,29 @@ import 'package:hostel_mgmt/login/login_page_model.dart';
 enum FieldsType { identityField, verificationField, model }
 
 class LoginState extends ChangeNotifier with WidgetsBindingObserver {
-  // Warden type selection state
-  String _wardenType = 'assistant'; // 'assistant' or 'senior'
-  String get wardenType => _wardenType;
-  void setWardenType(String value) {
-    if (_wardenType != value) {
-      _wardenType = value;
-      print(_wardenType);
+  // Default: assistant selected
+  TimelineActor _selectedWardenRole = TimelineActor.assistentWarden;
+  TimelineActor get selectedWardenRole => _selectedWardenRole;
+  void setSelectedWardenRole(TimelineActor role) {
+    if (_selectedWardenRole != role) {
+      _selectedWardenRole = role;
       notifyListeners();
     }
   }
+
+  void setWardenType(String type) {
+    if (type == 'warden') {
+      _selectedWardenRole = TimelineActor.assistentWarden;
+    } else if (type == 'senior_warden') {
+      _selectedWardenRole = TimelineActor.seniorWarden;
+    }
+    notifyListeners();
+  }
+
+  // Optionally keep a getter for backwards-compat string
+  String get wardenType => _selectedWardenRole == TimelineActor.assistentWarden
+      ? 'warden'
+      : 'senior_warden';
 
   LoginState() {
     WidgetsBinding.instance.addObserver(this);

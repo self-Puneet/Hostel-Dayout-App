@@ -116,4 +116,48 @@ extension RequestStatusX on RequestStatus {
         return Icons.remove_circle;
     }
   }
+
+  RequestStatus apiStringToStatus(String status) {
+    switch (status) {
+      case "requested":
+        return RequestStatus.requested;
+      case "referred_to_parent":
+        return RequestStatus.referred;
+      case "cancelled_assitent_warden":
+        return RequestStatus.cancelled;
+      case "accepted_by_parent":
+        return RequestStatus.parentApproved;
+      case "rejected_by_parent":
+        return RequestStatus.parentDenied;
+      case "accepted_by_warden":
+        return RequestStatus.approved;
+      case "rejected_by_warden":
+        return RequestStatus.rejected;
+      case "cancelled_by_student":
+        return RequestStatus.cancelledStudent;
+      default:
+        return RequestStatus.requested;
+    }
+  }
+
+  String get statusToApiString {
+    switch (this) {
+      case RequestStatus.requested:
+        return "requested";
+      case RequestStatus.referred:
+        return "referred_to_parent";
+      case RequestStatus.cancelled:
+        return "cancelled_assitent_warden";
+      case RequestStatus.parentApproved:
+        return "accepted_by_parent";
+      case RequestStatus.parentDenied:
+        return "rejected_by_parent";
+      case RequestStatus.rejected:
+        return "rejected_by_warden";
+      case RequestStatus.approved:
+        return "accepted_by_warden";
+      case RequestStatus.cancelledStudent:
+        return "cancelled_by_student";
+    }
+  }
 }

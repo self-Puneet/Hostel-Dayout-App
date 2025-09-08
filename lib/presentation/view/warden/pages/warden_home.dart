@@ -48,7 +48,6 @@ class WardenHomePage extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              // Top action row: enable only if selection exists and not actioning
               Row(
                 children: [
                   Expanded(
@@ -67,9 +66,13 @@ class WardenHomePage extends StatelessWidget {
                           ? () {
                               // negative action
                               if (actor == TimelineActor.assistentWarden) {
-                                // controller.bulkCancelSelected();
+                                controller.bulkActionSelected(
+                                  action: RequestAction.cancel,
+                                );
                               } else {
-                                // controller.bulkRejectSelected();
+                                controller.bulkActionSelected(
+                                  action: RequestAction.reject,
+                                );
                               }
                             }
                           : null, // disabled when no selection
@@ -93,11 +96,14 @@ class WardenHomePage extends StatelessWidget {
                       ),
                       onPressed: (!state.isActioning && state.hasSelection)
                           ? () {
-                              // positive action
                               if (actor == TimelineActor.assistentWarden) {
-                                // controller.bulkReferSelected();
+                                controller.bulkActionSelected(
+                                  action: RequestAction.refer,
+                                );
                               } else {
-                                // controller.bulkApproveSelected();
+                                controller.bulkActionSelected(
+                                  action: RequestAction.approve,
+                                );
                               }
                             }
                           : null, // disabled when no selection
@@ -130,6 +136,7 @@ class WardenHomePage extends StatelessWidget {
                               req.requestId,
                             );
                             return SimpleActionRequestCard(
+                              reason: req.reason,
                               name: req.studentEnrollmentNumber,
                               status: req.status,
                               leaveType: req.requestType,
@@ -149,16 +156,24 @@ class WardenHomePage extends StatelessWidget {
                                   : null,
 
                               // per-item actions disabled during selection
-                              onCancel:
+                              onRejection:
                                   (!state.hasSelection && !state.isActioning)
-                                  ? () => controller.acceptRequestbyId(
-                                      req.requestId,
+                                  ? () => controller.actionRequestById(
+                                      action:
+                                          actor == TimelineActor.assistentWarden
+                                          ? RequestAction.cancel
+                                          : RequestAction.reject,
+                                      requestId: req.requestId,
                                     )
                                   : null,
-                              onReferToParent:
+                              onAcceptence:
                                   (!state.hasSelection && !state.isActioning)
-                                  ? () => controller.rejectRequestbyId(
-                                      req.requestId,
+                                  ? () => controller.actionRequestById(
+                                      action:
+                                          actor == TimelineActor.assistentWarden
+                                          ? RequestAction.refer
+                                          : RequestAction.approve,
+                                      requestId: req.requestId,
                                     )
                                   : null,
                             );

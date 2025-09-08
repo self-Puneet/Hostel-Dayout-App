@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 
 class RequestActionDialogParam {
@@ -112,6 +113,35 @@ extension RequestActionX on RequestAction {
               'There are no available actions for the selected requests.',
           confirmText: 'OK',
         );
+    }
+  }
+
+  RequestStatus statusAfterAction(TimelineActor actor) {
+    switch (this) {
+      case RequestAction.refer:
+        return RequestStatus.referred;
+      case RequestAction.cancel:
+        switch (actor) {
+          case TimelineActor.student:
+            return RequestStatus.cancelledStudent;
+          case TimelineActor.assistentWarden:
+            return RequestStatus.cancelled;
+          default:
+            return RequestStatus.cancelled;
+        }
+      case RequestAction.approve:
+        switch (actor) {
+          case TimelineActor.parent:
+            return RequestStatus.parentApproved;
+          case TimelineActor.seniorWarden:
+            return RequestStatus.approved;
+          default:
+            return RequestStatus.approved;
+        }
+      case RequestAction.reject:
+        return RequestStatus.rejected;
+      case RequestAction.none:
+        return RequestStatus.requested;
     }
   }
 }
