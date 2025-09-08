@@ -22,9 +22,9 @@ class _WardenLayoutState extends State<WardenLayout> {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    final padding = EdgeInsets.symmetric(
-      horizontal: 31 * mediaQuery.size.width / 402,
-    );
+    // final padding = EdgeInsets.symmetric(
+    //   horizontal: 31 * mediaQuery.size.width / 402,
+    // );
 
     return GestureDetector(
       behavior:

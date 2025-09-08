@@ -160,7 +160,7 @@ class WardenHomeState extends ChangeNotifier {
 
     String _safeName(onScreenRequest w) {
       final n = w.request.studentEnrollmentNumber;
-      return (n ?? '').toLowerCase();
+      return n.toLowerCase();
     }
 
     currentOnScreenRequests = wrapped.where((w) {
