@@ -47,7 +47,7 @@
 // controllers/request_form_controller.dart
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
-import 'package:intl/intl.dart';
+// import 'package:intl/intl.dart';
 import '../state/request_form_state.dart';
 import 'package:hostel_mgmt/services/profile_service.dart';
 import 'package:hostel_mgmt/models/outing_rule_model.dart';
@@ -109,7 +109,7 @@ class RequestFormController {
   }
 
   // 2025-06-12T10:00:00Z
-  String _toZulu(DateTime dt) {
-    return DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(dt.toUtc());
-  }
+  // String _toZulu(DateTime dt) {
+  //   return DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(dt.toUtc());
+  // }
 }
