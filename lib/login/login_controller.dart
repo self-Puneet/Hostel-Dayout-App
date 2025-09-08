@@ -72,9 +72,9 @@ class LoginController {
     try {
       switch (actor) {
         case TimelineActor.student:
-          final result = await AuthService.loginParent(
+          final result = await AuthService.loginStudent(
             enrollmentNo: identity,
-            phoneNo: verification,
+            password: verification,
           );
           result.fold(
             (error) {
@@ -93,10 +93,10 @@ class LoginController {
               diSession.identityId = session.identityId;
               diSession.role = session.role;
               diSession.imageURL = session.imageURL;
-              diSession.email = session.email;
+
               await diSession.saveToPrefs();
               state.setLoggingIn(false);
-              GoRouter.of(context).go(AppRoutes.parentHome);
+              GoRouter.of(context).go(AppRoutes.studentHome);
               AppSnackBar.show(
                 context,
                 message: LoginSnackBarType.success.message,

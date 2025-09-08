@@ -15,13 +15,20 @@ class RequestFormPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    final padding = EdgeInsets.symmetric(horizontal: 31 * mediaQuery.size.width / 402);
+    final padding = EdgeInsets.symmetric(
+      horizontal: 31 * mediaQuery.size.width / 402,
+    );
 
     return ChangeNotifierProvider<RequestFormState>(
       create: (context) {
         final s = RequestFormState();
         // Fetch outing rule once after mount
-        Future.microtask(() => RequestFormController(state: s, context: context).fetchOutingRule());
+        Future.microtask(
+          () => RequestFormController(
+            state: s,
+            context: context,
+          ).fetchOutingRule(),
+        );
         return s;
       },
       child: _RequestFormView(padding: padding),
@@ -37,7 +44,7 @@ class _RequestFormView extends StatelessWidget {
   Widget build(BuildContext context) {
     final session = Get.find<LoginSession>();
     final mq = MediaQuery.of(context);
-
+    print("-----------------------------------------${session.imageURL}");
     return Padding(
       padding: EdgeInsets.only(top: mq.size.height * 50 / 874),
       child: SingleChildScrollView(
@@ -47,6 +54,7 @@ class _RequestFormView extends StatelessWidget {
             Container(
               margin: padding,
               child: WelcomeHeader(
+                actor: session.role,
                 name: session.username,
                 avatarUrl: session.imageURL,
                 greeting: 'Welcome back,',
@@ -85,19 +93,28 @@ class _OutingRuleBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Selector<RequestFormState, (bool, bool, OutingRule?, RequestType)>(
-      selector: (_, s) => (s.isLoadingRules, s.isRestricted, s.loadedOutingRule, s.selectedType),
+      selector: (_, s) => (
+        s.isLoadingRules,
+        s.isRestricted,
+        s.loadedOutingRule,
+        s.selectedType,
+      ),
       builder: (_, data, __) {
         final (loading, restricted, rule, type) = data;
         if (type != RequestType.dayout) return const SizedBox.shrink();
         if (loading) {
           return const Card(
             color: Colors.white,
-            child: SizedBox(height: 50, width: double.infinity, child: Center()),
+            child: SizedBox(
+              height: 50,
+              width: double.infinity,
+              child: Center(),
+            ),
           );
         }
         if (rule == null || rule.isUnrestricted) return const SizedBox.shrink();
-
-        final cardColor = restricted ? Colors.red : Colors.green;
+        // lighter shade for red and green for cardColor
+        final cardColor = restricted ? Colors.red[100] : Colors.green[100];
         final iconColor = restricted ? Colors.red : Colors.green;
         final message = restricted
             ? 'Dayout is restricted today.'
@@ -106,11 +123,23 @@ class _OutingRuleBanner extends StatelessWidget {
         return Card(
           color: cardColor,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 12.0),
+            padding: const EdgeInsets.symmetric(
+              vertical: 12.0,
+              horizontal: 12.0,
+            ),
             child: Row(
               children: [
-                Padding(padding: const EdgeInsets.symmetric(horizontal: 5), child: Icon(Icons.warning, color: iconColor)),
-                Text(message, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  child: Icon(Icons.warning, color: iconColor),
+                ),
+                Text(
+                  message,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
           ),
@@ -180,11 +209,16 @@ class _FromDateField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<RequestFormState, (DateTime?, String?, RequestType, OutingRule?)>(
-      selector: (_, s) => (s.fromDate, s.uiFromDateError, s.selectedType, s.loadedOutingRule),
+    return Selector<
+      RequestFormState,
+      (DateTime?, String?, RequestType, OutingRule?)
+    >(
+      selector: (_, s) =>
+          (s.fromDate, s.uiFromDateError, s.selectedType, s.loadedOutingRule),
       builder: (_, data, __) {
         final (value, error, type, rule) = data;
-        final helper = (type == RequestType.dayout && rule != null && !rule.isUnrestricted)
+        final helper =
+            (type == RequestType.dayout && rule != null && !rule.isUnrestricted)
             ? 'Allowed: ${OutingRule.formatDuration(rule.fromTime!)} – ${OutingRule.formatDuration(rule.toTime!)}'
             : null;
         return DateField(
@@ -213,11 +247,16 @@ class _FromTimeField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<RequestFormState, (TimeOfDay?, String?, RequestType, OutingRule?)>(
-      selector: (_, s) => (s.fromTime, s.uiFromTimeError, s.selectedType, s.loadedOutingRule),
+    return Selector<
+      RequestFormState,
+      (TimeOfDay?, String?, RequestType, OutingRule?)
+    >(
+      selector: (_, s) =>
+          (s.fromTime, s.uiFromTimeError, s.selectedType, s.loadedOutingRule),
       builder: (_, data, __) {
         final (value, error, type, rule) = data;
-        final helper = (type == RequestType.dayout && rule != null && !rule.isUnrestricted)
+        final helper =
+            (type == RequestType.dayout && rule != null && !rule.isUnrestricted)
             ? 'Allowed: ${OutingRule.formatDuration(rule.fromTime!)} – ${OutingRule.formatDuration(rule.toTime!)}'
             : null;
         return TimeField(
@@ -346,7 +385,9 @@ class TimeField extends StatelessWidget {
   Widget build(BuildContext context) {
     final display = value == null
         ? 'Pick time'
-        : DateFormat('h:mm a').format(DateTime(0, 1, 1, value!.hour, value!.minute));
+        : DateFormat(
+            'h:mm a',
+          ).format(DateTime(0, 1, 1, value!.hour, value!.minute));
     return InkWell(
       onTap: onPick,
       child: InputDecorator(
@@ -378,7 +419,15 @@ class _ErrorBanner extends StatelessWidget {
             children: [
               const Icon(Icons.error, color: Colors.red, size: 20),
               const SizedBox(width: 8),
-              Expanded(child: Text(msg, style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w500))),
+              Expanded(
+                child: Text(
+                  msg,
+                  style: const TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
             ],
           ),
         );
@@ -440,10 +489,20 @@ class _SubmitButton extends StatelessWidget {
                 : () async {
                     final state = context.read<RequestFormState>();
                     // Controller handles validation, API, and snackbars
-                    await RequestFormController(state: state, context: context).submit();
+                    await RequestFormController(
+                      state: state,
+                      context: context,
+                    ).submit();
                   },
             child: isSubmitting
-                ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
                 : const Text('Submit Request'),
           ),
         );

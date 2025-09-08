@@ -7,6 +7,9 @@ import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/core/routes/app_transition_page.dart'; // 👈 import here
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/login/login_layout.dart';
+import 'package:hostel_mgmt/presentation/view/parent/pages/parent_home.dart';
+import 'package:hostel_mgmt/presentation/view/parent/pages/parent_layout.dart';
+import 'package:hostel_mgmt/presentation/view/parent/state/parent_state.dart';
 import 'package:hostel_mgmt/presentation/view/student/pages/request_page.dart';
 import 'package:hostel_mgmt/presentation/view/warden/pages/warden_home.dart';
 import 'package:hostel_mgmt/presentation/view/warden/pages/warden_layout.dart';
@@ -49,7 +52,7 @@ String? _requireAuthRedirect(BuildContext context, GoRouterState state) {
 class AppRouter {
   static GoRouter build() {
     return GoRouter(
-      initialLocation: AppRoutes.requestForm,
+      initialLocation: AppRoutes.wardenHome,
       redirect: _requireAuthRedirect,
       routes: [
         /// Warden shell
@@ -72,6 +75,23 @@ class AppRouter {
                   ),
                 );
               },
+            ),
+          ],
+        ),
+
+        ShellRoute(
+          builder: (context, state, child) => ParentLayout(child: child),
+          routes: [
+            GoRoute(
+              path: AppRoutes.parentHome,
+              name: 'parent-home',
+              pageBuilder: (context, state) => AppTransitionPage(
+                key: state.pageKey,
+                child: ChangeNotifierProvider(
+                  create: (_) => ParentState(),
+                  child: const ParentHomePage(),
+                ),
+              ),
             ),
           ],
         ),

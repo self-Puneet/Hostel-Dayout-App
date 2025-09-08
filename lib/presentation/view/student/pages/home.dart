@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/login/login_controller.dart';
 import 'package:hostel_mgmt/presentation/components/active_request_card.dart';
 import 'package:hostel_mgmt/presentation/components/simple_request_card.dart';
@@ -70,6 +71,7 @@ class HomePage extends StatelessWidget {
                         Container(
                           margin: padding,
                           child: WelcomeHeader(
+                            actor: TimelineActor.student,
                             name: state.profile?.name ?? '',
                             avatarUrl: state.profile?.profilePic,
                             greeting: 'Welcome back,',
@@ -99,8 +101,7 @@ class HomePage extends StatelessWidget {
                             ? Column(
                                 children: [
                                   SizedBox(
-                                    height:
-                                        300, // adjust depending on card content
+                                    height: 330,
                                     child: PageView.builder(
                                       controller: pageController,
                                       itemCount: activeRequests.length,
@@ -109,6 +110,7 @@ class HomePage extends StatelessWidget {
                                         return Container(
                                           margin: padding,
                                           child: ActiveRequestCard(
+                                            reason: req.reason,
                                             requestId: req.requestId,
                                             requestType: req.requestType.name
                                                 .toUpperCase(),
@@ -140,6 +142,7 @@ class HomePage extends StatelessWidget {
                             ? Container(
                                 margin: padding,
                                 child: ActiveRequestCard(
+                                  reason: activeRequests.first.reason,
                                   requestId: activeRequests.first.id,
                                   requestType:
                                       activeRequests.first.requestType.name,

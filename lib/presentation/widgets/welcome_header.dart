@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
+import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
+import 'package:hostel_mgmt/login/login_controller.dart';
 import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/liquid_glass_chip.dart';
+import 'package:hostel_mgmt/presentation/widgets/profile_overlay.dart';
 import 'package:intl/intl.dart';
 
 class WelcomeHeader extends StatelessWidget {
   final String name;
   final DateTime date;
+  final TimelineActor actor;
   final String? avatarUrl; // nullable URL
   final String greeting;
 
@@ -13,6 +19,7 @@ class WelcomeHeader extends StatelessWidget {
     required this.name,
     this.avatarUrl,
     this.greeting = 'Welcome back,',
+    required this.actor,
     DateTime? date,
   }) : date = date ?? DateTime.now();
 
@@ -30,26 +37,51 @@ class WelcomeHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircleAvatar(
-            radius: 22,
-            backgroundColor: Colors.grey.shade300,
-            // Use the network image only when available
-            // foregroundImage: hasUrl ? NetworkImage(avatarUrl!) : null,
-            foregroundImage: AssetImage("assets/profile_pic_demo.png"),
-            // Fallback to initials when no URL
-            // child: hasUrl
-            //     ? null
-            //     : Text(
-            //         _initials(name),
-            //         style: const TextStyle(
-            //           fontFamily: 'Poppins',
-            //           fontWeight: FontWeight.w600,
-            //           fontSize: 14,
-            //           height: 1.0,
-            //           letterSpacing: 0.0,
-            //           color: Colors.black87,
-            //         ),
-            //       ),
+          GestureDetector(
+            onTap: () {
+              showDialog(
+                barrierDismissible: true,
+                context: context,
+                builder: (context) => ProfileOverlay(
+                  name: name,
+                  subtitle: actor.displayName,
+                  avatarUrl: avatarUrl,
+                  onEditProfile: () {
+                    // go route for AppRoutes.profile
+                    context.go(AppRoutes.profile);
+                    Navigator.pop(context);
+                    debugPrint("Edit Profile clicked");
+                  },
+                  onLogout: () {
+                    LoginController.logout(context);
+                    Navigator.pop(context);
+                    debugPrint("Logout clicked");
+                  },
+                  onClose: () => Navigator.pop(context),
+                ),
+              );
+            },
+            child: CircleAvatar(
+              radius: 22,
+              backgroundColor: Colors.grey.shade300,
+              // Use the network image only when available
+              // foregroundImage: hasUrl ? NetworkImage(avatarUrl!) : null,
+              foregroundImage: AssetImage("assets/profile_pic_demo.png"),
+              // Fallback to initials when no URL
+              // child: hasUrl
+              //     ? null
+              //     : Text(
+              //         _initials(name),
+              //         style: const TextStyle(
+              //           fontFamily: 'Poppins',
+              //           fontWeight: FontWeight.w600,
+              //           fontSize: 14,
+              //           height: 1.0,
+              //           letterSpacing: 0.0,
+              //           color: Colors.black87,
+              //         ),
+              //       ),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(

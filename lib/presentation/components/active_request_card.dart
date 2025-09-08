@@ -68,6 +68,7 @@ extension RequestStatusX1 on RequestStatus {
 }
 
 class ActiveRequestCard extends StatelessWidget {
+  final String reason;
   final String requestType;
   final RequestStatus status;
   final DateTime fromDate;
@@ -77,6 +78,7 @@ class ActiveRequestCard extends StatelessWidget {
 
   const ActiveRequestCard({
     Key? key,
+    required this.reason,
     required this.requestType,
     required this.status,
     required this.fromDate,
@@ -91,8 +93,6 @@ class ActiveRequestCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        // Navigate to dynamic request page
-        // go router please
         print("Navigating to request page for request ID: $requestId");
         context.go('/request/${requestId}');
       },
@@ -148,7 +148,19 @@ class ActiveRequestCard extends StatelessWidget {
                 ],
               ),
               Divider(thickness: 1, color: Color(0xFF757575)),
-              SizedBox(height: 18),
+              SizedBox(height: 15),
+              // italic style font
+              Text(
+                "\"$reason\"",
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w400,
+                  fontSize: 14,
+                ),
+              ),
+              SizedBox(height: 15),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

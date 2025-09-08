@@ -61,15 +61,16 @@ class _WardenLayoutState extends State<WardenLayout> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // a elevated button for logout
-                  ElevatedButton(
-                    onPressed: () {
-                      LoginController.logout(context);
-                    },
-                    child: const Text('Logout'),
-                  ),
+                  // ElevatedButton(
+                  //   onPressed: () {
+                  //     LoginController.logout(context);
+                  //   },
+                  //   child: const Text('Logout'),
+                  // ),
                   Container(
                     margin: padding,
                     child: WelcomeHeader(
+                      actor: actor,
                       name: state.loginSession.username,
                       avatarUrl: state.loginSession.imageURL,
                       greeting: 'Welcome back,',
