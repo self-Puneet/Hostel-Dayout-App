@@ -19,7 +19,7 @@ class HomePage extends StatelessWidget {
     final mediaQuery = MediaQuery.of(context);
 
     // Use a PageController for the PageView
-    final pageController = PageController();  
+    final pageController = PageController();
     final padding = EdgeInsets.symmetric(
       horizontal: 31 * mediaQuery.size.width / 402,
     );
@@ -60,13 +60,13 @@ class HomePage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            LoginController.logout(context);
-                            // Handle button press
-                          },
-                          child: Text('Elevated Button'),
-                        ),
+                        // ElevatedButton(
+                        //   onPressed: () {
+                        //     LoginController.logout(context);
+                        //     // Handle button press
+                        //   },
+                        //   child: Text('Elevated Button'),
+                        // ),
                         Container(
                           margin: padding,
                           child: WelcomeHeader(

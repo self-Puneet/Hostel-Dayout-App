@@ -117,11 +117,12 @@ class RequestService {
         },
         body: jsonEncode({"encrypted": encryptedBody}),
       );
-      print("📡 Status: ${response.statusCode}");
+      print("📡 Request Creation Status: ${response.statusCode}");
       final decrypted = CryptoUtil.handleEncryptedResponse(
         response: response,
         context: "createRequest",
       );
+      print(decrypted);
       if (decrypted == null || decrypted["error"] != null) {
         return left(
           decrypted != null ? decrypted["error"].toString() : "Unknown error",
@@ -129,10 +130,6 @@ class RequestService {
       }
       final request = RequestModel.fromJson(decrypted["request"] ?? {});
       return right(request);
-      // try {
-      // } catch (e) {
-      //   return left("Failed to parse created request: $e");
-      // }
     } catch (e) {
       print("❌ Exception: $e");
       return left("Exception: $e");

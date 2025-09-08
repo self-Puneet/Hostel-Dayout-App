@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/glass_nav_bar.dart';
 
 class StudentLayout extends StatelessWidget {
@@ -28,7 +30,20 @@ class StudentLayout extends StatelessWidget {
                     padding: EdgeInsets.symmetric(
                       horizontal: 31 * mediaQuery.size.width / 402,
                     ),
-                    child: LiquidGlassNavBar(),
+                    child: LiquidGlassNavBar(
+                      onHomePressed: () {
+                        // Navigate to home using go route
+                        context.go(AppRoutes.studentHome);
+                      },
+                      onNewPressed: () {
+                        // Navigate to new using go route
+                        context.go(AppRoutes.requestForm);
+                      },
+                      onProfilePressed: () {
+                        // Navigate to profile using go route
+                        context.go(AppRoutes.profile);
+                      },
+                    ),
                   ),
                 ),
               ),

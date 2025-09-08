@@ -432,6 +432,9 @@ class Services {
         response: response,
         context: "getAllRequests",
       );
+      // write in json file
+      final file = File("all_requests.json");
+      await file.writeAsString(jsonEncode(decrypted));
       print(decrypted);
       if (decrypted == null || decrypted["error"] != null) {
         return left(
@@ -605,6 +608,7 @@ Future<void> main() async {
   //   (error) => print("❌ Error: $error"),
   //   (data) => print("✅ Success: ${data.name}"),
   // );
+  print(DateTime.now().toUtc().toIso8601String().split('.').first+'Z');
 
   // final requestData = {
   //   "request_type": "outing",
@@ -615,13 +619,13 @@ Future<void> main() async {
   // print(await Services.createRequest(requestData: requestData));
   // print(await Services.getRequestById(requestId: "68aef4b26ce427e7a490d781"));
 
-  //   final thing = await Services.login("22EC002584", "test1");
-  //   // print(thing);
-  //   final token = thing['token'];
-  //   final final_thing = await Services.getAllRequests(token_: token);
-  //   // store this final_thing in the json file please
-  //   const encoder = JsonEncoder.withIndent('  ');
-  //   String jsonString = encoder.convert(final_thing);
+  final thing = await Services.login("22EC002584", "test1");
+  // print(thing);
+  final token = thing['token'];
+  final final_thing = await Services.getAllRequests(token_: token);
+  // store this final_thing in the json file please
+  const encoder = JsonEncoder.withIndent('  ');
+  String jsonString = encoder.convert(final_thing);
 
   //   // Write JSON to a file
   //   File file = File('student.json');
@@ -637,28 +641,30 @@ Future<void> main() async {
   //   final loginResponse = await Services.login("22EC002584", "test1");
   //   print(loginResponse);
 
-  final payload = {
-    "emp_id": "W002",
-    "wardenType": "warden",
-    "password": "l5wq+D701/",
-  };
+  // warden================================================================================
 
-  final payload1 = {
-    "emp_id": "W001",
-    "wardenType": "senior_warden",
-    "password": "kMKaH5l6Go",
-  };
-  final encrypted = CryptoUtil.encryptPayload(payload1);
-  final response = await http.post(
-    Uri.parse("http://20.192.25.27:4141/api/warden/login/warden"),
-    headers: {"Content-Type": "application/json"},
-    body: jsonEncode({"encrypted": encrypted}),
-  );
-  print("📡 Status: ${response.statusCode}");
-  final decrypted = CryptoUtil.handleEncryptedResponse(
-    response: response,
-    context: "loginAssistentWarden",
-  );
+  // final payload = {
+  //   "emp_id": "W002",
+  //   "wardenType": "warden",
+  //   "password": "l5wq+D701/",
+  // };
+
+  // final payload1 = {
+  //   "emp_id": "W001",
+  //   "wardenType": "senior_warden",
+  //   "password": "kMKaH5l6Go",
+  // };
+  // final encrypted = CryptoUtil.encryptPayload(payload1);
+  // final response = await http.post(
+  //   Uri.parse("http://20.192.25.27:4141/api/warden/login/warden"),
+  //   headers: {"Content-Type": "application/json"},
+  //   body: jsonEncode({"encrypted": encrypted}),
+  // );
+  // print("📡 Status: ${response.statusCode}");
+  // final decrypted = CryptoUtil.handleEncryptedResponse(
+  //   response: response,
+  //   context: "loginAssistentWarden",
+  // );
 
   // final response_profile = await http.get(
   //   Uri.parse("http://20.192.25.27:4141/api/warden/profile"),
@@ -674,19 +680,6 @@ Future<void> main() async {
   //     context: "wardenProfile",
   //   );
   // }
-  final response_allRequest = await http.get(
-    Uri.parse("http://20.192.25.27:4141/api/warden/allRequest"),
-    headers: {
-      "Authorization": "Bearer ${decrypted!['token']}",
-      "Content-Type": "application/json",
-    },
-  );
-
-  final decrypted_allRequest = CryptoUtil.handleEncryptedResponse(
-    response: response_allRequest,
-    context: "allRequest",
-  );
-  print(decrypted_allRequest);
 }
 // void main() async {
 //   await Env.load();

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
+import 'package:hostel_mgmt/core/routes/app_transition_page.dart'; // 👈 import here
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/login/login_layout.dart';
 import 'package:hostel_mgmt/presentation/view/student/pages/request_page.dart';
@@ -14,16 +15,26 @@ import 'package:hostel_mgmt/presentation/view/warden/state/warden_profile_state.
 import 'package:provider/provider.dart';
 import '../../presentation/view/student/pages/pages.dart';
 
-// Helper for route guards
+/// Helper for route guards
 String? _requireAuthRedirect(BuildContext context, GoRouterState state) {
   final session = Get.find<LoginSession>();
+
+  // Not logged in → go to login
   if (session.token.isEmpty || !session.isValid) {
     return AppRoutes.login;
   }
-  print("User role: ${session.role}");
+
+  final allowedRoutes = AppRoutes.routeAllowence[session.role] ?? [];
+
+  // Already on allowed route → no redirect
+  if (allowedRoutes.contains(state.matchedLocation)) {
+    return null;
+  }
+
+  // Otherwise, redirect user to home based on role
   switch (session.role) {
     case TimelineActor.student:
-      return AppRoutes.studentHome;
+      return AppRoutes.requestForm;
     case TimelineActor.assistentWarden:
       return AppRoutes.wardenHome;
     case TimelineActor.seniorWarden:
@@ -38,76 +49,90 @@ String? _requireAuthRedirect(BuildContext context, GoRouterState state) {
 class AppRouter {
   static GoRouter build() {
     return GoRouter(
-      initialLocation: AppRoutes.studentHome,
-      redirect: (context, state) {
-        return _requireAuthRedirect(context, state);
-      },
+      initialLocation: AppRoutes.requestForm,
+      redirect: _requireAuthRedirect,
       routes: [
+        /// Warden shell
         ShellRoute(
-          builder: (context, profileState, child) => ChangeNotifierProvider(
+          builder: (context, state, child) => ChangeNotifierProvider(
             create: (_) => WardenProfileState(),
             child: WardenLayout(child: child),
           ),
-          redirect: _requireAuthRedirect,
           routes: [
             GoRoute(
               path: AppRoutes.seniorWardenHome,
               name: 'warden-home',
-              builder: (context, state) {
+              pageBuilder: (context, state) {
                 final profile = context.read<WardenProfileState>();
-                return ChangeNotifierProvider(
-                  create: (_) => WardenHomeState(),
-                  child: WardenHomePage(actor: profile.loginSession.role),
+                return AppTransitionPage(
+                  key: state.pageKey,
+                  child: ChangeNotifierProvider(
+                    create: (_) => WardenHomeState(),
+                    child: WardenHomePage(actor: profile.loginSession.role),
+                  ),
                 );
               },
             ),
           ],
         ),
+
+        /// Login
         GoRoute(
           path: AppRoutes.login,
           name: 'login',
-          builder: (context, state) => const LoginLayout(),
+          pageBuilder: (context, state) =>
+              AppTransitionPage(key: state.pageKey, child: const LoginLayout()),
         ),
+
+        /// Student shell
         ShellRoute(
-          builder: (context, state, child) {
-            return StudentLayout(child: child);
-          },
+          builder: (context, state, child) => StudentLayout(child: child),
           routes: [
             GoRoute(
               path: AppRoutes.studentHome,
               name: 'home',
-              builder: (context, state) => const HomePage(),
-              redirect: _requireAuthRedirect,
+              pageBuilder: (context, state) => AppTransitionPage(
+                key: state.pageKey,
+                child: const HomePage(),
+              ),
             ),
             GoRoute(
               path: AppRoutes.history,
               name: 'history',
-              builder: (context, state) => const HistoryPage(),
-              redirect: _requireAuthRedirect,
+              pageBuilder: (context, state) => AppTransitionPage(
+                key: state.pageKey,
+                child: const HistoryPage(),
+              ),
             ),
             GoRoute(
               path: AppRoutes.requestForm,
               name: 'request',
-              builder: (context, state) => const RequestFormPage(),
-              redirect: _requireAuthRedirect,
+              pageBuilder: (context, state) => AppTransitionPage(
+                key: state.pageKey,
+                child: const RequestFormPage(),
+              ),
               routes: [
                 GoRoute(
                   path: ':id',
                   name: 'request-detail',
-                  builder: (context, state) {
+                  pageBuilder: (context, state) {
                     final requestId = state.pathParameters['id'] ?? '';
                     final role = Get.find<LoginSession>().role;
-                    return RequestPage(actor: role, requestId: requestId);
+                    return AppTransitionPage(
+                      key: state.pageKey,
+                      child: RequestPage(actor: role, requestId: requestId),
+                    );
                   },
-                  redirect: _requireAuthRedirect,
                 ),
               ],
             ),
             GoRoute(
               path: AppRoutes.profile,
               name: 'profile',
-              builder: (context, state) => const ProfilePage(),
-              redirect: _requireAuthRedirect,
+              pageBuilder: (context, state) => AppTransitionPage(
+                key: state.pageKey,
+                child: const ProfilePage(),
+              ),
             ),
           ],
         ),

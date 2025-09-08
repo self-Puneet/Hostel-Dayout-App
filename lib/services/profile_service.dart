@@ -57,13 +57,6 @@ class ProfileService {
   }
 
   static Future<Either<String, HostelSingleResponse>> getHostelInfo() async {
-    // var token = await LoginSession.getValidToken();
-
-    // token.fold((ifLeft) => null, (ifRight) {
-    //   if (ifRight.isEmpty) {
-    //     return left('Invalid or missing session. Please login again.');
-    //   }
-    // });
     final session = Get.find<LoginSession>();
     final token = session.token;
 
@@ -86,6 +79,7 @@ class ProfileService {
         );
       }
       try {
+        print("📡 getHostelInfo - Decrypted: $decrypted");
         final hostelResponse = HostelSingleResponse.fromJson(decrypted);
         return right(hostelResponse);
       } catch (e) {

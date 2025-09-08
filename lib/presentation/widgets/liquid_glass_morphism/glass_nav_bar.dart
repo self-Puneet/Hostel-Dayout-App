@@ -3,7 +3,17 @@ import 'dart:math';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 class LiquidGlassNavBar extends StatelessWidget {
-  const LiquidGlassNavBar({super.key});
+  // void callback for home button, new button and profile button
+  final VoidCallback onHomePressed;
+  final VoidCallback onNewPressed;
+  final VoidCallback onProfilePressed;
+
+  const LiquidGlassNavBar({
+    super.key,
+    required this.onHomePressed,
+    required this.onNewPressed,
+    required this.onProfilePressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +27,7 @@ class LiquidGlassNavBar extends StatelessWidget {
           borderRadius: borderRadius,
           child: Stack(
             alignment: Alignment.center,
-            children: [ 
+            children: [
               // Glass background
               LiquidGlass(
                 shape: LiquidRoundedSuperellipse(
@@ -53,7 +63,7 @@ class LiquidGlassNavBar extends StatelessWidget {
                           width: 34,
                           height: 34,
                         ),
-                        onPressed: () {},
+                        onPressed: onHomePressed,
                       ),
                     ),
                   ),
@@ -62,32 +72,35 @@ class LiquidGlassNavBar extends StatelessWidget {
                   Expanded(
                     flex: 143,
                     child: Center(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        // take as much height as it can
-                        constraints: const BoxConstraints(minHeight: 80),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.add, color: Colors.white, size: 24.3),
-                            SizedBox(width: 6),
-                            Text(
-                              "NEW",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w600, // SemiBold
-                                fontStyle: FontStyle
-                                    .normal, // SemiBold is weight, not style
-                                fontSize: 20,
-                                height: 1.0, // line-height: 100%
-                                letterSpacing: 0.0, // letter-spacing: 0%
+                      child: InkWell(
+                        onTap: onNewPressed,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          // take as much height as it can
+                          constraints: const BoxConstraints(minHeight: 80),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(Icons.add, color: Colors.white, size: 24.3),
+                              SizedBox(width: 6),
+                              Text(
+                                "NEW",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.w600, // SemiBold
+                                  fontStyle: FontStyle
+                                      .normal, // SemiBold is weight, not style
+                                  fontSize: 20,
+                                  height: 1.0, // line-height: 100%
+                                  letterSpacing: 0.0, // letter-spacing: 0%
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -106,7 +119,7 @@ class LiquidGlassNavBar extends StatelessWidget {
                           width: 34,
                           height: 34,
                         ),
-                        onPressed: () {},
+                        onPressed: onProfilePressed,
                       ),
                     ),
                   ),

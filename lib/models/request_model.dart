@@ -179,74 +179,74 @@ class RequestModel {
             )
           : null,
       parentRemark: json['parent_remark'],
-      studentAction: StudentAction(
-        studentProfileModel: StudentProfileModel.fromJson(
-          json['student_action']['action_by'],
-        ),
-        action: RequestAction.values.firstWhere(
-          (e) =>
-              e.toString().split('.').last == json['student_action']['action'],
-        ),
-        actionAt: DateTime.parse(json['student_action']['action_at']),
-      ),
-      parentAction: json['parent_action'] != null
-          ? ParentAction(
-              parentModel: ParentModel.fromJson(
-                json['parent_action']['action_by'],
-              ),
-              action: RequestAction.values.firstWhere(
-                (e) =>
-                    e.toString().split('.').last ==
-                    json['parent_action']['action'],
-              ),
-              actionAt: DateTime.parse(json['parent_action']['action_at']),
-            )
-          : null,
-      assistantWardenAction: json['assistant_warden_action'] != null
-          ? AssistantWardenAction(
-              assistantWardenModel: WardenModel.fromJson(
-                json['assistant_warden_action']['action_by'],
-              ),
-              action: RequestAction.values.firstWhere(
-                (e) =>
-                    e.toString().split('.').last ==
-                    json['assistant_warden_action']['action'],
-              ),
-              actionAt: DateTime.parse(
-                json['assistant_warden_action']['action_at'],
-              ),
-            )
-          : null,
-      seniorWardenAction: json['senior_warden_action'] != null
-          ? SeniorWardenAction(
-              seniorWardenModel: StudentProfileModel.fromJson(
-                json['senior_warden_action']['action_by'],
-              ),
-              action: RequestAction.values.firstWhere(
-                (e) =>
-                    e.toString().split('.').last ==
-                    json['senior_warden_action']['action'],
-              ),
-              actionAt: DateTime.parse(
-                json['senior_warden_action']['action_at'],
-              ),
-            )
-          : null,
-      securityGuardAction: json['security_guard_action'] != null
-          ? SecurityGuardAction(
-              securityGuardModel: SecurityGuardModel.fromJson(
-                json['security_guard_action']['action_by'],
-              ),
-              action: RequestAction.values.firstWhere(
-                (e) =>
-                    e.toString().split('.').last ==
-                    json['security_guard_action']['action'],
-              ),
-              actionAt: DateTime.parse(
-                json['security_guard_action']['action_at'],
-              ),
-            )
-          : null,
+      // studentAction: StudentAction(
+      //   studentProfileModel: StudentProfileModel.fromJson(
+      //     json['student_action']['action_by'],
+      //   ),
+      //   action: RequestAction.values.firstWhere(
+      //     (e) =>
+      //         e.toString().split('.').last == json['student_action']['action'],
+      //   ),
+      //   actionAt: DateTime.parse(json['student_action']['action_at']),
+      // ),
+      // parentAction: json['parent_action'] != null
+      //     ? ParentAction(
+      //         parentModel: ParentModel.fromJson(
+      //           json['parent_action']['action_by'],
+      //         ),
+      //         action: RequestAction.values.firstWhere(
+      //           (e) =>
+      //               e.toString().split('.').last ==
+      //               json['parent_action']['action'],
+      //         ),
+      //         actionAt: DateTime.parse(json['parent_action']['action_at']),
+      //       )
+      //     : null,
+      // assistantWardenAction: json['assistant_warden_action'] != null
+      //     ? AssistantWardenAction(
+      //         assistantWardenModel: WardenModel.fromJson(
+      //           json['assistant_warden_action']['action_by'],
+      //         ),
+      //         action: RequestAction.values.firstWhere(
+      //           (e) =>
+      //               e.toString().split('.').last ==
+      //               json['assistant_warden_action']['action'],
+      //         ),
+      //         actionAt: DateTime.parse(
+      //           json['assistant_warden_action']['action_at'],
+      //         ),
+      //       )
+      //     : null,
+      // seniorWardenAction: json['senior_warden_action'] != null
+      //     ? SeniorWardenAction(
+      //         seniorWardenModel: StudentProfileModel.fromJson(
+      //           json['senior_warden_action']['action_by'],
+      //         ),
+      //         action: RequestAction.values.firstWhere(
+      //           (e) =>
+      //               e.toString().split('.').last ==
+      //               json['senior_warden_action']['action'],
+      //         ),
+      //         actionAt: DateTime.parse(
+      //           json['senior_warden_action']['action_at'],
+      //         ),
+      //       )
+      //     : null,
+      // securityGuardAction: json['security_guard_action'] != null
+      //     ? SecurityGuardAction(
+      //         securityGuardModel: SecurityGuardModel.fromJson(
+      //           json['security_guard_action']['action_by'],
+      //         ),
+      //         action: RequestAction.values.firstWhere(
+      //           (e) =>
+      //               e.toString().split('.').last ==
+      //               json['security_guard_action']['action'],
+      //         ),
+      //         actionAt: DateTime.parse(
+      //           json['security_guard_action']['action_at'],
+      //         ),
+      //       )
+      //     : null,
     );
   }
 
@@ -267,50 +267,50 @@ class RequestModel {
       "last_updated_at": lastUpdatedAt.toIso8601String(),
       "security_status": securityStatus?.toString().split('.').last,
       "parent_remark": parentRemark,
-      "student_action": studentAction != null
-          ? {
-              "action_by": studentAction!.studentProfileModel.toJson(),
-              "action": (studentAction!.action != null)
-                  ? studentAction!.action!.name.toString().split('.').last
-                  : null,
-              "action_at": studentAction!.actionAt.toIso8601String(),
-            }
-          : null,
-      "parent_action": parentAction != null
-          ? {
-              "parent_model": parentAction!.parentModel.toJson(),
-              "action": parentAction!.action.toString().split('.').last,
-              "action_at": parentAction!.actionAt.toIso8601String(),
-            }
-          : null,
-      "assistant_warden_action": assistantWardenAction != null
-          ? {
-              "assistant_warden_model": assistantWardenAction!
-                  .assistantWardenModel
-                  .toJson(),
-              "action": assistantWardenAction!.action
-                  .toString()
-                  .split('.')
-                  .last,
-              "action_at": assistantWardenAction!.actionAt.toIso8601String(),
-            }
-          : null,
-      "senior_warden_action": seniorWardenAction != null
-          ? {
-              "senior_warden_model": seniorWardenAction!.seniorWardenModel
-                  .toJson(),
-              "action": seniorWardenAction!.action.toString().split('.').last,
-              "action_at": seniorWardenAction!.actionAt.toIso8601String(),
-            }
-          : null,
-      "security_guard_action": securityGuardAction != null
-          ? {
-              "security_guard_model": securityGuardAction!.securityGuardModel
-                  .toJson(),
-              "action": securityGuardAction!.action.toString().split('.').last,
-              "action_at": securityGuardAction!.actionAt.toIso8601String(),
-            }
-          : null,
+      // "student_action": studentAction != null
+      //     ? {
+      //         "action_by": studentAction!.studentProfileModel.toJson(),
+      //         "action": (studentAction!.action != null)
+      //             ? studentAction!.action!.name.toString().split('.').last
+      //             : null,
+      //         "action_at": studentAction!.actionAt.toIso8601String(),
+      //       }
+      //     : null,
+      // "parent_action": parentAction != null
+      //     ? {
+      //         "parent_model": parentAction!.parentModel.toJson(),
+      //         "action": parentAction!.action.toString().split('.').last,
+      //         "action_at": parentAction!.actionAt.toIso8601String(),
+      //       }
+      //     : null,
+      // "assistant_warden_action": assistantWardenAction != null
+      //     ? {
+      //         "assistant_warden_model": assistantWardenAction!
+      //             .assistantWardenModel
+      //             .toJson(),
+      //         "action": assistantWardenAction!.action
+      //             .toString()
+      //             .split('.')
+      //             .last,
+      //         "action_at": assistantWardenAction!.actionAt.toIso8601String(),
+      //       }
+      //     : null,
+      // "senior_warden_action": seniorWardenAction != null
+      //     ? {
+      //         "senior_warden_model": seniorWardenAction!.seniorWardenModel
+      //             .toJson(),
+      //         "action": seniorWardenAction!.action.toString().split('.').last,
+      //         "action_at": seniorWardenAction!.actionAt.toIso8601String(),
+      //       }
+      //     : null,
+      // "security_guard_action": securityGuardAction != null
+      //     ? {
+      //         "security_guard_model": securityGuardAction!.securityGuardModel
+      //             .toJson(),
+      //         "action": securityGuardAction!.action.toString().split('.').last,
+      //         "action_at": securityGuardAction!.actionAt.toIso8601String(),
+      //       }
+      //     : null,
     };
   }
 

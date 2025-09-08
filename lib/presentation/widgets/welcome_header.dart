@@ -17,25 +17,9 @@ class WelcomeHeader extends StatelessWidget {
   }) : date = date ?? DateTime.now();
 
   // Derive initials from a full name (e.g., "Alvaro Morte" -> "AM").
-  String _initials(String value) {
-    final parts = value
-        .trim()
-        .split(RegExp(r'\s+'))
-        .where((s) => s.isNotEmpty)
-        .toList();
-    if (parts.isEmpty) return '?';
-    if (parts.length == 1) {
-      final s = parts.first;
-      return (s.length >= 2 ? s.substring(0, 2) : s).toUpperCase();
-    }
-    return (parts.first + parts.last).toUpperCase();
-  }
-
   @override
   Widget build(BuildContext context) {
     final pillText = DateFormat('EEE, MMM d').format(date); // Thu, Aug 27
-
-    final hasUrl = (avatarUrl != null && avatarUrl!.trim().isNotEmpty);
 
     return Container(
       padding: const EdgeInsets.all(0),

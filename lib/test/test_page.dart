@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/glass_nav_bar.dart';
 import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/liquid_glass_chip.dart';
 
 class DemoPage extends StatelessWidget {
@@ -25,7 +24,7 @@ class DemoPage extends StatelessWidget {
                     horizontal: 40,
                     vertical: 40,
                   ),
-                  child: LiquidGlassNavBar(),
+                  // child: LiquidGlassNavBar(),
                 ),
               ],
             ),
