@@ -99,7 +99,7 @@ class ActiveRequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showActions = onApprove != null || onDecline != null;
+    // final showActions = onApprove != null || onDecline != null;
     return InkWell(
       onTap: () {
         context.go('/request/$requestId');

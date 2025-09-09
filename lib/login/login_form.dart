@@ -13,9 +13,7 @@ import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 
 // glass_warden_role_bar.dart
 import 'dart:math' show pi;
-import 'package:flutter/material.dart';
 import 'package:animated_segmented_tab_control/animated_segmented_tab_control.dart';
-import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 class LoginPage extends StatelessWidget {
   final TimelineActor actor; // 👈 decides which login config to use
@@ -33,24 +31,24 @@ class LoginPage extends StatelessWidget {
     final verificationController =
         state.textFieldMap[actor]?[FieldsType.verificationField];
 
-    final otherFunctionalities = Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        loginModel.showForgotPassword
-            ? TextButton(
-                onPressed: () => controller.forgotPassword(context, actor),
-                child: const Text("Forgot Password?"),
-              )
-            : const SizedBox.shrink(),
-        loginModel.showResetPassword
-            ? TextButton(
-                onPressed: () =>
-                    LoginController.doResetPassword(context, actor),
-                child: const Text("Reset Password"),
-              )
-            : const SizedBox.shrink(),
-      ],
-    );
+    // final otherFunctionalities = Row(
+    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //   children: [
+    //     loginModel.showForgotPassword
+    //         ? TextButton(
+    //             onPressed: () => controller.forgotPassword(context, actor),
+    //             child: const Text("Forgot Password?"),
+    //           )
+    //         : const SizedBox.shrink(),
+    //     loginModel.showResetPassword
+    //         ? TextButton(
+    //             onPressed: () =>
+    //                 LoginController.doResetPassword(context, actor),
+    //             child: const Text("Reset Password"),
+    //           )
+    //         : const SizedBox.shrink(),
+    //   ],
+    // );
 
     final identityField = TextField(
       controller: identityController,
