@@ -7,6 +7,7 @@ class LoginSession {
   String token;
   String username;
   String? email;
+  String? primaryId;
   String? hostel_id;
   String? hostel;
   String? identityId;
@@ -21,6 +22,7 @@ class LoginSession {
     required this.username,
     this.email,
     this.identityId,
+    this.primaryId,
     this.expiry,
     this.phone,
     this.fcmToken,
@@ -42,6 +44,7 @@ class LoginSession {
     "hostel_id": hostel_id,
     "hostel": hostel,
     "imageURL": imageURL,
+    "primaryId": primaryId,
   };
 
   factory LoginSession.fromJson(Map<String, dynamic> json) => LoginSession(
@@ -56,6 +59,7 @@ class LoginSession {
     hostel_id: json["hostel_id"],
     hostel: json["hostel"],
     imageURL: json["imageURL"],
+    primaryId: json["primaryId"],
   );
 
   Future<void> saveToPrefs() async {

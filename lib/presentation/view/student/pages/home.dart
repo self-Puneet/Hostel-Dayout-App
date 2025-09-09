@@ -70,23 +70,7 @@ class HomePage extends StatelessWidget {
                           ),
                         ),
 
-                        // Container(
-                        //   margin: EdgeInsets.symmetric(
-                        //     horizontal: 36 * mediaQuery.size.width / 402,
-                        //     vertical: 20,
-                        //   ),
-                        //   child: Text(
-                        //     'Your Requests',
-                        //     style: TextStyle(
-                        //       fontFamily: 'Poppins',
-                        //       fontWeight:
-                        //           FontWeight.w600, // SemiBold equivalent
-                        //       fontSize: 30,
-                        //       height: 1.0, // line-height 100%
-                        //       letterSpacing: 0.0,
-                        //     ),
-                        //   ),
-                        // ),
+
                         SizedBox(height: 20),
                         // Requests Cards with PageView if more than one
                         hasMultiple

@@ -1,3 +1,4 @@
+// active_request_card.dart
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/presentation/widgets/status_tag.dart';
@@ -76,6 +77,10 @@ class ActiveRequestCard extends StatelessWidget {
   final Widget timeline;
   final String requestId;
 
+  // NEW: optional actions
+  final VoidCallback? onApprove;
+  final VoidCallback? onDecline;
+
   const ActiveRequestCard({
     Key? key,
     required this.reason,
@@ -85,16 +90,19 @@ class ActiveRequestCard extends StatelessWidget {
     required this.toDate,
     required this.timeline,
     required this.requestId,
+    this.onApprove,
+    this.onDecline,
   }) : super(key: key);
 
   String _formatDate(DateTime date) =>
       '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+
   @override
   Widget build(BuildContext context) {
+    final showActions = onApprove != null || onDecline != null;
     return InkWell(
       onTap: () {
-        print("Navigating to request page for request ID: $requestId");
-        context.go('/request/${requestId}');
+        context.go('/request/$requestId');
       },
       borderRadius: BorderRadius.circular(28),
       child: Container(
@@ -104,13 +112,13 @@ class ActiveRequestCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.25),
-              offset: Offset(0, 0),
+              offset: const Offset(0, 0),
               blurRadius: 14,
               spreadRadius: 2,
             ),
           ],
         ),
-        margin: EdgeInsets.symmetric(horizontal: 0, vertical: 24),
+        margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 24),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: Column(
@@ -123,9 +131,9 @@ class ActiveRequestCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           "ACTIVE REQUEST",
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 14,
                           ),
@@ -147,9 +155,9 @@ class ActiveRequestCard extends StatelessWidget {
                   ),
                 ],
               ),
-              Divider(thickness: 1, color: Color(0xFF757575)),
-              SizedBox(height: 15),
-              // italic style font
+              const Divider(thickness: 1, color: Color(0xFF757575)),
+              const SizedBox(height: 15),
+              // Reason
               Text(
                 "\"$reason\"",
                 maxLines: 2,
@@ -160,16 +168,17 @@ class ActiveRequestCard extends StatelessWidget {
                   fontSize: 14,
                 ),
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
+              // Dates
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.calendar_today_rounded,
-                    color: Colors.grey[700],
+                    color: Colors.grey,
                     size: 24,
                   ),
-                  SizedBox(width: 6),
+                  const SizedBox(width: 6),
                   Text(
                     _formatDate(fromDate),
                     style: const TextStyle(
@@ -181,10 +190,10 @@ class ActiveRequestCard extends StatelessWidget {
                       letterSpacing: 0,
                     ),
                   ),
-                  Spacer(),
-                  Text(
+                  const Spacer(),
+                  const Text(
                     'TO',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w500,
                       fontStyle: FontStyle.normal,
@@ -193,7 +202,7 @@ class ActiveRequestCard extends StatelessWidget {
                       letterSpacing: 0,
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   Text(
                     _formatDate(toDate),
                     style: const TextStyle(
@@ -207,12 +216,42 @@ class ActiveRequestCard extends StatelessWidget {
                   ),
                 ],
               ),
-              // Timeline Placeholder
-              Container(
+              // Timeline
+              SizedBox(
                 height: 80,
                 child: HorizontalCheckpointTimeline(
                   checkpoints: status.chceckpointState,
                 ),
+              ),
+
+              // NEW: actions row at the bottom if provided
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: onApprove, // null => disabled
+                      icon: const Icon(Icons.check),
+                      label: const Text('Approve'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: onDecline, // null => disabled
+                      icon: const Icon(Icons.close),
+                      label: const Text('Decline'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

@@ -39,6 +39,7 @@ dependencies:
   flutter_inset_box_shadow: ^1.0.8
   material_segmented_control: ^5.0.1
   url_launcher: ^6.3.2
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -55,6 +56,10 @@ flutter:
     - assets/home.png
     - assets/profile_pic_demo.png
     - assets/calender_icon.png
+    - assets/app_icon.png
+    - assets/hostel_image.png
+    - assets/app_icon1.png
+    - assets/hero1.png
 
 flutter_native_splash:
   color: "#ffffff"
@@ -62,3 +67,9 @@ flutter_native_splash:
   android: true
   ios: true
   web: true
+
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/app_icon1.png"

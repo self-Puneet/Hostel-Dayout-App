@@ -127,7 +127,7 @@ class AppRouter {
                 key: state.pageKey,
                 child: ChangeNotifierProvider(
                   create: (_) => ParentState(),
-                  child: const ParentHomePage(),
+                  child: ParentHomePage(),
                 ),
               ),
             ),

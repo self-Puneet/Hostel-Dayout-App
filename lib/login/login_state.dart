@@ -38,7 +38,7 @@ class LoginState extends ChangeNotifier with WidgetsBindingObserver {
         loginTitle: "Parent Login",
         identityFieldName: "Enrollment Number",
         verificationFieldName: "Phone Number",
-        elevatedButtonText: "Login as Student",
+        elevatedButtonText: "Login as Parent",
         disabledButtonText: "Logging in ...",
         identityFieldIconData: Icons.school,
         verificationFieldIconData: Icons.phone,

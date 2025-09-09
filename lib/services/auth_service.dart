@@ -126,6 +126,64 @@ class AuthService {
     }
   }
 
+  // static Future<Either<String, LoginSession>> loginParent({
+  //   required String phoneNo,
+  //   required String enrollmentNo,
+  // }) async {
+  //   try {
+  //     final payload = {
+  //       "phone_no": phoneNo,
+  //       "student_enrollment_no": enrollmentNo,
+  //     };
+  //     print(payload);
+  //     print("pleaseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+  //     final encrypted = CryptoUtil.encryptPayload(payload);
+  //     final response = await http.post(
+  //       Uri.parse("http://20.192.25.27:4141/api/parent/login"),
+  //       headers: {"Content-Type": "application/json"},
+  //       body: jsonEncode({"encrypted": encrypted}),
+  //     );
+  //     print(
+  //       "📡 Parent Login Status: ${response.statusCode} - ${response.body}",
+  //     );
+  //     // final decrypted = CryptoUtil.handleEncryptedResponse(
+  //     //   response: response,
+  //     //   context: "loginParent",
+  //     // );
+  //     final decrypted = response.body.isNotEmpty
+  //         ? jsonDecode(response.body) as Map<String, dynamic>
+  //         : null;
+  //     print(decrypted);
+  //     if (decrypted == null) {
+  //       return left("Unknown error during login");
+  //     }
+  //     if (decrypted["error"] != null) {
+  //       return left(decrypted["error"].toString());
+  //     }
+  //     if ((decrypted['token'] ?? '').toString().isEmpty) {
+  //       return left(decrypted['message']?.toString() ?? "Login failed");
+  //     }
+  //     final diSession = Get.find<LoginSession>();
+  //     final token = decrypted['token'];
+  //     // diSession.token = token;
+  //     // Fetch parent profile
+  //     final profileResult = await ParentService.getParentProfile(token: token);
+  //     return profileResult.fold((profileError) => left(profileError), (parent) {
+  //       diSession.token = token;
+  //       diSession.role = TimelineActor.parent;
+  //       diSession.identityId = parent.phoneNo;
+  //       diSession.username = parent.name;
+  //       diSession.email = parent.email ?? '';
+  //       diSession.phone = parent.phoneNo;
+  //       diSession.primaryId = parent.parentId;
+  //       diSession.imageURL = null; // if your backend has no profilePic
+  //       return right(diSession);
+  //     });
+  //   } catch (e) {
+  //     return left("Exception: $e");
+  //   }
+  // }
+
   static Future<Either<String, LoginSession>> loginParent({
     required String phoneNo,
     required String enrollmentNo,
@@ -135,25 +193,15 @@ class AuthService {
         "phone_no": phoneNo,
         "student_enrollment_no": enrollmentNo,
       };
-      print(payload);
-      print("pleaseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
       final encrypted = CryptoUtil.encryptPayload(payload);
       final response = await http.post(
         Uri.parse("http://20.192.25.27:4141/api/parent/login"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"encrypted": encrypted}),
       );
-      print(
-        "📡 Parent Login Status: ${response.statusCode} - ${response.body}",
-      );
-      // final decrypted = CryptoUtil.handleEncryptedResponse(
-      //   response: response,
-      //   context: "loginParent",
-      // );
       final decrypted = response.body.isNotEmpty
           ? jsonDecode(response.body) as Map<String, dynamic>
           : null;
-      print(decrypted);
       if (decrypted == null) {
         return left("Unknown error during login");
       }
@@ -163,21 +211,33 @@ class AuthService {
       if ((decrypted['token'] ?? '').toString().isEmpty) {
         return left(decrypted['message']?.toString() ?? "Login failed");
       }
+
       final diSession = Get.find<LoginSession>();
       final token = decrypted['token'];
-      // diSession.token = token;
-      // Fetch parent profile
+
+      // 1) Set critical fields synchronously so DI contains valid session immediately
+      diSession.token = token;
+      diSession.role = TimelineActor.parent;
+
+      // 2) Fetch and apply profile (await so data is ready before persisting)
       final profileResult = await ParentService.getParentProfile(token: token);
-      return profileResult.fold((profileError) => left(profileError), (parent) {
-        diSession.token = token;
-        diSession.role = TimelineActor.parent;
-        diSession.identityId = parent.phoneNo;
-        diSession.username = parent.name;
-        diSession.email = parent.email ?? '';
-        diSession.phone = parent.phoneNo;
-        diSession.imageURL = null; // if your backend has no profilePic
-        return right(diSession);
-      });
+      final parentOrError = await profileResult
+          .fold<Future<Either<String, LoginSession>>>(
+            (profileError) async => left(profileError),
+            (parent) async {
+              diSession.identityId = parent.phoneNo;
+              diSession.username = parent.name;
+              diSession.email = parent.email ?? '';
+              diSession.phone = parent.phoneNo;
+              diSession.primaryId =
+                  parent.parentId; // used later by getAllRequests()
+              diSession.imageURL = null;
+              // 3) Persist to prefs BEFORE returning
+              await diSession.saveToPrefs();
+              return right(diSession);
+            },
+          );
+      return parentOrError;
     } catch (e) {
       return left("Exception: $e");
     }
