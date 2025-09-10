@@ -112,7 +112,11 @@ class ProfileOverlay extends StatelessWidget {
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: onEditProfile,
+                          onPressed: //pop this profile overlay first
+                              () {
+                            Navigator.pop(context);
+                            // onEditProfile();
+                          },
                           icon: const Icon(Icons.edit),
                           label: const Text(
                             "Edit Profile",

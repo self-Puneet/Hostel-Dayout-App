@@ -76,6 +76,7 @@ class ActiveRequestCard extends StatelessWidget {
   final DateTime toDate;
   final Widget timeline;
   final String requestId;
+  final bool? showActions;
 
   // NEW: optional actions
   final VoidCallback? onApprove;
@@ -90,6 +91,7 @@ class ActiveRequestCard extends StatelessWidget {
     required this.toDate,
     required this.timeline,
     required this.requestId,
+    this.showActions = false,
     this.onApprove,
     this.onDecline,
   }) : super(key: key);
@@ -99,10 +101,15 @@ class ActiveRequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("Show actions: $showActions");
     // final showActions = onApprove != null || onDecline != null;
     return InkWell(
+      // remove splash effect
+      highlightColor: Colors.transparent,
+
+      splashColor: Colors.transparent,
       onTap: () {
-        context.go('/request/$requestId');
+        // context.go('/request/$requestId');
       },
       borderRadius: BorderRadius.circular(28),
       child: Container(
@@ -139,7 +146,7 @@ class ActiveRequestCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          requestType,
+                          requestType.toUpperCase(),
                           style: const TextStyle(
                             fontWeight: FontWeight.w400,
                             fontSize: 22,
@@ -223,36 +230,42 @@ class ActiveRequestCard extends StatelessWidget {
                   checkpoints: status.chceckpointState,
                 ),
               ),
+              showActions == true
+                  ? Column(
+                      children: [
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: onApprove, // null => disabled
+                                icon: const Icon(Icons.check),
+                                label: const Text('Approve'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  foregroundColor: Colors.white,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: onDecline, // null => disabled
+                                icon: const Icon(Icons.close),
+                                label: const Text('Decline'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    )
+                  : const SizedBox.shrink(),
 
               // NEW: actions row at the bottom if provided
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: onApprove, // null => disabled
-                      icon: const Icon(Icons.check),
-                      label: const Text('Approve'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: onDecline, // null => disabled
-                      icon: const Icon(Icons.close),
-                      label: const Text('Decline'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             ],
           ),
         ),

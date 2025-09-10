@@ -46,12 +46,17 @@
 
 // controllers/request_form_controller.dart
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
+import 'package:hostel_mgmt/core/helpers/app_snackbar.dart';
+import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
+import 'package:hostel_mgmt/login/login_controller.dart';
 // import 'package:intl/intl.dart';
 import '../state/request_form_state.dart';
 import 'package:hostel_mgmt/services/profile_service.dart';
 import 'package:hostel_mgmt/models/outing_rule_model.dart';
 import 'package:hostel_mgmt/services/request_service.dart';
+import '../../../../core/enums/ui_eums/snackbar_type.dart';
 
 class RequestFormController {
   final RequestFormState state;
@@ -80,8 +85,8 @@ class RequestFormController {
     final to = state.toDateTime!;
     final payload = <String, dynamic>{
       'request_type': _mapRequestType(state.selectedType),
-      'applied_from': from.toUtc().toIso8601String().split('.').first+'Z',
-      'applied_to': to.toUtc().toIso8601String().split('.').first+'Z',
+      'applied_from': from.toUtc().toIso8601String().split('.').first + 'Z',
+      'applied_to': to.toUtc().toIso8601String().split('.').first + 'Z',
       'reason': state.reason.trim(),
     };
 
@@ -90,9 +95,21 @@ class RequestFormController {
       final result = await RequestService.createRequest(requestData: payload);
       result.fold((err) => _showSnackBar(err.toString()), (_) {
         _showSnackBar('Request submitted successfully!');
+        AppSnackBar.show(
+          context,
+          message: "Request Submitted Successfully",
+          type: AppSnackBarType.success,
+          icon: LoginSnackBarType.success.icon,
+        );
       });
+      context.go(AppRoutes.studentHome);
     } catch (_) {
-      _showSnackBar('Something went wrong');
+      AppSnackBar.show(
+        context,
+        message: "Something went wrong.",
+        type: AppSnackBarType.error,
+        icon: LoginSnackBarType.loginFailed.icon,
+      );
     } finally {
       state.setSubmitting(false);
     }

@@ -31,7 +31,10 @@ class RequestFormPage extends StatelessWidget {
         );
         return s;
       },
-      child: _RequestFormView(padding: padding),
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: _RequestFormView(padding: padding),
+      ),
     );
   }
 }

@@ -36,8 +36,8 @@ class _WardenLayoutState extends State<WardenLayout> {
           final actor = state.loginSession.role;
           final List<Widget> _pages = [
             WardenHomePage(actor: actor),
-            const Center(child: Text('Active Requests Page')),
-            const Center(child: Text('History Requests Page')),
+            const Center(child: Text('Page Under Construction')),
+            const Center(child: Text('Page Under Construction')),
           ];
 
           final padding2 = EdgeInsets.symmetric(
@@ -77,20 +77,18 @@ class _WardenLayoutState extends State<WardenLayout> {
               ),
             ),
             bottomNavigationBar: BottomNavigationBar(
+              selectedItemColor: Colors.black,
               currentIndex: _selectedIndex,
               onTap: _onItemTapped,
               items: const [
+                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.list_alt),
+                  icon: Icon(Icons.check_circle_outline),
                   label: 'Active Requests',
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.history),
                   label: 'History Requests',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.extension),
-                  label: 'Custom',
                 ),
               ],
             ),

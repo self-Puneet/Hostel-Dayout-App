@@ -1,6 +1,9 @@
 // warden_home_state.dart
 
 import 'package:flutter/material.dart';
+import 'package:get/instance_manager.dart';
+import 'package:hostel_mgmt/core/enums/enum.dart';
+import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 
 // Add isSelected to the wrapper.
@@ -72,7 +75,19 @@ class WardenHomeState extends ChangeNotifier {
 
   void setRequests(RequestApiResponse response) {
     _allRequests = response;
-    _filterRequests();
+    // Filter by actor queue before projecting selection
+    final actor = Get.find<LoginSession>().role;
+    final filtered = response.requests
+        .where((r) => belongsToActorQueue(r.status, actor))
+        .toList();
+
+    currentOnScreenRequests = filtered.map((req) {
+      return onScreenRequest(
+        request: req,
+        isSelected: _selectedIds.contains(req.requestId),
+      );
+    }).toList();
+
     notifyListeners();
   }
 
@@ -176,4 +191,49 @@ class WardenHomeState extends ChangeNotifier {
     filterController.dispose();
     super.dispose();
   }
+
+  // clear whole state
+  void clearState() {
+    _isLoading = false;
+    _isErrored = false;
+    _isActioning = false;
+    _errorMessage = '';
+    _allRequests = null;
+    currentOnScreenRequests = [];
+    _selectedIds.clear();
+    selectedRequests.clear();
+    filterController.clear();
+    notifyListeners();
+  }
+
+  // In WardenHomeState
+  static bool belongsToActorQueue(RequestStatus s, TimelineActor actor) {
+    switch (actor) {
+      case TimelineActor.assistentWarden:
+        // waiting at assistant: newly requested or student-cancel review
+        return s == RequestStatus.requested ||
+            s == RequestStatus.cancelledStudent;
+      case TimelineActor.seniorWarden:
+        // waiting at senior: referred by assistant and parent approved
+        return s == RequestStatus.referred || s == RequestStatus.parentApproved;
+      default:
+        return false;
+    }
+  }
+
+  // void setRequests(RequestApiResponse response) {
+  //   _allRequests = response;
+  //   // Filter by actor queue before projecting selection
+  //   final actor = Get.find<LoginSession>().role;
+  //   final filtered = response.requests.where((r) => belongsToActorQueue(r.status, actor)).toList();
+
+  //   currentOnScreenRequests = filtered.map((req) {
+  //     return onScreenRequest(
+  //       request: req,
+  //       isSelected: _selectedIds.contains(req.requestId),
+  //     );
+  //   }).toList();
+
+  //   notifyListeners();
+  // }
 }

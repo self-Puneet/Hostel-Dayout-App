@@ -30,57 +30,65 @@ class WardenHomeController {
     }
   }
 
-  // NEW: single per-item action method
   Future<void> actionRequestById({
-    required String requestId,
-    required RequestAction action,
-  }) async {
-    final session = Get.find<LoginSession>();
-    final TimelineActor actor = session.role;
+  required String requestId,
+  required RequestAction action,
+}) async {
+  final session = Get.find<LoginSession>();
+  final TimelineActor actor = session.role;
 
-    state.setIsActioningbyId(requestId, true);
+  state.setIsActioningbyId(requestId, true);
+  state.setError(false, '');
 
-    try {
-      // 1) Compute target status via your enum extension
-      final RequestStatus targetStatus = action.statusAfterAction(
-        actor,
-      ); // extension on RequestAction
-      final String statusApi =
-          targetStatus.statusToApiString; // extension on RequestStatus
+  try {
+    final targetStatus = action.statusAfterAction(actor);
+    final String statusApi = targetStatus.statusToApiString;
 
-      // 2) Call API (via WardenService or RequestService)
-      final result = await RequestService.updateRequestStatus(
-        requestId: requestId,
-        status: statusApi,
-        remark: 'ok done',
-      );
+    final result = await RequestService.updateRequestStatus(
+      requestId: requestId,
+      status: statusApi,
+      remark: 'ok done',
+    );
 
-      // 3) Handle response and update local state
-      result.fold(
-        (error) {
-          state.setError(true, error);
-        },
-        (updatedRequestModel) {
-          // Update the specific item locally
-          state.currentOnScreenRequests = state.currentOnScreenRequests.map((
-            w,
-          ) {
+    await result.fold(
+      (error) async {
+        state.setError(true, error);
+        await fetchRequestsFromApi(); // reconcile on error too
+      },
+      (updatedRequestModel) async {
+        // Optimistic remove if the updated status shouldn't remain in this queue
+        final keep = WardenHomeState.belongsToActorQueue(
+          updatedRequestModel.status,
+          actor,
+        );
+        
+        if (!keep) {
+          state.currentOnScreenRequests.removeWhere(
+            (w) => w.request.requestId == requestId,
+          );
+          state.notifyListeners();
+        } else {
+          // Or update in place if it still belongs here
+          state.currentOnScreenRequests = state.currentOnScreenRequests.map((w) {
             if (w.request.requestId == requestId) {
               return w.copyWith(request: updatedRequestModel);
             }
             return w;
           }).toList();
-        },
-      );
+          state.notifyListeners();
+        }
 
-      // 4) Optionally refresh from server to stay in sync
-      await fetchRequestsFromApi();
-    } catch (e) {
-      state.setError(true, 'Action failed: $e');
-    } finally {
-      state.setIsActioningbyId(requestId, false);
-    }
+        // Authoritative refresh
+        await fetchRequestsFromApi();
+      },
+    );
+  } catch (e) {
+    state.setError(true, 'Action failed: $e');
+  } finally {
+    state.setIsActioningbyId(requestId, false);
   }
+}
+
 
   // OPTIONAL: bulk variants can reuse the same method
   Future<void> bulkActionSelected({required RequestAction action}) async {

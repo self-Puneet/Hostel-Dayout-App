@@ -57,19 +57,19 @@ extension RequestStatusX on RequestStatus {
   Color get minimalStatusColor {
     switch (this) {
       case RequestStatus.requested:
-        return Color.fromRGBO(0, 98, 255, 0.27);
+        return Colors.blue;
       case RequestStatus.referred:
-        return Color.fromRGBO(0, 98, 255, 0.27);
+        return Colors.blue;
       case RequestStatus.cancelled:
-        return Color.fromRGBO(255, 0, 4, 0.4);
+        return Colors.red;
       case RequestStatus.parentApproved:
-        return Color.fromRGBO(0, 98, 255, 0.27);
+        return Colors.blue;
       case RequestStatus.parentDenied:
-        return Color.fromRGBO(255, 0, 4, 0.4);
+        return Colors.red;
       case RequestStatus.rejected:
-        return Color.fromRGBO(255, 0, 4, 0.4);
+        return Colors.red;
       case RequestStatus.approved:
-        return Color.fromRGBO(47, 255, 0, 0.4);
+        return Colors.green;
       case RequestStatus.cancelledStudent:
         return Colors.grey;
     }

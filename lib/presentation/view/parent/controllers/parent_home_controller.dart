@@ -1,6 +1,7 @@
 // parent_home_controller.dart
 import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
+import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:hostel_mgmt/presentation/view/parent/state/parent_state.dart';
 import 'package:hostel_mgmt/services/parent_service.dart';
 import 'package:hostel_mgmt/services/request_service.dart';
@@ -13,10 +14,39 @@ class ParentHomeController {
     state.setLoading(true);
     state.clearError();
     final result = await ParentService.getAllRequests();
-    result.fold(
-      (err) => state.setError(err),
-      (resp) => state.setRequests(resp),
-    );
+    result.fold((err) => state.setError(err), (resp) {
+      state.setRequests(resp);
+      state.setHistoryRequests([
+        RequestModel(
+          id: '1',
+          requestId: 'REQ1',
+          requestType: RequestType.leave,
+          studentEnrollmentNumber: 'ENR001',
+          appliedFrom: DateTime.now().subtract(Duration(days: 2)),
+          appliedTo: DateTime.now().subtract(Duration(days: 1)),
+          reason: 'Approved request',
+          status: RequestStatus.approved,
+          active: true,
+          createdBy: 'admin',
+          appliedAt: DateTime.now().subtract(Duration(days: 1)),
+          lastUpdatedAt: DateTime.now(),
+        ),
+        RequestModel(
+          id: '2',
+          requestId: 'REQ2',
+          requestType: RequestType.leave,
+          studentEnrollmentNumber: 'ENR002',
+          appliedFrom: DateTime.now().subtract(Duration(days: 3)),
+          appliedTo: DateTime.now().subtract(Duration(days: 2)),
+          reason: 'Rejected request',
+          status: RequestStatus.rejected,
+          active: false,
+          createdBy: 'admin',
+          appliedAt: DateTime.now().subtract(Duration(days: 2)),
+          lastUpdatedAt: DateTime.now(),
+        ),
+      ]);
+    });
     state.setLoading(false);
   }
 
@@ -37,11 +67,18 @@ class ParentHomeController {
         status: statusApi,
         remark: 'ok done',
       );
-      result.fold((err) => state.setError(err), (updated) {
-        state.setLoading(true);
-        fetchActiveRequests();
-        state.setLoading(false);
-      });
+      result.fold(
+        (err) {
+          state.setLoading(true);
+          fetchActiveRequests();
+          state.setLoading(false);
+        },
+        (updated) {
+          state.setLoading(true);
+          fetchActiveRequests();
+          state.setLoading(false);
+        },
+      );
       // Optionally refresh full list to be safe:
       // await fetchActiveRequests();
     } finally {

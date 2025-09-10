@@ -18,49 +18,61 @@ class LiquidGlassChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: borderRadius,
-        border: Border.all(color: const Color(0xFFC1C1C1), width: 1),
-      ),
-      child: LiquidGlass(
-        shape: LiquidRoundedSuperellipse(
-          borderRadius: borderRadius.topLeft, // matches your radius
-        ),
-        settings: const LiquidGlassSettings(
-          thickness: 8,
-          blur: 6,
-          chromaticAberration: 0.01,
-          lightAngle: pi * 5 / 18,
-          lightIntensity: 0.5,
-          refractiveIndex: 1.4,
-          saturation: 1,
-          lightness: 1,
-        ),
-        child: Container(
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-            borderRadius: borderRadius,
-            gradient: LinearGradient(
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-              colors: [
-                Colors.transparent,
-                Colors.black.withAlpha((0.1 * 225).toInt()),
-              ],
+    return SizedBox(
+      width: width, // constrain chip size from parent
+      height: height,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Glass background with only a Container child
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: borderRadius,
+                border: Border.all(color: const Color(0xFFC1C1C1), width: 1),
+              ),
+              child: LiquidGlass(
+                shape: LiquidRoundedSuperellipse(
+                  borderRadius: borderRadius.topLeft,
+                ),
+                settings: const LiquidGlassSettings(
+                  thickness: 8,
+                  blur: 6,
+                  chromaticAberration: 0.01,
+                  lightAngle: pi * 5 / 18,
+                  lightIntensity: 0,
+                  refractiveIndex: 1.4,
+                  saturation: 1,
+                  lightness: 1,
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: borderRadius,
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withAlpha((0.1 * 225).toInt()),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
-          alignment: Alignment.center,
-          child: Text(
+
+          // Text OVER the glass (not inside LiquidGlass child)
+          Text(
             label,
+            textAlign: TextAlign.center,
             style: const TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 14,
               color: Colors.black,
             ),
           ),
-        ),
+        ],
       ),
     );
   }

@@ -5,19 +5,19 @@ import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/liquid_ba
 import 'package:hostel_mgmt/presentation/widgets/segmented_button.dart';
 import 'package:provider/provider.dart';
 
-class HistoryPage extends StatelessWidget {
-  const HistoryPage({super.key});
+class ParentHistoryPage extends StatelessWidget {
+  const ParentHistoryPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => HistoryState(),
-      child: _HistoryPageView(),
+      child: _ParentHistoryPageView(),
     );
   }
 }
 
-class _HistoryPageView extends StatelessWidget {
+class _ParentHistoryPageView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
@@ -64,7 +64,7 @@ class _HistoryPageView extends StatelessWidget {
                     topLeft: Radius.circular(46),
                     topRight: Radius.circular(46),
                   ),
-                  border: Border.all(color: Colors.black, width: 1.6),
+                  // border: Border.all(color: Colors.black, width: 1.6),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.only(left: 35, right: 35, top: 30),

@@ -67,4 +67,14 @@ class HomeState extends ChangeNotifier {
     requests = historyRequests;
     notifyListeners();
   }
+
+  // clear state
+  void clear() {
+    isLoading = false;
+    activeRequests = [];
+    profile = null;
+    requests = [];
+    selectedStatus = 'All';
+    notifyListeners();
+  }
 }

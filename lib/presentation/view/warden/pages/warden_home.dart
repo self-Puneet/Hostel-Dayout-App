@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
+import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/presentation/components/simple_action_request_card.dart';
 import 'package:provider/provider.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_home_state.dart';
@@ -23,13 +25,6 @@ class WardenHomePage extends StatelessWidget {
 
         if (state.isLoading) {
           return const Center(child: CircularProgressIndicator());
-        } else if (state.isErrored) {
-          return Center(
-            child: Text(
-              state.errorMessage,
-              style: const TextStyle(color: Colors.red, fontSize: 16),
-            ),
-          );
         } else {
           final requests = state.currentOnScreenRequests
               .map((req) => req.request)
@@ -39,7 +34,7 @@ class WardenHomePage extends StatelessWidget {
               TextField(
                 controller: state.filterController,
                 decoration: InputDecoration(
-                  hintText: 'Search by student name...',
+                  hintText: 'Search by Enrollment no ...',
                   prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -158,23 +153,46 @@ class WardenHomePage extends StatelessWidget {
                               // per-item actions disabled during selection
                               onRejection:
                                   (!state.hasSelection && !state.isActioning)
-                                  ? () => controller.actionRequestById(
-                                      action:
-                                          actor == TimelineActor.assistentWarden
-                                          ? RequestAction.cancel
-                                          : RequestAction.reject,
-                                      requestId: req.requestId,
-                                    )
+                                  ? () {
+                                      controller.actionRequestById(
+                                        action:
+                                            actor ==
+                                                TimelineActor.assistentWarden
+                                            ? RequestAction.cancel
+                                            : RequestAction.reject,
+                                        requestId: req.requestId,
+                                      );
+                                      context.goNamed(
+                                        AppRoutes.wardenHome,
+                                        queryParameters: {
+                                          'ts': DateTime.now()
+                                              .millisecondsSinceEpoch
+                                              .toString(),
+                                        },
+                                      );
+                                    }
                                   : null,
                               onAcceptence:
                                   (!state.hasSelection && !state.isActioning)
-                                  ? () => controller.actionRequestById(
-                                      action:
-                                          actor == TimelineActor.assistentWarden
-                                          ? RequestAction.refer
-                                          : RequestAction.approve,
-                                      requestId: req.requestId,
-                                    )
+                                  ? () {
+                                      controller.actionRequestById(
+                                        action:
+                                            actor ==
+                                                TimelineActor.assistentWarden
+                                            ? RequestAction.refer
+                                            : RequestAction.approve,
+                                        requestId: req.requestId,
+                                      );
+                                      context.goNamed(
+                                        // AppRoutes.wardenHome,
+                                        "warden-home",
+                                        queryParameters: {
+                                          'ts': DateTime.now()
+                                              .millisecondsSinceEpoch
+                                              .toString(),
+                                        },
+                                      );
+                                    }
                                   : null,
                             );
                           },

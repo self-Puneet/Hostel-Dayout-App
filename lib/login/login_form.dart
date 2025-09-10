@@ -108,7 +108,7 @@ class LoginPage extends StatelessWidget {
 
     final formTitle = Text(
       loginModel.loginTitle,
-      style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+      style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
     );
 
     // inside LoginPage.build, replace `wardenTypeSelector` with:
@@ -198,7 +198,7 @@ class LoginPage extends StatelessWidget {
                 // Same settings as GlassSegmentedTabs
                 settings: const LiquidGlassSettings(
                   thickness: 10,
-                  blur: 25, // increased from 8 for stronger frost
+                  blur: 20, // increased from 8 for stronger frost
                   chromaticAberration: 0.01,
                   lightAngle: pi * 5 / 18,
                   lightIntensity: 0.5,
@@ -219,7 +219,7 @@ class LoginPage extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         formTitle,
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 16),
                         wardenTypeSelector,
                         const SizedBox(height: 16),
                         identityField,
