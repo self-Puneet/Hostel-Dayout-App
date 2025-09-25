@@ -11,7 +11,7 @@ class ParentLayout extends StatefulWidget {
 }
 
 class _ParentLayoutState extends State<ParentLayout> {
-  int _selectedIndex = 0;
+  // int _selectedIndex = 0;
 
   int _indexForLocation(String location) {
     if (location.startsWith(AppRoutes.parentHistory)) return 1;

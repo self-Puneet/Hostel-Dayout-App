@@ -221,6 +221,10 @@ class WardenHomeState extends ChangeNotifier {
     }
   }
 
+  void notifyListenerMethod() {
+    notifyListeners();
+  }
+
   // void setRequests(RequestApiResponse response) {
   //   _allRequests = response;
   //   // Filter by actor queue before projecting selection

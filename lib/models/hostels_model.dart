@@ -1,5 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/util/time_utils.dart';
-import 'package:hostel_mgmt/models/outing_rule_model.dart';
+import 'package:hostel_mgmt/models/restriction_window.dart';
 
 class HostelSingleResponse {
   final String message;
@@ -43,21 +44,6 @@ class HostelResponse {
 }
 
 class HostelModel {
-  OutingRule toOutingRule() {
-    if (!outingAllowed) {
-      return OutingRule.restricted();
-    }
-    // If times are not set, treat as unrestricted
-    if (checkOutStartTime == Duration.zero &&
-        latestReturnTime == Duration.zero) {
-      return OutingRule.unrestricted();
-    }
-    return OutingRule.allowed(
-      fromTime: checkOutStartTime,
-      toTime: latestReturnTime,
-    );
-  }
-
   final String hostelId;
   final String hostelName;
   final Duration checkOutStartTime; // since midnight
@@ -90,5 +76,54 @@ class HostelModel {
       'latest_return_time': TimeUtils.format(latestReturnTime),
       'outing_allowed': outingAllowed,
     };
+  }
+
+  /// Convert this HostelModel into a RestrictionWindow.
+  /// - Interprets checkOutStartTime/latestReturnTime as minutes since midnight.
+  /// - Builds a user note; when not allowed, shows the reason text instead.
+  /// - Timezone defaults to Asia/Kolkata but can be overridden.
+  RestrictionWindow toRestrictionWindow({
+    String timezone = 'Asia/Kolkata',
+    String? notAllowedReason,
+  }) {
+    final min = _durationToTimeOfDay(checkOutStartTime);
+    final max = _durationToTimeOfDay(latestReturnTime);
+
+    final note = outingAllowed
+        ? "Allowed time: ${_format12h(min)} – ${_format12h(max)}"
+        : (notAllowedReason ?? "Outing not allowed today.");
+
+    return RestrictionWindow(
+      allowedToday: outingAllowed,
+      minTime: min,
+      maxTime: max,
+      timezone: timezone,
+      note: note,
+    );
+  }
+
+  /// Safely converts a Duration since midnight to TimeOfDay.
+  /// Handles values beyond 24h by wrapping within a 24h range.
+  TimeOfDay _durationToTimeOfDay(Duration d) {
+    // Normalize to [0, 1440) minutes since midnight
+    final total = d
+        .inMinutes; // total minutes (can be > 1440 or negative) [web:175][web:180]
+    final mod = ((total % 1440) + 1440) % 1440; // safe modulo for negatives
+    final h = mod ~/ 60; // integer hours [web:173]
+    final m = mod % 60; // remainder minutes [web:173]
+    return TimeOfDay(
+      hour: h,
+      minute: m,
+    ); // TimeOfDay expects 0–23 hours [web:107]
+  }
+
+  /// 12-hour formatter without BuildContext (for notes).
+  String _format12h(TimeOfDay t) {
+    final h = t.hourOfPeriod == 0
+        ? 12
+        : t.hourOfPeriod; // 12 for 0 and 12 [web:112]
+    final m = t.minute.toString().padLeft(2, '0');
+    final period = t.period == DayPeriod.am ? 'AM' : 'PM';
+    return "$h:$m $period";
   }
 }

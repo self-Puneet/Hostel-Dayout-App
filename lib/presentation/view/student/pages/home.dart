@@ -53,13 +53,7 @@ class HomePage extends StatelessWidget {
 
           return AppRefreshWrapper(
             onRefresh: () async {
-              // invoke a method in the state
-              // state.clear();
-              // Future.delayed(const Duration(milliseconds: 500), () {
-              // context.go(AppRoutes.requestForm);
-              // context.go(AppRoutes.studentHome);
-
-              // You can add any additional refresh logic here if needed
+              await context.read<HomeController>().fetchProfileAndRequests();
             },
             child: Padding(
               padding: EdgeInsetsGeometry.only(
@@ -78,7 +72,7 @@ class HomePage extends StatelessWidget {
                               actor: TimelineActor.student,
                               name: state.profile?.name ?? '',
                               avatarUrl: state.profile?.profilePic,
-                              greeting: 'Welcome back,',
+                              greeting: 'Welcome,',
                             ),
                           ),
 

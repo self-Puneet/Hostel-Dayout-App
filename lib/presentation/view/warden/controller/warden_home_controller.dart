@@ -53,7 +53,6 @@ class WardenHomeController {
     await result.fold(
       (error) async {
         state.setError(true, error);
-        await fetchRequestsFromApi(); // reconcile on error too
       },
       (updatedRequestModel) async {
         // Optimistic remove if the updated status shouldn't remain in this queue
@@ -66,7 +65,7 @@ class WardenHomeController {
           state.currentOnScreenRequests.removeWhere(
             (w) => w.request.requestId == requestId,
           );
-          state.notifyListeners();
+          state.notifyListenerMethod();
         } else {
           // Or update in place if it still belongs here
           state.currentOnScreenRequests = state.currentOnScreenRequests.map((w) {
@@ -75,11 +74,8 @@ class WardenHomeController {
             }
             return w;
           }).toList();
-          state.notifyListeners();
+          state.notifyListenerMethod();
         }
-
-        // Authoritative refresh
-        await fetchRequestsFromApi();
       },
     );
   } catch (e) {
@@ -100,8 +96,6 @@ class WardenHomeController {
       for (final id in ids) {
         await actionRequestById(requestId: id, action: action);
       }
-      state.clearSelection();
-      await fetchRequestsFromApi();
     } finally {
       state.setIsActioning(false);
     }

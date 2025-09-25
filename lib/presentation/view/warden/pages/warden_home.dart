@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
+import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/presentation/components/simple_action_request_card.dart';
 import 'package:provider/provider.dart';
@@ -114,90 +115,101 @@ class WardenHomePage extends StatelessWidget {
               const Divider(height: 1, thickness: 1),
               SizedBox(height: 12),
               Expanded(
-                child: requests.isEmpty
-                    ? const Center(child: Text('No requests found.'))
-                    : state.isActioning
-                    ? const Center(child: CircularProgressIndicator())
-                    : MediaQuery.removePadding(
-                        context: context,
-                        removeTop: true, // remove the automatic top padding
-                        child: ListView.builder(
-                          padding: EdgeInsets.zero, // no extra list padding
-                          primary: false, // don’t apply primary scroll padding
-                          itemCount: requests.length,
-                          itemBuilder: (context, index) {
-                            final req = requests[index];
-                            final selected = state.isSelectedById(
-                              req.requestId,
-                            );
-                            return SimpleActionRequestCard(
-                              reason: req.reason,
-                              name: req.studentEnrollmentNumber,
-                              status: req.status,
-                              leaveType: req.requestType,
-                              fromDate: req.appliedFrom,
-                              toDate: req.appliedTo,
-                              selected: selected,
+                child: AppRefreshWrapper(
+                  onRefresh: () async {
+                    final s = context.read<WardenHomeState>();
+                    s.clearState(); // resets selection, flags, lists, filter; defined in state
+                    await WardenHomeController(s).fetchRequestsFromApi();
+                  },
+                  child: requests.isEmpty
+                      ? Container(height: 200, color: Colors.red)
+                      : state.isActioning
+                      ? const Center(child: CircularProgressIndicator())
+                      : MediaQuery.removePadding(
+                          context: context,
+                          removeTop: true, // remove the automatic top padding
+                          child: ListView.builder(
+                            padding: EdgeInsets.zero, // no extra list padding
+                            primary:
+                                false, // don’t apply primary scroll padding
+                            itemCount: requests.length,
+                            itemBuilder: (context, index) {
+                              final req = requests[index];
+                              final selected = state.isSelectedById(
+                                req.requestId,
+                              );
+                              return SimpleActionRequestCard(
+                                reason: req.reason,
+                                name: req.studentEnrollmentNumber,
+                                status: req.status,
+                                leaveType: req.requestType,
+                                fromDate: req.appliedFrom,
+                                toDate: req.appliedTo,
+                                selected: selected,
 
-                              // gestures
-                              onLongPress:
-                                  (!state.isActioning && !state.hasSelection)
-                                  ? () =>
-                                        state.toggleSelectedById(req.requestId)
-                                  : null,
-                              onTap: (!state.isActioning && state.hasSelection)
-                                  ? () =>
-                                        state.toggleSelectedById(req.requestId)
-                                  : null,
+                                // gestures
+                                onLongPress:
+                                    (!state.isActioning && !state.hasSelection)
+                                    ? () => state.toggleSelectedById(
+                                        req.requestId,
+                                      )
+                                    : null,
+                                onTap:
+                                    (!state.isActioning && state.hasSelection)
+                                    ? () => state.toggleSelectedById(
+                                        req.requestId,
+                                      )
+                                    : null,
 
-                              // per-item actions disabled during selection
-                              onRejection:
-                                  (!state.hasSelection && !state.isActioning)
-                                  ? () {
-                                      controller.actionRequestById(
-                                        action:
-                                            actor ==
-                                                TimelineActor.assistentWarden
-                                            ? RequestAction.cancel
-                                            : RequestAction.reject,
-                                        requestId: req.requestId,
-                                      );
-                                      context.goNamed(
-                                        AppRoutes.wardenHome,
-                                        queryParameters: {
-                                          'ts': DateTime.now()
-                                              .millisecondsSinceEpoch
-                                              .toString(),
-                                        },
-                                      );
-                                    }
-                                  : null,
-                              onAcceptence:
-                                  (!state.hasSelection && !state.isActioning)
-                                  ? () {
-                                      controller.actionRequestById(
-                                        action:
-                                            actor ==
-                                                TimelineActor.assistentWarden
-                                            ? RequestAction.refer
-                                            : RequestAction.approve,
-                                        requestId: req.requestId,
-                                      );
-                                      context.goNamed(
-                                        // AppRoutes.wardenHome,
-                                        "warden-home",
-                                        queryParameters: {
-                                          'ts': DateTime.now()
-                                              .millisecondsSinceEpoch
-                                              .toString(),
-                                        },
-                                      );
-                                    }
-                                  : null,
-                            );
-                          },
+                                // per-item actions disabled during selection
+                                onRejection:
+                                    (!state.hasSelection && !state.isActioning)
+                                    ? () {
+                                        controller.actionRequestById(
+                                          action:
+                                              actor ==
+                                                  TimelineActor.assistentWarden
+                                              ? RequestAction.cancel
+                                              : RequestAction.reject,
+                                          requestId: req.requestId,
+                                        );
+                                        context.goNamed(
+                                          AppRoutes.wardenHome,
+                                          queryParameters: {
+                                            'ts': DateTime.now()
+                                                .millisecondsSinceEpoch
+                                                .toString(),
+                                          },
+                                        );
+                                      }
+                                    : null,
+                                onAcceptence:
+                                    (!state.hasSelection && !state.isActioning)
+                                    ? () {
+                                        controller.actionRequestById(
+                                          action:
+                                              actor ==
+                                                  TimelineActor.assistentWarden
+                                              ? RequestAction.refer
+                                              : RequestAction.approve,
+                                          requestId: req.requestId,
+                                        );
+                                        context.goNamed(
+                                          // AppRoutes.wardenHome,
+                                          "warden-home",
+                                          queryParameters: {
+                                            'ts': DateTime.now()
+                                                .millisecondsSinceEpoch
+                                                .toString(),
+                                          },
+                                        );
+                                      }
+                                    : null,
+                              );
+                            },
+                          ),
                         ),
-                      ),
+                ),
               ),
             ],
           );

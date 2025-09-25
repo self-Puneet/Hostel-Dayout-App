@@ -1,436 +1,92 @@
+// presentation/view/student/request_form_page.dart
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:hostel_mgmt/core/enums/request_type.dart';
-import 'package:hostel_mgmt/models/outing_rule_model.dart';
-import 'package:hostel_mgmt/presentation/widgets/welcome_header.dart';
+import 'package:hostel_mgmt/core/enums/enum.dart';
+import 'package:hostel_mgmt/presentation/view/student/controllers/request_form_controller.dart';
+import 'package:hostel_mgmt/presentation/view/student/state/request_form_state.dart';
+import 'package:hostel_mgmt/presentation/widgets/reason_card.dart';
 import 'package:provider/provider.dart';
-import '../state/request_form_state.dart';
-import '../controllers/request_form_controller.dart';
-import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
-import 'package:intl/intl.dart';
+import 'package:hostel_mgmt/presentation/widgets/restriction_card.dart';
+import 'package:hostel_mgmt/presentation/widgets/type_toggle.dart';
+import 'package:hostel_mgmt/presentation/widgets/date_card.dart';
+import 'package:hostel_mgmt/presentation/widgets/time_card.dart';
+import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
+import 'package:hostel_mgmt/presentation/widgets/welcome_header.dart';
+
+// Helper for showing date picker.
+Future<DateTime?> pickDate(BuildContext ctx, DateTime? initial) async {
+  final today = DateTime.now();
+  return showDatePicker(
+    context: ctx,
+    initialDate: initial ?? today,
+    firstDate: DateTime(
+      today.year,
+      today.month,
+      today.day,
+    ), // today-only minimum
+    lastDate: today.add(const Duration(days: 365)),
+  );
+}
+
+// Helper for showing time picker.
+// outing_request_form.dart (update pickTime)
+Future<TimeOfDay?> pickTime(BuildContext ctx, TimeOfDay? initial) async {
+  return showTimePicker(
+    context: ctx,
+    initialTime: initial ?? TimeOfDay.now(),
+    builder: (ctx, child) => MediaQuery(
+      data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: false),
+      child: child!,
+    ),
+  );
+}
 
 class RequestFormPage extends StatelessWidget {
-  const RequestFormPage({super.key});
+  RequestFormPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
+    final mediaQuery = MediaQuery.of(context).size;
     final padding = EdgeInsets.symmetric(
-      horizontal: 31 * mediaQuery.size.width / 402,
+      horizontal: 31 * mediaQuery.width / 402,
     );
 
-    return ChangeNotifierProvider<RequestFormState>(
-      create: (context) {
-        final s = RequestFormState();
-        // Fetch outing rule once after mount
-        Future.microtask(
-          () => RequestFormController(
-            state: s,
-            context: context,
-          ).fetchOutingRule(),
-        );
-        return s;
-      },
-      child: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: _RequestFormView(padding: padding),
-      ),
-    );
-  }
-}
-
-class _RequestFormView extends StatelessWidget {
-  const _RequestFormView({required this.padding});
-  final EdgeInsets padding;
-
-  @override
-  Widget build(BuildContext context) {
-    final session = Get.find<LoginSession>();
-    final mq = MediaQuery.of(context);
-    print("-----------------------------------------${session.imageURL}");
-    return Padding(
-      padding: EdgeInsets.only(top: mq.size.height * 50 / 874),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: padding,
-              child: WelcomeHeader(
-                actor: session.role,
-                name: session.username,
-                avatarUrl: session.imageURL,
-                greeting: 'Welcome back,',
-              ),
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: padding,
-              child: Column(
-                children: const [
-                  _OutingRuleBanner(),
-                  SizedBox(height: 20),
-                  _ReasonField(),
-                  SizedBox(height: 20),
-                  _FromRow(),
-                  SizedBox(height: 12),
-                  _ToRow(),
-                  _ErrorBanner(),
-                  SizedBox(height: 16),
-                  _RequestTypeDropdown(),
-                  SizedBox(height: 30),
-                  _SubmitButton(),
-                ],
-              ),
-            ),
-          ],
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<RequestFormState>(
+          create: (_) => RequestFormState(),
         ),
-      ),
-    );
-  }
-}
-
-class _OutingRuleBanner extends StatelessWidget {
-  const _OutingRuleBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    return Selector<RequestFormState, (bool, bool, OutingRule?, RequestType)>(
-      selector: (_, s) => (
-        s.isLoadingRules,
-        s.isRestricted,
-        s.loadedOutingRule,
-        s.selectedType,
-      ),
-      builder: (_, data, __) {
-        final (loading, restricted, rule, type) = data;
-        if (type != RequestType.dayout) return const SizedBox.shrink();
-        if (loading) {
-          return const Card(
-            color: Colors.white,
-            child: SizedBox(
-              height: 50,
-              width: double.infinity,
-              child: Center(),
-            ),
-          );
-        }
-        if (rule == null || rule.isUnrestricted) return const SizedBox.shrink();
-        // lighter shade for red and green for cardColor
-        final cardColor = restricted ? Colors.red[100] : Colors.green[100];
-        final iconColor = restricted ? Colors.red : Colors.green;
-        final message = restricted
-            ? 'Dayout is restricted today.'
-            : 'Dayout from ${OutingRule.formatDuration(rule.fromTime!)} to ${OutingRule.formatDuration(rule.toTime!)}';
-
-        return Card(
-          color: cardColor,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 12.0,
-              horizontal: 12.0,
-            ),
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: Icon(Icons.warning, color: iconColor),
-                ),
-                Text(
-                  message,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _ReasonField extends StatelessWidget {
-  const _ReasonField();
-
-  @override
-  Widget build(BuildContext context) {
-    return Selector<RequestFormState, (String, String?)>(
-      selector: (_, s) => (s.reason, s.uiReasonError),
-      builder: (_, data, __) {
-        final (_, error) = data;
-        return TextField(
-          maxLines: 3,
-          onChanged: context.read<RequestFormState>().setReason,
-          decoration: InputDecoration(
-            labelText: 'Reason',
-            hintText: 'Describe the request...',
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-            errorText: error,
-            alignLabelWithHint: true,
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _FromRow extends StatelessWidget {
-  const _FromRow();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: const [
-        Expanded(child: _FromDateField()),
-        SizedBox(width: 10),
-        Expanded(child: _FromTimeField()),
+        Provider<RequestFormController>(
+          create: (ctx) {
+            final state = ctx.read<RequestFormState>();
+            final c = RequestFormController(state: state, context: ctx);
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              c.ensureBootstrapped();
+              c.fetchProfile();
+            });
+            return c;
+          },
+        ),
       ],
-    );
-  }
-}
-
-class _ToRow extends StatelessWidget {
-  const _ToRow();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: const [
-        Expanded(child: _ToDateField()),
-        SizedBox(width: 10),
-        Expanded(child: _ToTimeField()),
-      ],
-    );
-  }
-}
-
-class _FromDateField extends StatelessWidget {
-  const _FromDateField();
-
-  @override
-  Widget build(BuildContext context) {
-    return Selector<
-      RequestFormState,
-      (DateTime?, String?, RequestType, OutingRule?)
-    >(
-      selector: (_, s) =>
-          (s.fromDate, s.uiFromDateError, s.selectedType, s.loadedOutingRule),
-      builder: (_, data, __) {
-        final (value, error, type, rule) = data;
-        final helper =
-            (type == RequestType.dayout && rule != null && !rule.isUnrestricted)
-            ? 'Allowed: ${OutingRule.formatDuration(rule.fromTime!)} – ${OutingRule.formatDuration(rule.toTime!)}'
-            : null;
-        return DateField(
-          label: 'From date',
-          value: value,
-          errorText: error,
-          helperText: helper,
-          onPick: () async {
-            final now = DateTime.now();
-            final pickedDate = await showDatePicker(
-              context: context,
-              initialDate: value ?? now,
-              firstDate: now.subtract(const Duration(days: 365)),
-              lastDate: now.add(const Duration(days: 365)),
-            );
-            context.read<RequestFormState>().setFromDate(pickedDate);
-          },
-        );
-      },
-    );
-  }
-}
-
-class _FromTimeField extends StatelessWidget {
-  const _FromTimeField();
-
-  @override
-  Widget build(BuildContext context) {
-    return Selector<
-      RequestFormState,
-      (TimeOfDay?, String?, RequestType, OutingRule?)
-    >(
-      selector: (_, s) =>
-          (s.fromTime, s.uiFromTimeError, s.selectedType, s.loadedOutingRule),
-      builder: (_, data, __) {
-        final (value, error, type, rule) = data;
-        final helper =
-            (type == RequestType.dayout && rule != null && !rule.isUnrestricted)
-            ? 'Allowed: ${OutingRule.formatDuration(rule.fromTime!)} – ${OutingRule.formatDuration(rule.toTime!)}'
-            : null;
-        return TimeField(
-          label: 'From time',
-          value: value,
-          errorText: error,
-          helperText: helper,
-          onPick: () async {
-            final picked = await showTimePicker(
-              context: context,
-              initialTime: value ?? TimeOfDay.now(),
-            );
-            context.read<RequestFormState>().setFromTime(picked);
-          },
-        );
-      },
-    );
-  }
-}
-
-class _ToDateField extends StatelessWidget {
-  const _ToDateField();
-
-  @override
-  Widget build(BuildContext context) {
-    return Selector<RequestFormState, (DateTime?, String?)>(
-      selector: (_, s) => (s.toDate, s.uiToDateError),
-      builder: (_, data, __) {
-        final (value, error) = data;
-        return DateField(
-          label: 'To date',
-          value: value,
-          errorText: error,
-          onPick: () async {
-            final now = DateTime.now();
-            final pickedDate = await showDatePicker(
-              context: context,
-              initialDate: value ?? now,
-              firstDate: now.subtract(const Duration(days: 365)),
-              lastDate: now.add(const Duration(days: 365)),
-            );
-            context.read<RequestFormState>().setToDate(pickedDate);
-          },
-        );
-      },
-    );
-  }
-}
-
-class _ToTimeField extends StatelessWidget {
-  const _ToTimeField();
-
-  @override
-  Widget build(BuildContext context) {
-    return Selector<RequestFormState, (TimeOfDay?, String?)>(
-      selector: (_, s) => (s.toTime, s.uiToTimeError),
-      builder: (_, data, __) {
-        final (value, error) = data;
-        return TimeField(
-          label: 'To time',
-          value: value,
-          errorText: error,
-          onPick: () async {
-            final picked = await showTimePicker(
-              context: context,
-              initialTime: value ?? TimeOfDay.now(),
-            );
-            context.read<RequestFormState>().setToTime(picked);
-          },
-        );
-      },
-    );
-  }
-}
-
-class DateField extends StatelessWidget {
-  const DateField({
-    required this.label,
-    required this.value,
-    required this.onPick,
-    this.errorText,
-    this.helperText,
-  });
-
-  final String label;
-  final DateTime? value;
-  final Future<void> Function() onPick;
-  final String? errorText;
-  final String? helperText;
-
-  @override
-  Widget build(BuildContext context) {
-    final text = value == null ? 'Pick date' : DateFormat.yMd().format(value!);
-    return InkWell(
-      onTap: onPick,
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: label,
-          errorText: errorText,
-          helperText: helperText,
-          border: const OutlineInputBorder(),
-          suffixIcon: const Icon(Icons.event),
-        ),
-        child: Text(text),
-      ),
-    );
-  }
-}
-
-class TimeField extends StatelessWidget {
-  const TimeField({
-    required this.label,
-    required this.value,
-    required this.onPick,
-    this.errorText,
-    this.helperText,
-  });
-
-  final String label;
-  final TimeOfDay? value;
-  final Future<void> Function() onPick;
-  final String? errorText;
-  final String? helperText;
-
-  @override
-  Widget build(BuildContext context) {
-    final display = value == null
-        ? 'Pick time'
-        : DateFormat(
-            'h:mm a',
-          ).format(DateTime(0, 1, 1, value!.hour, value!.minute));
-    return InkWell(
-      onTap: onPick,
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: label,
-          errorText: errorText,
-          helperText: helperText,
-          border: const OutlineInputBorder(),
-          suffixIcon: const Icon(Icons.schedule),
-        ),
-        child: Text(display),
-      ),
-    );
-  }
-}
-
-class _ErrorBanner extends StatelessWidget {
-  const _ErrorBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    return Selector<RequestFormState, String?>(
-      selector: (_, s) => s.generalError,
-      builder: (_, msg, __) {
-        if (msg == null) return const SizedBox(height: 0);
-        return Padding(
-          padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
-          child: Row(
+      // Use builder so that the child context has access to providers
+      builder: (context, child) {
+        // Use Consumer here to get the provider instance safely
+        return Consumer<RequestFormState>(
+          builder: (context, provider, _) => Column(
             children: [
-              const Icon(Icons.error, color: Colors.red, size: 20),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  msg,
-                  style: const TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.w500,
+              Padding(
+                padding: EdgeInsets.only(top: mediaQuery.height * 50 / 874),
+                child: Container(
+                  margin: padding,
+                  child: WelcomeHeader(
+                    actor: TimelineActor.student,
+                    name: provider.profile?.name ?? '',
+                    avatarUrl: provider.profile?.profilePic,
+                    greeting: 'Welcome,',
                   ),
                 ),
               ),
+              // Pass provider down or wrap below with Consumer accordingly
+              const Expanded(child: _RequestFormView()),
             ],
           ),
         );
@@ -439,77 +95,301 @@ class _ErrorBanner extends StatelessWidget {
   }
 }
 
-class _RequestTypeDropdown extends StatelessWidget {
-  const _RequestTypeDropdown();
+class _RequestFormView extends StatelessWidget {
+  const _RequestFormView();
 
   @override
   Widget build(BuildContext context) {
-    return Selector<RequestFormState, RequestType>(
-      selector: (_, s) => s.selectedType,
-      builder: (_, selected, __) {
-        return DropdownButtonFormField<RequestType>(
-          value: selected,
-          decoration: const InputDecoration(
-            labelText: 'Request type',
-            border: OutlineInputBorder(),
-          ),
-          isExpanded: true,
-          items: RequestType.values.map((t) {
-            return DropdownMenuItem<RequestType>(
-              value: t,
-              child: Row(
-                children: [
-                  Icon(t.icon, color: t.color),
-                  const SizedBox(width: 8),
-                  Text(t.displayName),
+    final provider = context.watch<RequestFormState>();
+    final controller = context.read<RequestFormController>();
+    final mediaQuery = MediaQuery.of(context).size;
+    // final padding = EdgeInsets.symmetric(
+    //   horizontal: 31 * mediaQuery.width / 402,
+    // );
+    final padding2 = EdgeInsets.symmetric(
+      horizontal: 31 * mediaQuery.width / 402,
+      vertical: 18,
+    );
+
+    return AppRefreshWrapper(
+      onRefresh: () async {
+        // Unfocus any focused input before showing dialog and clearing
+        FocusScope.of(context).unfocus();
+
+        final confirmed =
+            await showDialog<bool>(
+              context: context,
+              barrierDismissible: true, // allow tap outside to close dialog
+              builder: (ctx) => AlertDialog(
+                title: const Text('Clear form?'),
+                content: const Text(
+                  'Are you sure you want to remove the entered data? This cannot be undone.',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(false),
+                    child: const Text('Cancel'),
+                  ),
+                  FilledButton(
+                    onPressed: () => Navigator.of(ctx).pop(true),
+                    child: const Text('Clear & refresh'),
+                  ),
                 ],
               ),
-            );
-          }).toList(),
-          onChanged: (v) {
-            if (v != null) context.read<RequestFormState>().setRequestType(v);
-          },
-        );
+            ) ??
+            false;
+
+        if (!confirmed) return;
+        provider.clearState();
+        await controller.loadRestriction(); // reload rules on refresh
       },
-    );
-  }
-}
+      // onRefresh: () async {
+      //   final confirmed =
+      //       await showDialog<bool>(
+      //         context: context,
+      //         barrierDismissible: false,
+      //         builder: (ctx) => AlertDialog(
+      //           title: const Text('Clear form?'),
+      //           content: const Text(
+      //             'Are you sure you want to remove the entered data? This cannot be undone.',
+      //           ),
+      //           actions: [
+      //             TextButton(
+      //               onPressed: () => Navigator.of(ctx).pop(false),
+      //               child: const Text('Cancel'),
+      //             ),
+      //             FilledButton(
+      //               onPressed: () => Navigator.of(ctx).pop(true),
+      //               child: const Text('Clear & refresh'),
+      //             ),
+      //           ],
+      //         ),
+      //       ) ??
+      //       false;
 
-class _SubmitButton extends StatelessWidget {
-  const _SubmitButton();
+      //   if (!confirmed) return;
+      //   provider.clearState();
+      //   await controller.loadRestriction(); // reload rules on refresh
+      // },
+      child: SingleChildScrollView(
+        child: Container(
+          margin: padding2,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              RestrictionCard(
+                restriction: provider.restrictionWindow,
+                isLoading: provider.isLoadingRestriction,
+                isApplicable: provider.isDayout,
+                onRetry: () =>
+                    controller.loadRestriction(), // controller handles it
+              ),
+              const SizedBox(height: 20),
+              const Text("OUTING  TYPE"),
+              const SizedBox(height: 5),
+              TypeToggle(
+                selected: provider.requestType,
+                onChanged: provider.setRequestType,
+              ),
+              const SizedBox(height: 20),
 
-  @override
-  Widget build(BuildContext context) {
-    return Selector<RequestFormState, (bool, bool)>(
-      selector: (_, s) => (s.canSubmit, s.isSubmitting),
-      builder: (_, data, __) {
-        final (canSubmit, isSubmitting) = data;
-        return SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: (!canSubmit || isSubmitting)
-                ? null
-                : () async {
-                    final state = context.read<RequestFormState>();
-                    // Controller handles validation, API, and snackbars
-                    await RequestFormController(
-                      state: state,
-                      context: context,
-                    ).submit();
+              if (provider.isDayout) ...[
+                // Reason (common to both)
+                const SizedBox(height: 10),
+                ReasonCard(
+                  value: provider.reason,
+                  label: "Reason",
+                  placeholder: "Write a brief reason for the request",
+                  touched: provider.touchedReason,
+                  error: provider.errorReason,
+                  onChanged: provider.setReason,
+                  maxLength: 300, // optional
+                ),
+                const SizedBox(height: 10),
+
+                DateCard(
+                  value: provider.dayoutDate,
+                  label: "Dayout Date",
+                  placeholder: "Select date",
+                  touched: provider.touchedDayoutDate,
+                  error: provider.errorDayoutDate,
+                  onTap: () async {
+                    final picked = await pickDate(context, provider.dayoutDate);
+                    if (picked != null) provider.setDayoutDate(picked);
                   },
-            child: isSubmitting
-                ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: TimeCard(
+                        value: provider.dayoutFromTime,
+                        label: "From time",
+                        placeholder: "Select Time",
+                        touched: provider.touchedDayoutFromTime,
+                        error: provider.errorDayoutFromTime,
+                        onTap: () async {
+                          final picked = await pickTime(
+                            context,
+                            provider.dayoutFromTime,
+                          );
+                          if (picked != null) {
+                            provider.setDayoutFromTime(picked);
+                          }
+                        },
+                      ),
                     ),
-                  )
-                : const Text('Submit Request'),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TimeCard(
+                        value: provider.dayoutToTime,
+                        label: "To time",
+                        placeholder: "Select time",
+                        touched: provider.touchedDayoutToTime,
+                        error: provider.errorDayoutToTime,
+                        onTap: () async {
+                          final picked = await pickTime(
+                            context,
+                            provider.dayoutToTime,
+                          );
+                          if (picked != null) provider.setDayoutToTime(picked);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+
+              if (provider.isLeave) ...[
+                const SizedBox(height: 10),
+                ReasonCard(
+                  value: provider.reason,
+                  label: "Reason",
+                  placeholder: "Write a brief reason for the request",
+                  touched: provider.touchedReason,
+                  error: provider.errorReason,
+                  onChanged: provider.setReason,
+                  maxLength: 300, // optional
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: DateCard(
+                        value: provider.leaveFromDate,
+                        label: "From date",
+                        placeholder: "Select Time",
+                        touched: provider.touchedLeaveFromDate,
+                        error: provider.errorLeaveFromDate,
+                        onTap: () async {
+                          final picked = await pickDate(
+                            context,
+                            provider.leaveFromDate,
+                          );
+                          if (picked != null) provider.setLeaveFromDate(picked);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TimeCard(
+                        value: provider.leaveFromTime,
+                        label: "From time",
+                        placeholder: "From time",
+                        touched: provider.touchedLeaveFromTime,
+                        error: provider.errorLeaveFromTime,
+                        onTap: () async {
+                          final picked = await pickTime(
+                            context,
+                            provider.leaveFromTime,
+                          );
+                          if (picked != null) provider.setLeaveFromTime(picked);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: DateCard(
+                        value: provider.leaveToDate,
+                        label: "To date",
+                        placeholder: "Select Date",
+                        touched: provider.touchedLeaveToDate,
+                        error: provider.errorLeaveToDate,
+                        onTap: () async {
+                          final picked = await pickDate(
+                            context,
+                            provider.leaveToDate,
+                          );
+                          provider.setLeaveToDate(picked);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TimeCard(
+                        value: provider.leaveToTime,
+                        label: "To time",
+                        placeholder: "Select Time",
+                        touched: provider.touchedLeaveToTime,
+                        error: provider.errorLeaveToTime,
+                        onTap: () async {
+                          final picked = await pickTime(
+                            context,
+                            provider.leaveToTime,
+                          );
+                          if (picked != null) provider.setLeaveToTime(picked);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+
+              const SizedBox(height: 30),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: provider.isSubmittable
+                      ? () async {
+                          await controller.submit();
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    backgroundColor: provider.isFormValid
+                        ? Colors.indigo
+                        : Colors.grey.shade400,
+                  ),
+                  child: provider.isSubmitting
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 3),
+                        )
+                      : Text(
+                          provider.isDayout
+                              ? "Submit Dayout Request"
+                              : "Submit Leave Request",
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                ),
+              ),
+              Container(height: 84 + MediaQuery.of(context).viewPadding.bottom),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

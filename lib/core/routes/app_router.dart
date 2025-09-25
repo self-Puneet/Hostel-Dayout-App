@@ -16,6 +16,9 @@ import 'package:hostel_mgmt/presentation/view/warden/pages/warden_home.dart';
 import 'package:hostel_mgmt/presentation/view/warden/pages/warden_layout.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_home_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_profile_state.dart';
+// import 'package:hostel_mgmt/test/outing_request_form.dart';
+// import 'package:hostel_mgmt/test/outing_request_provider.dart';
+// import 'package:hostel_mgmt/test/restriction_controller.dart';
 import 'package:provider/provider.dart';
 import '../../presentation/view/student/pages/pages.dart';
 
@@ -78,8 +81,33 @@ class AppRouter {
   static GoRouter build() {
     return GoRouter(
       initialLocation: _initialRoute(),
+      // initialLocation: '/request-new',
       redirect: _requireAuthRedirect,
       routes: [
+        // GoRoute(
+        //   path: "/request-new", // e.g. '/outing/request'
+        //   name: 'outing_request_form',
+        //   pageBuilder: (context, state) {
+        //     // If the profile is needed, it can be read here from Provider scope
+        //     // final profile = context.read<WardenProfileState>(); // optional
+
+        //     return AppTransitionPage(
+        //       key: state.pageKey, // keep stable key per go_router guidance
+        //       child: ChangeNotifierProvider(
+        //         create: (_) => OutingRequestProvider(
+        //           restrictionController: RestrictionController(
+        //             apiBaseUrl: "heehehe",
+        //           ),
+        //         ),
+        //         child: Scaffold(
+        //           appBar: AppBar(title: Text('Outing Request Form')),
+        //           body: OutingRequestForm(),
+        //         ),
+        //       ),
+        //     );
+        //   },
+        // ),
+
         /// Warden shell
         ShellRoute(
           builder: (context, state, child) => ChangeNotifierProvider(
@@ -177,7 +205,7 @@ class AppRouter {
               name: 'request',
               pageBuilder: (context, state) => AppTransitionPage(
                 key: state.pageKey,
-                child: const RequestFormPage(),
+                child: RequestFormPage(),
               ),
               routes: [
                 GoRoute(

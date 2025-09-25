@@ -1,77 +1,82 @@
-// import 'package:flutter/material.dart';
-// import 'package:hostel_mgmt/models/outing_rule_model.dart';
-// import 'package:hostel_mgmt/services/profile_service.dart';
-// import '../state/request_form_state.dart';
-// // import '../../../services/request_service.dart';
-
-// class RequestFormController {
-//   final RequestFormState state;
-//   final BuildContext context;
-
-//   RequestFormController({required this.state, required this.context});
-
-//   Future<void> fetchOutingRule() async {
-//     state.isLoadingRules = true;
-//     // Fetch hostel info using ProfileService
-//     final result = await ProfileService.getHostelInfo();
-//     result.fold(
-//       (error) {
-//         state.setOutingRule(OutingRule.restricted());
-//         state.isLoadingRules = false;
-//       },
-//       (hostelResponse) {
-//         final rule = hostelResponse.hostel.toOutingRule();
-//         state.setOutingRule(rule);
-//         state.isLoadingRules = false;
-//       },
-//     );
-//   }
-
-//   void _showSnackBar(String message) {
-//     ScaffoldMessenger.of(
-//       context,
-//     ).showSnackBar(SnackBar(content: Text(message)));
-//   }
-
-//   Future<void> submit() async {
-//     // if (!validate()) return;
-//     state.setSubmitting(true);
-//     if (state.error == true) return;
-//     await Future.delayed(const Duration(seconds: 2)); // Simulate network
-//     state.setSubmitting(false);
-//     _showSnackBar('Request submitted successfully!');
-//     // go.rout
-//   }
-// }
-
-// controllers/request_form_controller.dart
+// presentation/view/student/controllers/request_form_controller.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/helpers/app_snackbar.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/login/login_controller.dart';
-// import 'package:intl/intl.dart';
-import '../state/request_form_state.dart';
+import 'package:hostel_mgmt/models/restriction_window.dart';
 import 'package:hostel_mgmt/services/profile_service.dart';
-import 'package:hostel_mgmt/models/outing_rule_model.dart';
 import 'package:hostel_mgmt/services/request_service.dart';
 import '../../../../core/enums/ui_eums/snackbar_type.dart';
+import '../state/request_form_state.dart';
 
 class RequestFormController {
   final RequestFormState state;
   final BuildContext context;
 
   RequestFormController({required this.state, required this.context});
+  bool _bootstrapped = false; // NEW
 
-  Future<void> fetchOutingRule() async {
-    state.isLoadingRules = true;
-    final result = await ProfileService.getHostelInfo();
-    result.fold(
-      (error) => state.setOutingRule(OutingRule.restricted()),
-      (hostelResponse) =>
-          state.setOutingRule(hostelResponse.hostel.toOutingRule()),
-    );
+  // NEW: call this after first frame only
+  void ensureBootstrapped() {
+    if (_bootstrapped) return;
+    _bootstrapped = true;
+    loadRestriction();
+  }
+
+  Future<void> loadRestriction() async {
+    // Silent bootstrap: if we’re at the initial state (already loading & no data),
+    // skip notifying here to avoid “during build” notifies.
+    final isInitialBootstrap =
+        state.restrictionWindow == null && state.isLoadingRestriction == true;
+
+    if (!isInitialBootstrap) {
+      state.setRestrictionLoading(true); // this one can notify safely later
+    }
+    try {
+      final result = await ProfileService.getHostelInfo();
+      result.fold(
+        (error) {
+          state.setRestrictionWindow(
+            RestrictionWindow(
+              errroLoading: true,
+              allowedToday: false,
+              minTime: const TimeOfDay(hour: 0, minute: 0),
+              maxTime: const TimeOfDay(hour: 0, minute: 0),
+              timezone: "Asia/Kolkata",
+              note: "Unable to load outing rules.",
+            ),
+          );
+        },
+        (hostelResponse) {
+          state.setRestrictionWindow(
+            hostelResponse.hostel.toRestrictionWindow(),
+          );
+        },
+      );
+    } catch (_) {
+      state.setRestrictionWindow(
+        RestrictionWindow(
+          errroLoading: true,
+          allowedToday: false,
+          minTime: const TimeOfDay(hour: 0, minute: 0),
+          maxTime: const TimeOfDay(hour: 0, minute: 0),
+          timezone: "Asia/Kolkata",
+          note: "Network error while loading rules.",
+        ),
+      );
+    }
+  }
+
+  // Optional helper to bootstrap
+  void bootstrapAfterFirstFrame() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Only run once
+      if (state.restrictionWindow == null && state.isLoadingRestriction) {
+        loadRestriction();
+      }
+    });
   }
 
   Future<void> submit() async {
@@ -81,13 +86,46 @@ class RequestFormController {
       return;
     }
 
-    final from = state.fromDateTime!;
-    final to = state.toDateTime!;
+    // Build payload using current selection
+    final bool isDayout = state.isDayout;
+    final DateTime from = isDayout
+        ? DateTime(
+            state.dayoutDate!.year,
+            state.dayoutDate!.month,
+            state.dayoutDate!.day,
+            state.dayoutFromTime!.hour,
+            state.dayoutFromTime!.minute,
+          )
+        : DateTime(
+            state.leaveFromDate!.year,
+            state.leaveFromDate!.month,
+            state.leaveFromDate!.day,
+            (state.leaveFromTime ?? const TimeOfDay(hour: 0, minute: 0)).hour,
+            (state.leaveFromTime ?? const TimeOfDay(hour: 0, minute: 0)).minute,
+          );
+
+    final DateTime to = isDayout
+        ? DateTime(
+            state.dayoutDate!.year,
+            state.dayoutDate!.month,
+            state.dayoutDate!.day,
+            state.dayoutToTime!.hour,
+            state.dayoutToTime!.minute,
+          )
+        : DateTime(
+            (state.leaveToDate ?? state.leaveFromDate!).year,
+            (state.leaveToDate ?? state.leaveFromDate!).month,
+            (state.leaveToDate ?? state.leaveFromDate!).day,
+            (state.leaveToTime ?? const TimeOfDay(hour: 23, minute: 59)).hour,
+            (state.leaveToTime ?? const TimeOfDay(hour: 23, minute: 59)).minute,
+          );
+
     final payload = <String, dynamic>{
-      'request_type': _mapRequestType(state.selectedType),
+      'request_type': _mapRequestType(state.requestType),
       'applied_from': from.toUtc().toIso8601String().split('.').first + 'Z',
       'applied_to': to.toUtc().toIso8601String().split('.').first + 'Z',
-      'reason': state.reason.trim(),
+      'reason': state.reason
+          .trim(), // wire your reason field if present in state
     };
 
     state.setSubmitting(true);
@@ -101,8 +139,8 @@ class RequestFormController {
           type: AppSnackBarType.success,
           icon: LoginSnackBarType.success.icon,
         );
+        context.go(AppRoutes.studentHome);
       });
-      context.go(AppRoutes.studentHome);
     } catch (_) {
       AppSnackBar.show(
         context,
@@ -115,6 +153,20 @@ class RequestFormController {
     }
   }
 
+  Future<void> fetchProfile() async {
+    state.isProfileLoading = true;
+    // Fetch profile
+    final profileResult = await ProfileService.getStudentProfile();
+    profileResult.fold(
+      (error) {
+        print('Profile error: $error');
+      },
+      (apiResponse) {
+        state.profile = apiResponse.student;
+      },
+    );
+  }
+
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(
       context,
@@ -122,11 +174,7 @@ class RequestFormController {
   }
 
   String _mapRequestType(RequestType t) {
+    // Map to API types as needed
     return t == RequestType.dayout ? 'outing' : 'outing';
   }
-
-  // 2025-06-12T10:00:00Z
-  // String _toZulu(DateTime dt) {
-  //   return DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(dt.toUtc());
-  // }
 }

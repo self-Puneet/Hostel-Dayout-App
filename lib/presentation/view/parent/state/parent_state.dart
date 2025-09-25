@@ -103,4 +103,14 @@ class ParentState extends ChangeNotifier {
     this.historyRequests = historyRequests;
     notifyListeners();
   }
+
+  void resetForRefresh() {
+    // Clear error/flags and reset filters
+    isErrored = false;
+    errorMessage = '';
+    isActioning = false;
+    selectedStatus = 'All';
+    // Optionally keep data to avoid UI flicker during refresh
+    notifyListeners();
+  }
 }
