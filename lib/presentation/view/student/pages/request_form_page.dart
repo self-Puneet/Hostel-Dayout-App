@@ -141,7 +141,11 @@ class _RequestFormView extends StatelessWidget {
 
         if (!confirmed) return;
         provider.clearState();
-        await controller.loadRestriction(); // reload rules on refresh
+        await Future.wait([
+          controller.loadRestriction(),
+          controller.fetchProfile(),
+        ]);
+        // reload rules on refresh
       },
       // onRefresh: () async {
       //   final confirmed =

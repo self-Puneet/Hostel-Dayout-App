@@ -466,6 +466,9 @@ class RequestFormState extends ChangeNotifier {
     touchedReason = false;
     errorReason = null;
 
+    profile = null;
+    isProfileLoading = false;
+
     _validate();
     notifyListeners();
   }

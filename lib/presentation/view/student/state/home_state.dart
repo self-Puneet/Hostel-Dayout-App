@@ -70,7 +70,6 @@ class HomeState extends ChangeNotifier {
 
   // clear state
   void clear() {
-    isLoading = false;
     activeRequests = [];
     profile = null;
     requests = [];
