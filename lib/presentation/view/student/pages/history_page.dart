@@ -61,8 +61,8 @@ class _HistoryPageView extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: const Color.fromRGBO(233, 233, 233, 1),
                   borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(46),
-                    topRight: Radius.circular(46),
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
                   ),
                   border: Border.all(color: Colors.black, width: 1.6),
                 ),

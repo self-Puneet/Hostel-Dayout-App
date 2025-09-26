@@ -1,58 +1,22 @@
-import 'package:hostel_mgmt/models/branch_model.dart';
-import 'package:hostel_mgmt/models/hostels_model.dart';
-import 'package:hostel_mgmt/models/student_profile.dart';
+// lib/presentation/view/profile/state/profile_state.dart
 import 'package:flutter/material.dart';
-
-enum ProfileValidationError {
-  none,
-  emptyHostel,
-  emptyRoomNo,
-  invalidRoomNo,
-  emptySemester,
-  emptyBranch,
-  emptyParentRelation,
-}
+import 'package:hostel_mgmt/models/student_profile.dart';
 
 class ProfileState extends ChangeNotifier {
-  // UI state for editing profile
-  String? selectedHostel;
-  String? selectedBranch;
-  int? selectedSemester;
-  String? selectedRelation;
-  TextEditingController roomNoController = TextEditingController();
-
-  void setSelectedHostel(String? value) {
-    selectedHostel = value;
-    notifyListeners();
-  }
-
-  void setSelectedBranch(String? value) {
-    selectedBranch = value;
-    selectedSemester = null;
-    notifyListeners();
-  }
-
-  void setSelectedSemester(String? value) {
-    selectedSemester = int.tryParse(value ?? '');
-    notifyListeners();
-  }
-
-  void setSelectedRelation(String? value) {
-    selectedRelation = value;
-    notifyListeners();
-  }
-
   StudentProfileModel? profile;
-  List<HostelModel> hostels = [];
-  List<BranchModel> branches = [];
-  bool isEditing = false;
   bool isLoading = false;
-  String? errorMessage;
   bool isErrored = false;
-  ProfileValidationError validationError = ProfileValidationError.none;
+  String? errorMessage;
+
+  bool isUploadingPic = false;
 
   void setLoading(bool value) {
     isLoading = value;
+    notifyListeners();
+  }
+
+  void setUploadingPic(bool value) {
+    isUploadingPic = value;
     notifyListeners();
   }
 
@@ -73,23 +37,10 @@ class ProfileState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setHostels(List<HostelModel> h) {
-    hostels = h;
-    notifyListeners();
-  }
-
-  void setBranches(List<BranchModel> b) {
-    branches = b;
-    notifyListeners();
-  }
-
-  void setEditing(bool value) {
-    isEditing = value;
-    notifyListeners();
-  }
-
-  void setValidationError(ProfileValidationError error) {
-    validationError = error;
-    notifyListeners();
+  void setProfilePic(String url) {
+    if (profile != null) {
+      profile = profile!.copyWith(profilePic: url);
+      notifyListeners();
+    }
   }
 }

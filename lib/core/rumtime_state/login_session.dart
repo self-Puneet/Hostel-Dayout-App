@@ -16,6 +16,7 @@ class LoginSession {
   String? fcmToken;
   TimelineActor role;
   String? imageURL;
+  String? roomNo;
 
   LoginSession({
     required this.token,
@@ -30,6 +31,7 @@ class LoginSession {
     this.hostel_id,
     this.hostel,
     this.imageURL,
+    this.roomNo,
   });
 
   Map<String, dynamic> toJson() => {
@@ -45,6 +47,7 @@ class LoginSession {
     "hostel": hostel,
     "imageURL": imageURL,
     "primaryId": primaryId,
+    "room_no": roomNo
   };
 
   factory LoginSession.fromJson(Map<String, dynamic> json) => LoginSession(
@@ -60,6 +63,7 @@ class LoginSession {
     hostel: json["hostel"],
     imageURL: json["imageURL"],
     primaryId: json["primaryId"],
+    roomNo: json['room_no']
   );
 
   Future<void> saveToPrefs() async {

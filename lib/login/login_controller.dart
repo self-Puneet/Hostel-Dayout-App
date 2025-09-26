@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/helpers/app_snackbar.dart';
 import 'package:hostel_mgmt/core/enums/ui_eums/snackbar_type.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
+import 'package:hostel_mgmt/models/student_profile.dart';
 import 'package:hostel_mgmt/services/auth_service.dart';
 import 'package:hostel_mgmt/login/login_state.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hostel_mgmt/services/profile_service.dart';
 
 enum LoginSnackBarType {
   emptyFields,
@@ -49,6 +51,26 @@ class LoginController {
 
   LoginController(this.state);
 
+  Future<StudentProfileModel> fetchProfile() async {
+    try {
+      final profileResult = await ProfileService.getStudentProfile();
+      return profileResult.fold(
+        (error) {
+          debugPrint('Profile error: $error');
+          throw Exception(
+            'Failed to load profile: $error',
+          ); // propagate failure
+        },
+        (apiResponse) {
+          return apiResponse.student; // properly return student here
+        },
+      );
+    } catch (e) {
+      debugPrint('Profile fetch exception: $e');
+      throw Exception('Exception during profile fetch: $e');
+    }
+  }
+
   Future<void> login(BuildContext context, TimelineActor actor) async {
     state.setLoggingIn(true);
 
@@ -89,12 +111,19 @@ class LoginController {
             (session) async {
               final diSession = Get.find<LoginSession>();
               diSession.token = session.token;
+              await diSession.saveToPrefs();
+              final profile = await fetchProfile();
+              print(profile.profilePic);
+              print("--------------------");
               diSession.username = session.username;
               diSession.identityId = session.identityId;
               diSession.role = session.role;
-              diSession.imageURL = session.imageURL;
+              diSession.imageURL = profile.profilePic;
+              diSession.roomNo = profile.roomNo;
+              diSession.hostel = profile.hostelName;
 
               await diSession.saveToPrefs();
+              print(diSession.roomNo);
               state.setLoggingIn(false);
               GoRouter.of(context).go(AppRoutes.studentHome);
               AppSnackBar.show(

@@ -31,7 +31,6 @@ class StudentLayout extends StatelessWidget {
           child: Stack(
             children: [
               child,
-
               Positioned(
                 left: 0,
                 right: 0,
@@ -56,7 +55,7 @@ class StudentLayout extends StatelessWidget {
                             onNewPressed: () =>
                                 context.go(AppRoutes.requestForm),
                             onProfilePressed: () =>
-                                context.go(AppRoutes.profile),
+                                context.go(AppRoutes.history),
                           ),
                         ),
                       ),

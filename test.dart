@@ -632,7 +632,7 @@ Future<void> main() async {
   //   await file.writeAsString(jsonString);
   // }
   // void main() async {
-  //   await Env.load();
+    await Env.load();
 
   //   // Example usage of the login function
   //   // final empId = "W12345";
@@ -656,7 +656,7 @@ Future<void> main() async {
   // };
   // final encrypted = CryptoUtil.encryptPayload(payload1);
   // final response = await http.post(
-  //   Uri.parse("http://20.192.25.27:4141/api/warden/login/warden"),
+  //   Uri.parse("http://172.16.40.17:4141/api/warden/login/warden"),
   //   headers: {"Content-Type": "application/json"},
   //   body: jsonEncode({"encrypted": encrypted}),
   // );
@@ -665,6 +665,8 @@ Future<void> main() async {
   //   response: response,
   //   context: "loginAssistentWarden",
   // );
+
+loginWarden();
 
   // final response_profile = await http.get(
   //   Uri.parse("http://20.192.25.27:4141/api/warden/profile"),
@@ -705,3 +707,22 @@ Future<void> main() async {
 
 //   print("✅ Stored API response in student.json");
 // }
+
+Future<void> loginWarden() async {
+  final url = Uri.parse('http://<server-ip>:<port>/api/warden/login/warden');
+  
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'username': 'warden1',
+      'password': 'password123',
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print('Login successful!');
+  } else {
+    print('Failed to login: ${response.body}');
+  }
+}

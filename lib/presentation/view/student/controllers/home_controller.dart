@@ -21,6 +21,7 @@ class HomeController {
         print('Profile error: $error');
       },
       (apiResponse) {
+        
         state.setProfile(apiResponse.student);
       },
     );

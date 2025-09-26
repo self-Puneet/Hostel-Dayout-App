@@ -1,6 +1,8 @@
 // presentation/view/student/request_form_page.dart
 import 'package:flutter/material.dart';
+import 'package:get/instance_manager.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
+import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/presentation/view/student/controllers/request_form_controller.dart';
 import 'package:hostel_mgmt/presentation/view/student/state/request_form_state.dart';
 import 'package:hostel_mgmt/presentation/widgets/reason_card.dart';
@@ -61,7 +63,6 @@ class RequestFormPage extends StatelessWidget {
             final c = RequestFormController(state: state, context: ctx);
             WidgetsBinding.instance.addPostFrameCallback((_) {
               c.ensureBootstrapped();
-              c.fetchProfile();
             });
             return c;
           },
@@ -69,6 +70,8 @@ class RequestFormPage extends StatelessWidget {
       ],
       // Use builder so that the child context has access to providers
       builder: (context, child) {
+        final loginSession = Get.find<LoginSession>();
+        print(loginSession.imageURL);
         // Use Consumer here to get the provider instance safely
         return Consumer<RequestFormState>(
           builder: (context, provider, _) => Column(
@@ -78,9 +81,13 @@ class RequestFormPage extends StatelessWidget {
                 child: Container(
                   margin: padding,
                   child: WelcomeHeader(
+                    phoneNumber: loginSession.phone,
+                    enrollmentNumber: loginSession.identityId,
+                    hostelName: loginSession.hostel,
+                    roomNumber: loginSession.roomNo,
                     actor: TimelineActor.student,
-                    name: provider.profile?.name ?? '',
-                    avatarUrl: provider.profile?.profilePic,
+                    name: loginSession.username,
+                    avatarUrl: loginSession.imageURL,
                     greeting: 'Welcome,',
                   ),
                 ),
@@ -141,10 +148,7 @@ class _RequestFormView extends StatelessWidget {
 
         if (!confirmed) return;
         provider.clearState();
-        await Future.wait([
-          controller.loadRestriction(),
-          controller.fetchProfile(),
-        ]);
+        await Future.wait([controller.loadRestriction()]);
         // reload rules on refresh
       },
       // onRefresh: () async {

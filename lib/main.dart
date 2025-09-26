@@ -23,6 +23,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final router = AppRouter.build();
 
+
     return MaterialApp.router(
       title: "Hostel Mgmt",
       theme: AppTheme.lightTheme,

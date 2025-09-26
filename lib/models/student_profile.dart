@@ -64,6 +64,34 @@ class StudentProfileModel {
       'parentsInfo': parents.map((p) => p.toJson()).toList(),
     };
   }
+
+  StudentProfileModel copyWith({
+    String? studentId,
+    String? enrollmentNo,
+    String? name,
+    String? email,
+    String? phoneNo,
+    String? profilePic,
+    String? hostelName,
+    String? roomNo,
+    int? semester,
+    String? branch,
+    List<ParentModel>? parents,
+  }) {
+    return StudentProfileModel(
+      studentId: studentId ?? this.studentId,
+      enrollmentNo: enrollmentNo ?? this.enrollmentNo,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      phoneNo: phoneNo ?? this.phoneNo,
+      profilePic: profilePic ?? this.profilePic,
+      hostelName: hostelName ?? this.hostelName,
+      roomNo: roomNo ?? this.roomNo,
+      semester: semester ?? this.semester,
+      branch: branch ?? this.branch,
+      parents: parents ?? this.parents,
+    );
+  }
 }
 
 class StudentApiResponse {

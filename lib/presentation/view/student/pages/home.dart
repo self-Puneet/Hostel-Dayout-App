@@ -1,9 +1,10 @@
 // lib/presentation/view/student/pages/home.dart
 import 'package:flutter/material.dart';
+import 'package:get/instance_manager.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
-import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
+import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/presentation/components/active_request_card.dart';
 import 'package:hostel_mgmt/presentation/components/simple_request_card.dart';
 import 'package:hostel_mgmt/presentation/view/student/controllers/home_controller.dart';
@@ -14,21 +15,46 @@ import 'package:hostel_mgmt/presentation/widgets/welcome_header.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  // Tracks where the refresh indicator should begin (below the Welcome card).
+  final GlobalKey _welcomeKey = GlobalKey();
+  final PageController _pageController = PageController();
+
+  double _edgeOffset = 0;
+
+  void _updateEdgeOffset(double topGap) {
+    final box = _welcomeKey.currentContext?.findRenderObject() as RenderBox?;
+    final welcomeHeight = box?.size.height ?? 0;
+    // 20 matches the SizedBox(height: 20) right under the header.
+    final newOffset = topGap + welcomeHeight + 20;
+    if (newOffset != _edgeOffset && mounted) {
+      setState(() => _edgeOffset = newOffset);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
 
-    // Local controller for PageView dots; fine as Stateless
-    final pageController = PageController();
-
     final padding = EdgeInsets.symmetric(
       horizontal: 31 * mediaQuery.size.width / 402,
     );
 
-    // Provide both the controller and its ChangeNotifier state
+    // Keep exactly the same top spacing as before.
+    final topGap = mediaQuery.size.height * 50 / 874;
+
+    // Recalculate edgeOffset after layout to align the indicator under the Welcome card.
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _updateEdgeOffset(topGap),
+    );
+
     return MultiProvider(
       providers: [
         Provider<HomeController>(create: (_) => HomeController()),
@@ -41,6 +67,7 @@ class HomePage extends StatelessWidget {
           builder: (context, state, __) {
             final activeRequests = state.activeRequests;
             final hasMultiple = activeRequests.length > 1;
+            final profile = Get.find<LoginSession>();
 
             final dropdown = Dropdown<String>(
               items: state.statusOptions
@@ -57,7 +84,14 @@ class HomePage extends StatelessWidget {
               },
             );
 
-            return AppRefreshWrapper(
+            // RefreshIndicator placed directly on the ListView with edgeOffset set
+            // so the spinner appears below the Welcome card.
+            return RefreshIndicator(
+              color: Colors.deepPurple,
+              backgroundColor: Colors.white,
+              strokeWidth: 3,
+              displacement: 60,
+              edgeOffset: _edgeOffset, // key change
               onRefresh: () async {
                 // Optional: clear for instant visual reset
                 state.clear();
@@ -68,13 +102,19 @@ class HomePage extends StatelessWidget {
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.zero,
                 children: [
-                  // Give some top spacing
-                  SizedBox(height: mediaQuery.size.height * 50 / 874),
+                  // Top spacing (unchanged)
+                  SizedBox(height: topGap),
 
-                  // Welcome header
+                  // Welcome header (with key to measure height)
                   Container(
+                    key: _welcomeKey,
                     margin: padding,
                     child: WelcomeHeader(
+                      phoneNumber: profile.phone,
+                      enrollmentNumber: profile.identityId,
+                      hostelName: profile.hostel,
+                      roomNumber: profile.roomNo,
+
                       actor: TimelineActor.student,
                       name: state.profile?.name ?? '',
                       avatarUrl: state.profile?.profilePic,
@@ -89,7 +129,7 @@ class HomePage extends StatelessWidget {
                     SizedBox(
                       height: 330,
                       child: PageView.builder(
-                        controller: pageController,
+                        controller: _pageController,
                         itemCount: activeRequests.length,
                         itemBuilder: (context, index) {
                           final req = activeRequests[index];
@@ -108,18 +148,19 @@ class HomePage extends StatelessWidget {
                         },
                       ),
                     ),
-                    Center(child: SmoothPageIndicator(
-                      controller: pageController,
-                      count: activeRequests.length,
-                      effect: JumpingDotEffect(
-                        dotHeight: 9,
-                        dotWidth: 9,
-                        activeDotColor: Colors.black,
-                        dotColor: Colors.grey[300]!,
-                        jumpScale: 1,
+                    Center(
+                      child: SmoothPageIndicator(
+                        controller: _pageController,
+                        count: activeRequests.length,
+                        effect: JumpingDotEffect(
+                          dotHeight: 9,
+                          dotWidth: 9,
+                          activeDotColor: Colors.black,
+                          dotColor: Colors.grey[300]!,
+                          jumpScale: 1,
+                        ),
                       ),
-                    ),),
-                    
+                    ),
                   ] else if (activeRequests.isNotEmpty) ...[
                     Container(
                       margin: padding,

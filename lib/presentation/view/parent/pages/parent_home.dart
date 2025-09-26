@@ -73,6 +73,11 @@ class ParentHomePage extends StatelessWidget {
                   Container(
                     margin: padding,
                     child: WelcomeHeader(
+                      phoneNumber: loginSession.phone!,
+                    // enrollmentNumber: ,
+                    // hostelName: provider.profile!.hostelName,
+                    // roomNumber: provider.profile!.roomNo,
+                    
                       actor: loginSession.role,
                       name: loginSession.username,
                       avatarUrl: loginSession.imageURL,

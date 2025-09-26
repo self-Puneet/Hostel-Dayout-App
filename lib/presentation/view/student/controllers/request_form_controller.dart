@@ -153,19 +153,29 @@ class RequestFormController {
     }
   }
 
-  Future<void> fetchProfile() async {
-    state.isProfileLoading = true;
-    // Fetch profile
-    final profileResult = await ProfileService.getStudentProfile();
-    profileResult.fold(
-      (error) {
-        print('Profile error: $error');
-      },
-      (apiResponse) {
-        state.profile = apiResponse.student;
-      },
-    );
-  }
+  // RequestFormController.fetchProfile
+// Future<void> fetchProfile() async {
+//   state.setProfileLoading(true); // notifies start of load [OK]
+//   try {
+//     final profileResult = await ProfileService.getStudentProfile();
+//     profileResult.fold(
+//       (error) {
+//         debugPrint('Profile error: $error');
+//         state.setProfileError(); // notifies end of load (error)
+//       },
+//       (apiResponse) {
+//         state.setProfile(apiResponse.student); // notifies with data
+//       },
+//     );
+//   } catch (e) {
+//     debugPrint('Profile fetch exception: $e');
+//     state.setProfileError(); // notifies end of load (exception)
+//   } finally {
+//     // If profile already set above, this keeps idempotent; cheap re-notify is fine
+//     if (state.isProfileLoading) state.setProfileLoading(false);
+//   }
+// }
+
 
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(

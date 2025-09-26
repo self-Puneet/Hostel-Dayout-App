@@ -14,6 +14,10 @@ class WelcomeHeader extends StatelessWidget {
   final TimelineActor actor;
   final String? avatarUrl; // nullable URL
   final String greeting;
+  final String? enrollmentNumber;
+  final String? phoneNumber;
+  final String? hostelName;
+  final String? roomNumber;
 
   WelcomeHeader({
     super.key,
@@ -22,6 +26,10 @@ class WelcomeHeader extends StatelessWidget {
     this.greeting = 'Welcome back,',
     required this.actor,
     DateTime? date,
+    this.enrollmentNumber,
+    this.phoneNumber,
+    this.hostelName,
+    this.roomNumber,
   }) : date = date ?? DateTime.now();
 
   // Derive initials from a full name (e.g., "Alvaro Morte" -> "AM").
@@ -59,6 +67,10 @@ class WelcomeHeader extends StatelessWidget {
                     debugPrint("Logout clicked");
                   },
                   onClose: () => Navigator.pop(context),
+                  enrollmentNumber: enrollmentNumber,
+                  hostelName: hostelName,
+                  roomNo: roomNumber,
+                  phoneNumber: phoneNumber,
                 ),
               );
             },

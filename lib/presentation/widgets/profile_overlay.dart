@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 
 class ProfileOverlay extends StatelessWidget {
   final String name;
   final String subtitle;
   final String? avatarUrl;
+  final String? enrollmentNumber;
+  final String? hostelName;
+  final String? roomNo;
+  final String? phoneNumber;
   final VoidCallback onEditProfile;
   final VoidCallback onLogout;
   final VoidCallback onClose;
@@ -13,6 +19,10 @@ class ProfileOverlay extends StatelessWidget {
     required this.name,
     required this.subtitle,
     this.avatarUrl,
+    this.enrollmentNumber,
+    this.hostelName,
+    this.roomNo,
+    this.phoneNumber,
     required this.onEditProfile,
     required this.onLogout,
     required this.onClose,
@@ -30,6 +40,9 @@ class ProfileOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // fixedWidth can be tuned for your longest label plus icon
+    const double fixedWidth = 115;
+
     return GestureDetector(
       onTap: onClose, // tap outside closes
       child: Material(
@@ -43,7 +56,7 @@ class ProfileOverlay extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: Colors.black26,
                     blurRadius: 12,
@@ -93,7 +106,6 @@ class ProfileOverlay extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // Name & subtitle
                   Text(
                     name,
                     style: const TextStyle(
@@ -105,6 +117,46 @@ class ProfileOverlay extends StatelessWidget {
                     subtitle,
                     style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
                   ),
+
+                  const SizedBox(height: 16),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  if (enrollmentNumber != null &&
+                      enrollmentNumber!.trim().isNotEmpty)
+                    _AlignedInfoRow(
+                      icon: Icons.badge_outlined,
+                      label: 'Enrollment No',
+                      value: enrollmentNumber!,
+                      fixedLabelWidth: fixedWidth,
+                    ),
+                  if (enrollmentNumber != null &&
+                      enrollmentNumber!.trim().isNotEmpty)
+                    const SizedBox(height: 8),
+                  if (hostelName != null && hostelName!.trim().isNotEmpty)
+                    _AlignedInfoRow(
+                      icon: Icons.home_outlined,
+                      label: 'Hostel',
+                      value: hostelName!,
+                      fixedLabelWidth: fixedWidth,
+                    ),
+                  if (hostelName != null && hostelName!.trim().isNotEmpty)
+                    const SizedBox(height: 8),
+                  if (roomNo != null && roomNo!.trim().isNotEmpty)
+                    _AlignedInfoRow(
+                      icon: Icons.meeting_room_outlined,
+                      label: 'Room No',
+                      value: roomNo!,
+                      fixedLabelWidth: fixedWidth,
+                    ),
+                  if (roomNo != null && roomNo!.trim().isNotEmpty)
+                    const SizedBox(height: 8),
+                  if (phoneNumber != null && phoneNumber!.trim().isNotEmpty)
+                    _AlignedInfoRow(
+                      icon: Icons.phone_outlined,
+                      label: 'Phone',
+                      value: phoneNumber!,
+                      fixedLabelWidth: fixedWidth,
+                    ),
                   const SizedBox(height: 20),
 
                   // Buttons
@@ -112,14 +164,13 @@ class ProfileOverlay extends StatelessWidget {
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: //pop this profile overlay first
-                              () {
+                          onPressed: () {
+                            context.push(AppRoutes.profile);
                             Navigator.pop(context);
-                            // onEditProfile();
                           },
-                          icon: const Icon(Icons.edit),
+                          icon: const Icon(Icons.person),
                           label: const Text(
-                            "Edit Profile",
+                            "View Profile",
                             style: TextStyle(color: Colors.black),
                           ),
                           style: OutlinedButton.styleFrom(
@@ -155,6 +206,51 @@ class ProfileOverlay extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _AlignedInfoRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final double fixedLabelWidth;
+
+  const _AlignedInfoRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.fixedLabelWidth,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final labelStyle = TextStyle(
+      fontSize: 14,
+      color: Colors.grey.shade700,
+      fontWeight: FontWeight.w500,
+    );
+    const valueStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.w600);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Icon(icon, size: 20, color: Colors.grey.shade700),
+        const SizedBox(width: 10),
+        SizedBox(
+          width: fixedLabelWidth,
+          child: Text('$label:', style: labelStyle, textAlign: TextAlign.left),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            value,
+            style: valueStyle,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 }

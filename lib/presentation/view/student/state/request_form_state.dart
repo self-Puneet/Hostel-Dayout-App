@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/models/restriction_window.dart';
-import 'package:hostel_mgmt/models/student_profile.dart';
 
 class RequestFormState extends ChangeNotifier {
   // Request type
@@ -77,9 +76,24 @@ class RequestFormState extends ChangeNotifier {
   bool _cachedTouchedLeaveFromTime = false;
   bool _cachedTouchedLeaveToTime = false;
 
-  // profile fields
-  bool isProfileLoading = true;
-  StudentProfileModel? profile;
+  // bool isProfileLoading = true;
+  // StudentProfileModel? profile;
+
+  // void setProfileLoading(bool v) {
+  //   isProfileLoading = v;
+  //   notifyListeners();
+  // }
+
+  // void setProfile(StudentProfileModel p) {
+  //   profile = p;
+  //   notifyListeners();
+  // }
+
+  // void setProfileError() {
+  //   // optional: if tracking profile load errors
+  //   isProfileLoading = false;
+  //   notifyListeners();
+  // }
 
   DateTime? _cachedDayoutDate;
   TimeOfDay? _cachedDayoutFromTime;
@@ -466,8 +480,8 @@ class RequestFormState extends ChangeNotifier {
     touchedReason = false;
     errorReason = null;
 
-    profile = null;
-    isProfileLoading = false;
+    // profile = null;
+    // isProfileLoading = false;
 
     _validate();
     notifyListeners();

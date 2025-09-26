@@ -64,6 +64,8 @@ class _WardenLayoutState extends State<WardenLayout> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       WelcomeHeader(
+                        enrollmentNumber: state.loginSession.identityId,
+                        phoneNumber: state.loginSession.phone,
                         actor: actor,
                         name: state.loginSession.username,
                         avatarUrl: state.loginSession.imageURL,

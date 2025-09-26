@@ -58,6 +58,11 @@ class LiquidGlassNavBar extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: IconButton(
+                        style: ButtonStyle(
+                          overlayColor: WidgetStateProperty.all(
+                            Colors.transparent,
+                          ),
+                        ),
                         icon: Image.asset(
                           'assets/home.png',
                           width: 34,
@@ -73,6 +78,12 @@ class LiquidGlassNavBar extends StatelessWidget {
                     flex: 143,
                     child: Center(
                       child: InkWell(
+                        highlightColor: Colors.transparent,
+                        overlayColor: WidgetStateProperty.all(
+                          Colors.transparent,
+                        ),
+                        focusColor: Colors.transparent,
+                        splashColor: Colors.transparent,
                         onTap: onNewPressed,
                         child: Container(
                           decoration: BoxDecoration(
@@ -114,11 +125,12 @@ class LiquidGlassNavBar extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: IconButton(
-                        icon: Image.asset(
-                          'assets/user.png',
-                          width: 34,
-                          height: 34,
+                        style: ButtonStyle(
+                          overlayColor: WidgetStateProperty.all(
+                            Colors.transparent,
+                          ),
                         ),
+                        icon: Icon(Icons.history, size: 34),
                         onPressed: onProfilePressed,
                       ),
                     ),
