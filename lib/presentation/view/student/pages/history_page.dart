@@ -1,6 +1,7 @@
 // lib/presentation/view/student/history_page.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
 import 'package:hostel_mgmt/presentation/components/month_requests_card.dart';
 import 'package:provider/provider.dart';
 
@@ -40,6 +41,7 @@ class _HistoryPageViewState extends State<_HistoryPageView> {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
+    final padding = 31 * mediaQuery.size.width / 402;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -94,10 +96,15 @@ class _HistoryPageViewState extends State<_HistoryPageView> {
                         HistoryListView(filter: 'Accepted'),
                         HistoryListView(filter: 'Rejected'),
                       ];
-                      return GlassSegmentedTabs(
-                        options: historyState.filterOptions,
-                        views: views,
-                        margin: 35,
+                      return AppRefreshWrapper(
+                        onRefresh: () async {
+                          await context.read<HistoryState>().load();
+                        },
+                        child: GlassSegmentedTabs(
+                          options: historyState.filterOptions,
+                          views: views,
+                          margin: padding,
+                        ),
                       );
                     },
                   ),
@@ -111,44 +118,119 @@ class _HistoryPageViewState extends State<_HistoryPageView> {
   }
 }
 
+// class HistoryListView extends StatelessWidget {
+//   final String filter;
+//   const HistoryListView({super.key, required this.filter});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final mediaQuery = MediaQuery.of(context);
+//     final padding = 31 * mediaQuery.size.width / 402;
+
+//     return Consumer<HistoryState>(
+//       builder: (context, state, _) {
+//         if (state.isLoading) {
+//           return const Center(child: CircularProgressIndicator());
+//         }
+//         if (state.isErrored) {
+//           return Center(
+//             child: Text(
+//               state.errorMessage,
+//               style: const TextStyle(color: Colors.red),
+//             ),
+//           );
+//         }
+
+//         final grouped = state.groupedForFilter(filter);
+//         final monthKeys = state.sortedMonthKeys(grouped.keys);
+
+//         if (monthKeys.isEmpty) {
+//           return const Center(child: Text('No requests found'));
+//         }
+
+//         return ListView.builder(
+//           padding: const EdgeInsets.fromLTRB(0, 30, 0, 0), // tiny inset
+//           itemCount: monthKeys.length,
+//           itemBuilder: (context, index) {
+//             final key = monthKeys[index];
+//             final items = grouped[key]!;
+//             return Padding(
+//               padding: EdgeInsetsGeometry.symmetric(horizontal: padding),
+//               child: MonthGroupCard(monthTitle: key, requests: items),
+//             );
+//           },
+//         );
+//       },
+//     );
+//   }
+// }
 class HistoryListView extends StatelessWidget {
   final String filter;
   const HistoryListView({super.key, required this.filter});
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final padding = 31 * mediaQuery.size.width / 402;
+
     return Consumer<HistoryState>(
       builder: (context, state, _) {
-        if (state.isLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
+        // Error state: keep pull-to-refresh available
         if (state.isErrored) {
-          return Center(
-            child: Text(
-              state.errorMessage,
-              style: const TextStyle(color: Colors.red),
+          return AppRefreshWrapper(
+            onRefresh: () async => context.read<HistoryState>().load(),
+            child: const CustomScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(child: Text('Something went wrong')),
+                ),
+              ],
             ),
           );
+        }
+
+        // Loading state can stay as-is, or also be scrollable if desired
+        if (state.isLoading) {
+          return const Center(child: CircularProgressIndicator());
         }
 
         final grouped = state.groupedForFilter(filter);
         final monthKeys = state.sortedMonthKeys(grouped.keys);
 
+        // Empty: still scrollable so pull-to-refresh works
         if (monthKeys.isEmpty) {
-          return const Center(child: Text('No requests found'));
+          return AppRefreshWrapper(
+            onRefresh: () async => context.read<HistoryState>().load(),
+            child: const CustomScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(child: Text('No requests found')),
+                ),
+              ],
+            ),
+          );
         }
 
-        return ListView.builder(
-          padding: const EdgeInsets.fromLTRB(0, 24, 0, 0), // tiny inset
-          itemCount: monthKeys.length,
-          itemBuilder: (context, index) {
-            final key = monthKeys[index];
-            final items = grouped[key]!;
-            return Padding(
-              padding: EdgeInsetsGeometry.symmetric(horizontal: 30),
-              child: MonthGroupCard(monthTitle: key, requests: items),
-            );
-          },
+        // Non-empty: a scrollable ListView with AlwaysScrollableScrollPhysics
+        return AppRefreshWrapper(
+          onRefresh: () async => context.read<HistoryState>().load(),
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+            itemCount: monthKeys.length,
+            itemBuilder: (context, index) {
+              final key = monthKeys[index];
+              final items = grouped[key]!;
+              return Padding(
+                padding: EdgeInsetsGeometry.symmetric(horizontal: padding),
+                child: MonthGroupCard(monthTitle: key, requests: items),
+              );
+            },
+          ),
         );
       },
     );

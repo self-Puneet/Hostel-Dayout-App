@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:hostel_mgmt/presentation/components/simple_request_card.dart';
-import 'package:provider/provider.dart';
-import 'package:hostel_mgmt/presentation/view/student/state/history_state.dart';
 
-class MonthGroupCard extends StatelessWidget {
+class MonthGroupCard extends StatefulWidget {
   final String monthTitle;
   final List<RequestModel> requests;
 
@@ -17,44 +15,81 @@ class MonthGroupCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final history = context.watch<HistoryState>();
-    final expanded = history.isMonthExpanded[monthTitle] ?? false;
+  State<MonthGroupCard> createState() => _MonthGroupCardState();
+}
 
+class _MonthGroupCardState extends State<MonthGroupCard> {
+  bool _expanded = false; // local expansion state
+  int _resetTick = 0; // bump to force ExpansionTile rebuild
+  TabController? _tabController;
+  int _lastIndex = 0;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final controller = DefaultTabController.of(context);
+    if (_tabController != controller) {
+      _tabController?.removeListener(_onTabChanged);
+      _tabController = controller;
+      if (_tabController != null) {
+        _lastIndex = _tabController!.index;
+        _tabController!.addListener(_onTabChanged);
+      }
+    }
+  }
+
+  void _onTabChanged() {
+    if (_tabController == null) return;
+    // Run after the tab finishes changing
+    if (!_tabController!.indexIsChanging &&
+        _tabController!.index != _lastIndex) {
+      setState(() {
+        _expanded = false; // collapse this card on every tab switch
+        _resetTick++; // change key to reinitialize ExpansionTile state
+      });
+      _lastIndex = _tabController!.index;
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabController?.removeListener(_onTabChanged);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       decoration: BoxDecoration(
         color: Colors.white,
-        // border: Border.all(color: const Color(0xFF2A2A2A), width: 1.2),
         borderRadius: BorderRadius.circular(28),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: const Color(0x66000000), // #00000040 → 40 hex = 25% opacity
-            blurRadius: 2, // like the "2px"
-            spreadRadius: 0.4, // like the "0.4px"
-            offset: Offset(0, 0), // x=0, y=0
+            color: Color(0x66000000),
+            blurRadius: 2,
+            spreadRadius: 0.4,
+            offset: Offset(0, 0),
           ),
         ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(26),
         child: Theme(
-          // Keep ExpansionTile visuals transparent so the Container drives the look
           data: Theme.of(context).copyWith(
             dividerColor: Colors.transparent,
-            splashColor: Colors.transparent, // remove ripple splash
-            highlightColor: Colors.transparent, // remove tap highlight
-            hoverColor:
-                Colors.transparent, // remove hover highlight (for web/desktop)
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            hoverColor: Colors.transparent,
           ),
           child: ExpansionTile(
-            key: PageStorageKey<String>(monthTitle),
-            initiallyExpanded: expanded,
-            onExpansionChanged: (val) =>
-                history.setMonthExpanded(monthTitle, val),
+            // No PageStorageKey → no persistence across tabs
+            // Use a ValueKey that changes after tab switches so initiallyExpanded is reapplied
+            key: ValueKey<String>('exp:${_resetTick}:${widget.monthTitle}'),
+            initiallyExpanded: _expanded,
+            onExpansionChanged: (val) => setState(() => _expanded = val),
             backgroundColor: Colors.white,
             collapsedBackgroundColor: Colors.white,
-            // No tile border; outer Container draws it
             shape: const RoundedRectangleBorder(
               side: BorderSide(color: Colors.transparent),
             ),
@@ -74,9 +109,8 @@ class MonthGroupCard extends StatelessWidget {
                     color: Colors.black87,
                   ),
                 ),
-                // const SizedBox(height: 6),
                 Text(
-                  monthTitle,
+                  widget.monthTitle,
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w500,
                     fontSize: 18,
@@ -85,12 +119,10 @@ class MonthGroupCard extends StatelessWidget {
                 ),
               ],
             ),
-            trailing: _Chevron(expanded: expanded),
+            trailing: _Chevron(expanded: _expanded),
             children: [
-              // const SizedBox(height: 6),
               const Divider(color: Colors.black87, thickness: 1),
-              // const SizedBox(height: 6),
-              ..._buildRequestList(requests),
+              ..._buildRequestList(widget.requests),
               const SizedBox(height: 4),
             ],
           ),
@@ -117,9 +149,7 @@ class MonthGroupCard extends StatelessWidget {
         ),
       );
       if (i != items.length - 1) {
-        widgets.add(
-          const Divider(color: Color(0x1A000000)),
-        ); // subtle divider between rows
+        widgets.add(const Divider(color: Color(0x1A000000)));
       }
     }
     return widgets;
@@ -133,21 +163,13 @@ class _Chevron extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedRotation(
-      turns: expanded ? 0.5 : 0.0, // 180° on expand
+      turns: expanded ? 0.5 : 0.0,
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOut,
-      child: Container(
-        padding: const EdgeInsets.all(6),
-        // decoration: BoxDecoration(
-        // color: const Color(0xFFF1F1F1),
-        // borderRadius: BorderRadius.circular(12),
-        // border: Border.all(color: const Color(0xFF2A2A2A), width: 1),
-        // ),
-        child: const Icon(
-          Icons.keyboard_arrow_down_rounded,
-          size: 25,
-          color: Colors.black,
-        ),
+      child: const Icon(
+        Icons.keyboard_arrow_down_rounded,
+        size: 25,
+        color: Colors.black,
       ),
     );
   }
