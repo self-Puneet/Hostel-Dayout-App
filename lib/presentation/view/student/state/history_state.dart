@@ -1,42 +1,106 @@
-// make a state in which iserrored, errorMessage, isloading and related methods and get things should be there + there shou be another thing i.e. a list of strings which would be shown as option in segmented control and the selected filter among those option and related filters too.
-
+// lib/presentation/view/student/state/history_state.dart
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/models/request_model.dart';
+import 'package:hostel_mgmt/services/history_service.dart';
+import 'package:intl/intl.dart';
+import 'package:hostel_mgmt/core/enums/request_status.dart';
 
 class HistoryState extends ChangeNotifier {
   bool isLoading = false;
   bool isErrored = false;
   String errorMessage = '';
-  List<String> filterOptions = const [
-    "All",
-    "Cancelled",
-    "Accepted",
-    "Rejected",
-  ];
+
+  // Tabs
+  List<String> filterOptions = const ["All", "Cancelled", "Accepted", "Rejected"];
   String selectedFilter = 'All';
 
-  // update states
-  void updateLoadingState(bool isLoading) {
-    this.isLoading = isLoading;
+  // Data
+  final RequestService _service = RequestService();
+  List<RequestModel> allRequests = [];
+
+  // UI state: month expansion map
+  Map<String, bool> isMonthExpanded = {};
+
+  Future<void> load() async {
+    updateLoadingState(true);
+    try {
+      allRequests = await _service.fetchDemoRequests();
+      _initMonthExpansion(allRequests);
+      updateErrorState(false, '');
+    } catch (e) {
+      updateErrorState(true, e.toString());
+    } finally {
+      updateLoadingState(false);
+    }
+  }
+
+  // Grouping helpers
+  String monthKey(DateTime d) => DateFormat('MMMM yyyy').format(d);
+  DateTime parseMonthKey(String key) => DateFormat('MMMM yyyy').parse(key);
+
+  Map<String, List<RequestModel>> groupByMonth(List<RequestModel> items) {
+    final map = <String, List<RequestModel>>{};
+    for (final r in items) {
+      final key = monthKey(r.appliedFrom);
+      map.putIfAbsent(key, () => []).add(r);
+    }
+    // Sort each month's items by date desc
+    for (final list in map.values) {
+      list.sort((a, b) => b.appliedFrom.compareTo(a.appliedFrom));
+    }
+    return map;
+  }
+
+  List<String> sortedMonthKeys(Iterable<String> keys) {
+    final list = keys.toList();
+    list.sort((a, b) => parseMonthKey(b).compareTo(parseMonthKey(a)));
+    return list;
+  }
+
+  Map<String, List<RequestModel>> groupedForFilter(String filter) {
+    final list = _filteredList(filter);
+    return groupByMonth(list);
+  }
+
+  List<RequestModel> _filteredList(String filter) {
+    switch (filter) {
+      case 'Cancelled':
+        return allRequests.where((r) =>
+          r.status == RequestStatus.cancelled ||
+          r.status == RequestStatus.cancelledStudent).toList();
+      case 'Accepted':
+        return allRequests.where((r) => r.status == RequestStatus.approved).toList();
+      case 'Rejected':
+        return allRequests.where((r) =>
+          r.status == RequestStatus.rejected ||
+          r.status == RequestStatus.parentDenied).toList();
+      case 'All':
+      default:
+        return allRequests;
+    }
+  }
+
+  void _initMonthExpansion(List<RequestModel> list) {
+    final keys = list.map((r) => monthKey(r.appliedFrom)).toSet();
+    isMonthExpanded = { for (final k in keys) k: false }; // All folded initially
     notifyListeners();
   }
 
-  void updateErrorState(bool isErrored, String errorMessage) {
-    this.isErrored = isErrored;
-    this.errorMessage = errorMessage;
+  void setMonthExpanded(String key, bool expanded) {
+    isMonthExpanded[key] = expanded;
     notifyListeners();
   }
 
+  // Boilerplate updates
+  void updateLoadingState(bool value) { isLoading = value; notifyListeners(); }
+  void updateErrorState(bool errored, String message) { isErrored = errored; errorMessage = message; notifyListeners(); }
   void updateFilterOptions(List<String> options) {
     filterOptions = options;
-    // Reset selected filter if it's not in the new options
     if (!options.contains(selectedFilter)) {
-      selectedFilter = options.isNotEmpty ? options[0] : '';
+      selectedFilter = options.isNotEmpty ? options.first : '';
     }
     notifyListeners();
   }
-
-  void updateSelectedFilter(String filter) {
-    selectedFilter = filter;
-    notifyListeners();
-  }
+  void updateSelectedFilter(String filter) { selectedFilter = filter; notifyListeners(); }
+  
 }

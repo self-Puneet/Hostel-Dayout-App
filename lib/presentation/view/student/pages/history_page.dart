@@ -1,9 +1,12 @@
+// lib/presentation/view/student/history_page.dart
 import 'package:flutter/material.dart';
-import 'package:hostel_mgmt/presentation/view/student/state/history_state.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hostel_mgmt/presentation/components/month_requests_card.dart';
+import 'package:provider/provider.dart';
+
+import 'package:hostel_mgmt/presentation/view/student/state/history_state.dart';
 import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/liquid_back_button.dart';
 import 'package:hostel_mgmt/presentation/widgets/segmented_button.dart';
-import 'package:provider/provider.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({super.key});
@@ -12,12 +15,28 @@ class HistoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => HistoryState(),
-      child: _HistoryPageView(),
+      child: const _HistoryPageView(),
     );
   }
 }
 
-class _HistoryPageView extends StatelessWidget {
+class _HistoryPageView extends StatefulWidget {
+  const _HistoryPageView();
+
+  @override
+  State<_HistoryPageView> createState() => _HistoryPageViewState();
+}
+
+class _HistoryPageViewState extends State<_HistoryPageView> {
+  @override
+  void initState() {
+    super.initState();
+    // Trigger initial load once the widget is mounted
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<HistoryState>().load();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
@@ -30,7 +49,6 @@ class _HistoryPageView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: 26,
-                // top: mediaQuery.size.height * 50 / 874,
                 vertical: mediaQuery.size.height * 25 / 874,
               ),
               child: Stack(
@@ -44,8 +62,8 @@ class _HistoryPageView extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    textAlign: TextAlign.center,
                     'History',
+                    textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w500,
                       fontStyle: FontStyle.normal,
@@ -66,19 +84,20 @@ class _HistoryPageView extends StatelessWidget {
                   ),
                   border: Border.all(color: Colors.black, width: 1.6),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 35, right: 35, top: 30),
-                  child: // consumer of Home state
-                  Consumer<HistoryState>(
-                    builder: (context, historyState, child) {
+                child: Container(
+                  margin: const EdgeInsets.only(top: 30),
+                  child: Consumer<HistoryState>(
+                    builder: (context, historyState, _) {
+                      final views = [
+                        HistoryListView(filter: 'All'),
+                        HistoryListView(filter: 'Cancelled'),
+                        HistoryListView(filter: 'Accepted'),
+                        HistoryListView(filter: 'Rejected'),
+                      ];
                       return GlassSegmentedTabs(
                         options: historyState.filterOptions,
-                        views: [
-                          Center(child: Text("Page Under Construction")),
-                          Center(child: Text("Page Under Construction")),
-                          Center(child: Text("Page Under Construction")),
-                          Center(child: Text("Page Under Construction")),
-                        ],
+                        views: views,
+                        margin: 35,
                       );
                     },
                   ),
@@ -88,6 +107,50 @@ class _HistoryPageView extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class HistoryListView extends StatelessWidget {
+  final String filter;
+  const HistoryListView({super.key, required this.filter});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<HistoryState>(
+      builder: (context, state, _) {
+        if (state.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (state.isErrored) {
+          return Center(
+            child: Text(
+              state.errorMessage,
+              style: const TextStyle(color: Colors.red),
+            ),
+          );
+        }
+
+        final grouped = state.groupedForFilter(filter);
+        final monthKeys = state.sortedMonthKeys(grouped.keys);
+
+        if (monthKeys.isEmpty) {
+          return const Center(child: Text('No requests found'));
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.fromLTRB(0, 24, 0, 0), // tiny inset
+          itemCount: monthKeys.length,
+          itemBuilder: (context, index) {
+            final key = monthKeys[index];
+            final items = grouped[key]!;
+            return Padding(
+              padding: EdgeInsetsGeometry.symmetric(horizontal: 30),
+              child: MonthGroupCard(monthTitle: key, requests: items),
+            );
+          },
+        );
+      },
     );
   }
 }

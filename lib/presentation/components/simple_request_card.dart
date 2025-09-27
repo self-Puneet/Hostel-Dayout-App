@@ -10,6 +10,7 @@ class SimpleRequestCard extends StatelessWidget {
   final DateTime toDate;
   final RequestStatus status; // e.g., "Approved"
   final DateTime statusDate; // e.g., "22/08"
+  final String reason; // NEW
 
   const SimpleRequestCard({
     Key? key,
@@ -18,11 +19,13 @@ class SimpleRequestCard extends StatelessWidget {
     required this.toDate,
     required this.status,
     required this.statusDate,
+    required this.reason, // NEW
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Request info
         Expanded(
@@ -34,28 +37,47 @@ class SimpleRequestCard extends StatelessWidget {
                 style: const TextStyle(
                   fontFamily: "Poppins",
                   fontWeight: FontWeight.w500, // 500 = Medium
-                  fontStyle: FontStyle
-                      .normal, // "Medium" here means weight, not italic
-                  fontSize: 18, // px → logical pixels
-                  height: 1.0, // line-height: 100% → 1.0
-                  letterSpacing: 0.0, // 0%
+                  fontStyle: FontStyle.normal,
+                  fontSize: 18,
+                  height: 1.0,
+                  letterSpacing: 0.0,
                 ),
               ),
-              SizedBox(height: 15),
+
+              const SizedBox(height: 10),
+              Text(
+                "\"$reason\"",
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+                style: const TextStyle(
+                  fontFamily: "Poppins",
+                  fontWeight: FontWeight.w400,
+                  fontStyle: FontStyle.italic,
+                  fontSize: 12,
+                  height: 1.2,
+                  letterSpacing: 0.0,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 10),
               Text(
                 "${InputConverter.dateFormater(fromDate)}\n\n${InputConverter.dateFormater(toDate)}",
                 style: const TextStyle(
                   fontFamily: "Poppins",
-                  fontWeight: FontWeight.w400, // 400 = regular
-                  fontStyle: FontStyle.normal, // Regular
-                  fontSize: 12, // in logical pixels
-                  height: 1.0, // line-height: 100% → 1.0
-                  letterSpacing: 0.0, // 0%
+                  fontWeight: FontWeight.w400,
+                  fontStyle: FontStyle.normal,
+                  fontSize: 12,
+                  height: 1.0,
+                  letterSpacing: 0.0,
                 ),
               ),
+
+              // Reason text (2 lines + ellipsis)
             ],
           ),
         ),
+        const SizedBox(width: 12),
         // Status and date
         Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -64,10 +86,10 @@ class SimpleRequestCard extends StatelessWidget {
               status: status.minimalDisplayName,
               color: status.minimalStatusColor,
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               'ON ${InputConverter.dateToDayMonth(statusDate)}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w400,
                 fontSize: 12,

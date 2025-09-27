@@ -274,6 +274,7 @@ class _HomePageState extends State<HomePage> {
                               toDate: state.filteredRequests!.appliedTo,
                               status: state.filteredRequests!.status,
                               statusDate: state.filteredRequests!.lastUpdatedAt,
+                              reason: state.filteredRequests!.reason,
                             ),
                     ),
                   ),

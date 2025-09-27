@@ -74,10 +74,10 @@ class ParentHomePage extends StatelessWidget {
                     margin: padding,
                     child: WelcomeHeader(
                       phoneNumber: loginSession.phone!,
-                    // enrollmentNumber: ,
-                    // hostelName: provider.profile!.hostelName,
-                    // roomNumber: provider.profile!.roomNo,
-                    
+
+                      // enrollmentNumber: ,
+                      // hostelName: provider.profile!.hostelName,
+                      // roomNumber: provider.profile!.roomNo,
                       actor: loginSession.role,
                       name: loginSession.username,
                       avatarUrl: loginSession.imageURL,
@@ -287,6 +287,7 @@ class ParentHomePage extends StatelessWidget {
                               toDate: state.filteredRequests!.appliedTo,
                               status: state.filteredRequests!.status,
                               statusDate: state.filteredRequests!.lastUpdatedAt,
+                              reason: state.filteredRequests!.reason,
                             ),
                     ),
                   ),
