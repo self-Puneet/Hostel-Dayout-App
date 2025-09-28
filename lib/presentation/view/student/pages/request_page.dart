@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
+import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
 import 'package:hostel_mgmt/core/util/input_convertor.dart';
 import 'package:hostel_mgmt/models/warden_model.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
@@ -10,29 +12,188 @@ import 'package:hostel_mgmt/presentation/view/student/controllers/request_detail
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
-class RequestPage extends StatelessWidget {
+// class RequestPage extends StatelessWidget {
+//   final TimelineActor actor;
+//   final String requestId;
+//   const RequestPage({Key? key, required this.actor, required this.requestId})
+//     : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return ChangeNotifierProvider<RequestState>(
+//       create: (_) {
+//         final state = RequestState();
+//         // Trigger fetch once state is created
+//         RequestDetailController(state: state, requestId: requestId);
+//         return state;
+//       },
+//       child: Consumer<RequestState>(
+//         builder: (context, state, _) {
+//           if (state.isLoading) {
+//             return const Scaffold(
+//               body: Center(child: CircularProgressIndicator()),
+//               // floatingActionButton: ,
+//             );
+//           }
+
+//           if (state.isErrored) {
+//             return Scaffold(
+//               appBar: AppBar(
+//                 leading: IconButton(
+//                   icon: const Icon(Icons.arrow_back),
+//                   onPressed: () => context.go('/home'),
+//                 ),
+//                 title: const Text("Error"),
+//               ),
+//               body: Center(child: Text(state.errorMessage)),
+//             );
+//           }
+
+//           if (state.request == null) {
+//             return Scaffold(
+//               backgroundColor: Colors.white,
+//               appBar: AppBar(
+//                 leading: IconButton(
+//                   icon: const Icon(Icons.arrow_back),
+//                   onPressed: () => context.go('/home'),
+//                 ),
+//                 title: const Text("No request found"),
+//               ),
+//               body: const Center(child: Text("No request found.")),
+//             );
+//           }
+
+//           final req = state.request!;
+//           final assistentWardenContactCard = ContactCard(
+//             name: req.assistentWarden.name,
+//             role: req.assistentWarden.wardenRole.displayName,
+//             phoneNumber: req.assistentWarden.phoneNo,
+//           );
+//           final seniorWardenContactCard = ContactCard(
+//             name: req.seniorWarden.name,
+//             role: req.seniorWarden.wardenRole.displayName,
+//             phoneNumber: req.seniorWarden.phoneNo,
+//           );
+
+//           return Scaffold(
+//             backgroundColor: Colors.white,
+//             appBar: AppBar(
+//               leading: IconButton(
+//                 icon: const Icon(Icons.arrow_back),
+//                 onPressed: () => context.go('/home'),
+//               ),
+//               title: Text(req.request.requestType.name),
+//             ),
+//             body: SingleChildScrollView(
+//               child: Padding(
+//                 padding: const EdgeInsets.symmetric(horizontal: 30),
+//                 child: Column(
+//                   // mainAxisAlignment: MainAxisAlignment.start,
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     IntrinsicHeight(
+//                       child: Row(
+//                         crossAxisAlignment: CrossAxisAlignment.stretch,
+//                         children: [
+//                           Expanded(
+//                             flex: 2,
+//                             child: statusCard(status: req.request.status),
+//                           ),
+//                           SizedBox(width: 18),
+//                           Expanded(
+//                             flex: 3,
+//                             child: infoCard(
+//                               req.request.appliedFrom,
+//                               req.request.appliedTo,
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+
+//                     const SizedBox(height: 15),
+
+//                     reasonRemarkSection(
+//                       reason: req.request.reason,
+//                       parentRemark: req.request.parentRemark,
+//                     ),
+//                     if (actor == TimelineActor.student)
+//                       dynamicTimeline(req: req, actor: actor),
+//                     assistentWardenContactCard,
+//                     seniorWardenContactCard,
+//                     SizedBox(height: 200),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//           );
+//         },
+//       ),
+//     );
+//   }
+
+class RequestPage extends StatefulWidget {
   final TimelineActor actor;
   final String requestId;
   const RequestPage({Key? key, required this.actor, required this.requestId})
     : super(key: key);
 
   @override
+  State<RequestPage> createState() => _RequestPageState();
+}
+
+class _RequestPageState extends State<RequestPage> {
+  bool _expanded = false;
+
+  late final RequestDetailController _controller;
+  @override
+  void initState() {
+    super.initState();
+    final state = RequestState();
+    _controller = RequestDetailController(
+      state: state,
+      requestId: widget.requestId,
+    );
+  }
+
+  Future<bool> _confirmAction(
+    BuildContext context,
+    RequestAction action,
+  ) async {
+    final msg = action.dialogBoxMessage;
+    final result = await showDialog<bool>(
+      // Material dialog
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(msg.title),
+        content: Text(msg.description),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(msg.confirmText),
+          ),
+        ],
+      ),
+    );
+    return result == true;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<RequestState>(
-      create: (_) {
-        final state = RequestState();
-        // Trigger fetch once state is created
-        RequestDetailController(state: state, requestId: requestId);
-        return state;
-      },
+    return ChangeNotifierProvider<RequestState>.value(
+      value: _controller.state,
       child: Consumer<RequestState>(
         builder: (context, state, _) {
+          // Loading/error scaffolds
           if (state.isLoading) {
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
             );
           }
-
           if (state.isErrored) {
             return Scaffold(
               appBar: AppBar(
@@ -45,7 +206,6 @@ class RequestPage extends StatelessWidget {
               body: Center(child: Text(state.errorMessage)),
             );
           }
-
           if (state.request == null) {
             return Scaffold(
               backgroundColor: Colors.white,
@@ -72,6 +232,108 @@ class RequestPage extends StatelessWidget {
             phoneNumber: req.seniorWarden.phoneNo,
           );
 
+          // Compute actions based on actor + current status
+          final statusNow = req.request.status;
+          final actions = RequestActionX.actionPossibleonStatus(
+            statusNow,
+            widget.actor,
+          );
+
+          // Build FABs only when not loading and not empty
+          Widget? fab;
+          if (!state.isLoading && actions.isNotEmpty) {
+            // Build the core FAB content (single or expandable group)
+            final Widget coreFab = (actions.length == 1)
+                ? (() {
+                    final a = actions.first;
+                    return FloatingActionButton.extended(
+                      onPressed: state.isActioning
+                          ? null
+                          : () async {
+                              final ok = await _confirmAction(context, a);
+                              if (!ok) return;
+                              await _controller.performAction(
+                                actor: widget.actor,
+                                action: a,
+                              );
+                            },
+                      icon: a.icon,
+                      label: Text(
+                        a.name,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: a.actionColor,
+                    );
+                  })()
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      AnimatedSize(
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeInOut,
+                        child: _expanded
+                            ? Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: actions.map((a) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: FloatingActionButton.extended(
+                                      heroTag:
+                                          '${a.name}-${req.request.requestId}',
+                                      onPressed: state.isActioning
+                                          ? null
+                                          : () async {
+                                              final ok = await _confirmAction(
+                                                context,
+                                                a,
+                                              );
+                                              if (!ok) return;
+                                              setState(() => _expanded = false);
+                                              await _controller.performAction(
+                                                actor: widget.actor,
+                                                action: a,
+                                              );
+                                            },
+                                      icon: a.icon,
+                                      label: Text(a.name),
+                                      backgroundColor: a.actionColor,
+                                      isExtended: true,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      elevation: 6,
+                                    ),
+                                  );
+                                }).toList(),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                      FloatingActionButton(
+                        heroTag: 'toggle-${req.request.requestId}',
+                        onPressed: state.isActioning
+                            ? null
+                            : () => setState(() => _expanded = !_expanded),
+                        child: Icon(_expanded ? Icons.close : Icons.more_vert),
+                      ),
+                    ],
+                  );
+
+            // Wrap with SafeArea + Padding to add bottom/left gaps
+            fab = Padding(
+              // Additional fine-tuning if needed
+              padding: EdgeInsets.only(
+                bottom: (84 + MediaQuery.of(context).viewPadding.bottom) / 2,
+                right: 16,
+                left: 16,
+              ),
+              child: coreFab,
+            );
+          }
+
           return Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
@@ -81,45 +343,51 @@ class RequestPage extends StatelessWidget {
               ),
               title: Text(req.request.requestType.name),
             ),
-            body: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30),
-                child: Column(
-                  // mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    IntrinsicHeight(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(
-                            flex: 2,
-                            child: statusCard(status: req.request.status),
-                          ),
-                          SizedBox(width: 18),
-                          Expanded(
-                            flex: 3,
-                            child: infoCard(
-                              req.request.appliedFrom,
-                              req.request.appliedTo,
+            floatingActionButton: fab, // FAB or expandable FABs
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+            body: AppRefreshWrapper(
+              onRefresh: () async {
+                await _controller.fetchRequestDetail(widget.requestId);
+              },
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: statusCard(status: req.request.status),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 18),
+                            Expanded(
+                              flex: 3,
+                              child: infoCard(
+                                req.request.appliedFrom,
+                                req.request.appliedTo,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-
-                    const SizedBox(height: 15),
-
-                    reasonRemarkSection(
-                      reason: req.request.reason,
-                      parentRemark: req.request.parentRemark,
-                    ),
-                    if (actor == TimelineActor.student)
-                      dynamicTimeline(req: req, actor: actor),
-                    assistentWardenContactCard,
-                    seniorWardenContactCard,
-                    SizedBox(height: 200),
-                  ],
+                      const SizedBox(height: 15),
+                      reasonRemarkSection(
+                        reason: req.request.reason,
+                        parentRemark: req.request.parentRemark,
+                      ),
+                      if (widget.actor == TimelineActor.student)
+                        dynamicTimeline(req: req, actor: widget.actor),
+                      assistentWardenContactCard,
+                      seniorWardenContactCard,
+                      Container(
+                        height: 84 + MediaQuery.of(context).viewPadding.bottom,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

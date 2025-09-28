@@ -50,15 +50,15 @@ extension RequestActionX on RequestAction {
   Icon get icon {
     switch (this) {
       case RequestAction.refer:
-        return Icon(Icons.phone_in_talk_outlined);
+        return Icon(Icons.phone_in_talk_outlined, color: Colors.white);
       case RequestAction.cancel:
-        return Icon(Icons.cancel_outlined);
+        return Icon(Icons.cancel_outlined, color: Colors.white);
       case RequestAction.approve:
-        return Icon(Icons.check);
+        return Icon(Icons.check, color: Colors.white);
       case RequestAction.reject:
         return Icon(Icons.cancel_outlined);
       case RequestAction.none:
-        return Icon(Icons.help_outline);
+        return Icon(Icons.help_outline, color: Colors.white);
     }
   }
 
@@ -90,8 +90,8 @@ extension RequestActionX on RequestAction {
         return RequestActionDialogParam(
           title: 'Cancel All Requests',
           description:
-              'All requests will be cancelled and will not be referred to their respective parents.',
-          confirmText: 'Cancel',
+              'Your Current request will be cancelled. \n Are you sure you wanna continue ?',
+          confirmText: 'Cancel Request',
         );
       case RequestAction.approve:
         return RequestActionDialogParam(
@@ -142,6 +142,68 @@ extension RequestActionX on RequestAction {
         return RequestStatus.rejected;
       case RequestAction.none:
         return RequestStatus.requested;
+    }
+  }
+
+  static List<RequestAction> actionPossibleonStatus(
+    RequestStatus status,
+    TimelineActor actor,
+  ) {
+    switch (status) {
+      case RequestStatus.requested:
+        switch (actor) {
+          case TimelineActor.student:
+            return [RequestAction.cancel];
+          case TimelineActor.assistentWarden:
+            return [RequestAction.refer, RequestAction.cancel];
+          default:
+            return [];
+        }
+      case RequestStatus.cancelled:
+        switch (actor) {
+          default:
+            return [];
+        }
+      case RequestStatus.referred:
+        switch (actor) {
+          case TimelineActor.student:
+            return [RequestAction.cancel];
+          case TimelineActor.parent:
+            return [RequestAction.approve, RequestAction.approve];
+          default:
+            return [];
+        }
+      case RequestStatus.rejected:
+        switch (actor) {
+          default:
+            return [];
+        }
+      case RequestStatus.approved:
+        switch (actor) {
+          case TimelineActor.student:
+            return [RequestAction.cancel];
+          default:
+            return [];
+        }
+      case RequestStatus.parentApproved:
+        switch (actor) {
+          case TimelineActor.student:
+            return [RequestAction.cancel];
+          case TimelineActor.seniorWarden:
+            return [RequestAction.approve, RequestAction.reject];
+          default:
+            return [];
+        }
+      case RequestStatus.parentDenied:
+        switch (actor) {
+          default:
+            return [];
+        }
+      case RequestStatus.cancelledStudent:
+        switch (actor) {
+          default:
+            return [];
+        }
     }
   }
 }

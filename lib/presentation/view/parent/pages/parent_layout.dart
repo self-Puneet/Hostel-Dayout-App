@@ -1,53 +1,80 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
+import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/glass_nav_bar.dart';
 
-class ParentLayout extends StatefulWidget {
+class ParentLayout extends StatelessWidget {
   final Widget child;
-  const ParentLayout({Key? key, required this.child}) : super(key: key);
-
-  @override
-  State<ParentLayout> createState() => _ParentLayoutState();
-}
-
-class _ParentLayoutState extends State<ParentLayout> {
-  // int _selectedIndex = 0;
-
-  int _indexForLocation(String location) {
-    if (location.startsWith(AppRoutes.parentHistory)) return 1;
-    if (location.startsWith(AppRoutes.profile)) return 2;
-    return 0; // default to Home
-  }
-
-  void _onItemTapped(BuildContext context, int index) {
-    switch (index) {
-      case 0:
-        context.push(AppRoutes.parentHome);
-        break;
-      case 1:
-        context.push(AppRoutes.parentHistory);
-        break;
-      case 2:
-        context.push(AppRoutes.parentHome);
-        break;
-    }
-  }
+  const ParentLayout({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
-    final String location = GoRouterState.of(context).uri.toString();
-    final int currentIndex = _indexForLocation(location);
-    return Scaffold(
-      backgroundColor: const Color(0xFFE9E9E9),
-      body: widget.child,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
-        onTap: (int i) => _onItemTapped(context, i),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
+    final media = MediaQuery.of(context);
+    final bottomInset = media.viewInsets.bottom;
+    final bottomSafe = media.viewPadding.bottom;
+
+    final bool isKeyboardOpen = bottomInset > 0;
+    final bool showNavBar = !isKeyboardOpen;
+
+    final double barBottomOffset = bottomSafe + 12;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTapDown: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFE9E9E9),
+        resizeToAvoidBottomInset: true,
+        extendBody: true,
+        body: SafeArea(
+          top: false,
+          bottom: false,
+          child: Stack(
+            children: [
+              child,
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: barBottomOffset,
+                child: Center(
+                  child: IgnorePointer(
+                    ignoring: !showNavBar,
+                    child: AnimatedSlide(
+                      duration: const Duration(milliseconds: 180),
+                      curve: Curves.easeOut,
+                      offset: showNavBar ? Offset.zero : const Offset(0, 1),
+                      child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 120),
+                        opacity: showNavBar ? 1 : 0,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 31 * media.size.width / 402,
+                          ),
+                          child: LiquidGlassNavBar(
+                            onHomePressed: () =>
+                                context.push(AppRoutes.parentHome),
+                            onNewPressed: () =>
+                                context.push(AppRoutes.parentHistory),
+                            onProfilePressed: () =>
+                                context.push(AppRoutes.parentHistory),
+
+                            leftIcon: Image.asset(
+                              'assets/home.png',
+                              width: 36,
+                              height: 36,
+                            ),
+                            rightIcon: Icons.person_outline_outlined,
+                            middleIcon: Icons.history,
+                            middleText: "HIST",
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

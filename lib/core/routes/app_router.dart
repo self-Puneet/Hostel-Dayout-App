@@ -7,7 +7,6 @@ import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/core/routes/app_transition_page.dart'; // 👈 import here
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/login/login_layout.dart';
-import 'package:hostel_mgmt/presentation/view/parent/pages/parent_history.dart';
 import 'package:hostel_mgmt/presentation/view/parent/pages/parent_home.dart';
 import 'package:hostel_mgmt/presentation/view/parent/pages/parent_layout.dart';
 import 'package:hostel_mgmt/presentation/view/parent/state/parent_state.dart';
@@ -16,9 +15,6 @@ import 'package:hostel_mgmt/presentation/view/warden/pages/warden_home.dart';
 import 'package:hostel_mgmt/presentation/view/warden/pages/warden_layout.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_home_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_profile_state.dart';
-// import 'package:hostel_mgmt/test/outing_request_form.dart';
-// import 'package:hostel_mgmt/test/outing_request_provider.dart';
-// import 'package:hostel_mgmt/test/restriction_controller.dart';
 import 'package:provider/provider.dart';
 import '../../presentation/view/student/pages/pages.dart';
 
@@ -32,16 +28,22 @@ String? _requireAuthRedirect(BuildContext context, GoRouterState state) {
   }
 
   final allowedRoutes = AppRoutes.routeAllowence[session.role] ?? [];
-  print(allowedRoutes);
+  print("aaah" * 90);
+  print(state.matchedLocation);
+  print(
+    allowedRoutes.any((allowed) => state.matchedLocation.startsWith(allowed)),
+  );
   // Already on allowed route → no redirect
-  if (allowedRoutes.contains(state.matchedLocation)) {
+  if (allowedRoutes.any(
+    (allowed) => state.matchedLocation.startsWith(allowed),
+  )) {
     return null;
   }
 
   // Otherwise, redirect user to home based on role
   switch (session.role) {
     case TimelineActor.student:
-      return AppRoutes.requestForm;
+      return AppRoutes.studentHome;
     case TimelineActor.assistentWarden:
       return AppRoutes.wardenHome;
     case TimelineActor.seniorWarden:
@@ -84,30 +86,6 @@ class AppRouter {
       // initialLocation: '/request-new',
       redirect: _requireAuthRedirect,
       routes: [
-        // GoRoute(
-        //   path: "/request-new", // e.g. '/outing/request'
-        //   name: 'outing_request_form',
-        //   pageBuilder: (context, state) {
-        //     // If the profile is needed, it can be read here from Provider scope
-        //     // final profile = context.read<WardenProfileState>(); // optional
-
-        //     return AppTransitionPage(
-        //       key: state.pageKey, // keep stable key per go_router guidance
-        //       child: ChangeNotifierProvider(
-        //         create: (_) => OutingRequestProvider(
-        //           restrictionController: RestrictionController(
-        //             apiBaseUrl: "heehehe",
-        //           ),
-        //         ),
-        //         child: Scaffold(
-        //           appBar: AppBar(title: Text('Outing Request Form')),
-        //           body: OutingRequestForm(),
-        //         ),
-        //       ),
-        //     );
-        //   },
-        // ),
-
         /// Warden shell
         ShellRoute(
           builder: (context, state, child) => ChangeNotifierProvider(
@@ -163,10 +141,10 @@ class AppRouter {
             ),
             GoRoute(
               path: AppRoutes.parentHistory,
-              name: 'hehe',
+              name: 'parent-history',
               pageBuilder: (context, state) => AppTransitionPage(
                 key: state.pageKey,
-                child: const ParentHistoryPage(),
+                child: const HistoryPage(),
               ),
             ),
           ],

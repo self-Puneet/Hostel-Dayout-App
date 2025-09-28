@@ -157,7 +157,9 @@ class RequestModel {
 
   /// Deserialize from JSON
   factory RequestModel.fromJson(Map<String, dynamic> json) {
-    print("Parsing request with status: ${json['request_status']} -> ${json['request_status']}");
+    print(
+      "Parsing request with status: ${json['request_status']} -> ${json['request_status']}",
+    );
     return RequestModel(
       id: json['_id'] ?? '',
       requestId: json['request_id'] ?? '',
@@ -392,14 +394,12 @@ class RequestDetailApiResponse {
   final RequestModel request;
   final WardenModel assistentWarden;
   final WardenModel seniorWarden;
-  final StudentProfileModel studentId;
 
   RequestDetailApiResponse({
     required this.message,
     required this.request,
     required this.assistentWarden,
     required this.seniorWarden,
-    required this.studentId,
   });
 
   factory RequestDetailApiResponse.fromJson(Map<String, dynamic> json) {
@@ -408,9 +408,6 @@ class RequestDetailApiResponse {
       request: RequestModel.fromJson(json['request'] ?? {}),
       assistentWarden: WardenModel.fromJson(json['assistantWarden']),
       seniorWarden: WardenModel.fromJson(json['seniorWarden']),
-      studentId: StudentProfileModel.fromJson(
-        json['studentId']['student'] ?? {},
-      ),
     );
   }
 
@@ -420,7 +417,6 @@ class RequestDetailApiResponse {
       "request": request.toJson(),
       "assistantWarden": assistentWarden.toJson(),
       "seniorWarden": seniorWarden.toJson(),
-      "student_id": studentId.toJson(),
     };
   }
 }

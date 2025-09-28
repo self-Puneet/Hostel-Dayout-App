@@ -16,6 +16,7 @@ class AppRoutes {
   static const String requestForm = '/student/create-request';
   static const String requestDetails = '/student/request/:id';
   static String requestDetailsPath(String id) => '/student/request/$id';
+  static const String parentProfile = '/parent/profile';
 
   // static const String productDetails = '/student/product-details/:id';
   // static String productDetailsPath(String id) => '/student/product-details/$id';
@@ -27,7 +28,7 @@ class AppRoutes {
       history,
       requestForm,
       login,
-      requestDetails,
+      '/student/request',
     ],
     TimelineActor.assistentWarden: [wardenHome, profile, login, requestDetails],
     TimelineActor.seniorWarden: [
@@ -36,6 +37,13 @@ class AppRoutes {
       login,
       requestDetails,
     ],
-    TimelineActor.parent: [parentHome, profile, login, requestDetails, parentHistory],
+    TimelineActor.parent: [
+      parentHome,
+      parentProfile,
+      login,
+      parentHistory,
+
+      '/student/create-request',
+    ],
   };
 }

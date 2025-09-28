@@ -7,12 +7,20 @@ class LiquidGlassNavBar extends StatelessWidget {
   final VoidCallback onHomePressed;
   final VoidCallback onNewPressed;
   final VoidCallback onProfilePressed;
+  final dynamic leftIcon;
+  final dynamic middleIcon;
+  final dynamic rightIcon;
+  final String middleText;
 
   const LiquidGlassNavBar({
     super.key,
     required this.onHomePressed,
     required this.onNewPressed,
     required this.onProfilePressed,
+    required this.leftIcon,
+    required this.middleIcon,
+    required this.rightIcon,
+    required this.middleText,
   });
 
   @override
@@ -63,11 +71,7 @@ class LiquidGlassNavBar extends StatelessWidget {
                             Colors.transparent,
                           ),
                         ),
-                        icon: Image.asset(
-                          'assets/home.png',
-                          width: 34,
-                          height: 34,
-                        ),
+                        icon: leftIcon,
                         onPressed: onHomePressed,
                       ),
                     ),
@@ -94,11 +98,11 @@ class LiquidGlassNavBar extends StatelessWidget {
                           constraints: const BoxConstraints(minHeight: 80),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(Icons.add, color: Colors.white, size: 24.3),
+                            children: [
+                              Icon(middleIcon, color: Colors.white, size: 24.3),
                               SizedBox(width: 6),
                               Text(
-                                "NEW",
+                                middleText,
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontFamily: 'Poppins',
@@ -130,7 +134,7 @@ class LiquidGlassNavBar extends StatelessWidget {
                             Colors.transparent,
                           ),
                         ),
-                        icon: Icon(Icons.history, size: 34),
+                        icon: Icon(rightIcon, size: 34),
                         onPressed: onProfilePressed,
                       ),
                     ),

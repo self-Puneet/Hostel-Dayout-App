@@ -1,8 +1,7 @@
 // lib/presentation/view/student/state/history_state.dart
 import 'package:flutter/material.dart';
-import 'package:hostel_mgmt/models/request_model.dart';
-import 'package:hostel_mgmt/services/history_service.dart';
 import 'package:intl/intl.dart';
+import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:hostel_mgmt/core/enums/request_status.dart';
 
 class HistoryState extends ChangeNotifier {
@@ -15,23 +14,16 @@ class HistoryState extends ChangeNotifier {
   String selectedFilter = 'All';
 
   // Data
-  final RequestService _service = RequestService();
   List<RequestModel> allRequests = [];
 
   // UI state: month expansion map
   Map<String, bool> isMonthExpanded = {};
 
-  Future<void> load() async {
-    updateLoadingState(true);
-    try {
-      allRequests = await _service.fetchDemoRequests();
-      _initMonthExpansion(allRequests);
-      updateErrorState(false, '');
-    } catch (e) {
-      updateErrorState(true, e.toString());
-    } finally {
-      updateLoadingState(false);
-    }
+  // Set data from controller
+  void setAllRequests(List<RequestModel> items) {
+    allRequests = items;
+    _initMonthExpansion(allRequests);
+    notifyListeners();
   }
 
   // Grouping helpers
@@ -44,7 +36,6 @@ class HistoryState extends ChangeNotifier {
       final key = monthKey(r.appliedFrom);
       map.putIfAbsent(key, () => []).add(r);
     }
-    // Sort each month's items by date desc
     for (final list in map.values) {
       list.sort((a, b) => b.appliedFrom.compareTo(a.appliedFrom));
     }
@@ -66,14 +57,14 @@ class HistoryState extends ChangeNotifier {
     switch (filter) {
       case 'Cancelled':
         return allRequests.where((r) =>
-          r.status == RequestStatus.cancelled ||
-          r.status == RequestStatus.cancelledStudent).toList();
+            r.status == RequestStatus.cancelled ||
+            r.status == RequestStatus.cancelledStudent).toList();
       case 'Accepted':
         return allRequests.where((r) => r.status == RequestStatus.approved).toList();
       case 'Rejected':
         return allRequests.where((r) =>
-          r.status == RequestStatus.rejected ||
-          r.status == RequestStatus.parentDenied).toList();
+            r.status == RequestStatus.rejected ||
+            r.status == RequestStatus.parentDenied).toList();
       case 'All':
       default:
         return allRequests;
@@ -82,13 +73,7 @@ class HistoryState extends ChangeNotifier {
 
   void _initMonthExpansion(List<RequestModel> list) {
     final keys = list.map((r) => monthKey(r.appliedFrom)).toSet();
-    isMonthExpanded = { for (final k in keys) k: false }; // All folded initially
-    notifyListeners();
-  }
-
-  void setMonthExpanded(String key, bool expanded) {
-    isMonthExpanded[key] = expanded;
-    notifyListeners();
+    isMonthExpanded = { for (final k in keys) k: false };
   }
 
   // Boilerplate updates
@@ -102,5 +87,4 @@ class HistoryState extends ChangeNotifier {
     notifyListeners();
   }
   void updateSelectedFilter(String filter) { selectedFilter = filter; notifyListeners(); }
-  
 }

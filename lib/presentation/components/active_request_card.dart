@@ -1,5 +1,6 @@
 // active_request_card.dart
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/presentation/widgets/status_tag.dart';
 import 'package:hostel_mgmt/presentation/widgets/timeline.dart';
@@ -107,8 +108,11 @@ class ActiveRequestCard extends StatelessWidget {
       highlightColor: Colors.transparent,
 
       splashColor: Colors.transparent,
+      // onTap: () {
+      // context.push('/request/$requestId');
       onTap: () {
-        // context.go('/request/$requestId');
+        context.pushNamed('request-detail', pathParameters: {'id': requestId});
+        // }
       },
       borderRadius: BorderRadius.circular(28),
       child: Container(

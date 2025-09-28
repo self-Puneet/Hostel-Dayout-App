@@ -51,11 +51,19 @@ class StudentLayout extends StatelessWidget {
                           ),
                           child: LiquidGlassNavBar(
                             onHomePressed: () =>
-                                context.go(AppRoutes.studentHome),
+                                context.push(AppRoutes.studentHome),
                             onNewPressed: () =>
-                                context.go(AppRoutes.requestForm),
+                                context.push(AppRoutes.requestForm),
                             onProfilePressed: () =>
-                                context.go(AppRoutes.history),
+                                context.push(AppRoutes.history),
+                            rightIcon: Icons.history,
+                            leftIcon: Image.asset(
+                              'assets/home.png',
+                              width: 34,
+                              height: 34,
+                            ),
+                            middleIcon: Icons.add,
+                            middleText: "NEW",
                           ),
                         ),
                       ),

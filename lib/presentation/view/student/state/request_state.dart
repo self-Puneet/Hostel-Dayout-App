@@ -1,3 +1,4 @@
+// lib/presentation/view/student/state/request_state.dart
 import 'package:flutter/foundation.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 
@@ -7,10 +8,10 @@ class RequestState extends ChangeNotifier {
   bool isErrored = false;
   String errorMessage = '';
 
-  void setLoading(bool value) {
-    isLoading = value;
-    notifyListeners();
-  }
+  // Action flags
+  bool isActioning = false;
+
+  void setLoading(bool value) { isLoading = value; notifyListeners(); }
 
   void setRequest(RequestDetailApiResponse req) {
     request = req;
@@ -26,6 +27,11 @@ class RequestState extends ChangeNotifier {
   void clearError() {
     isErrored = false;
     errorMessage = '';
+    notifyListeners();
+  }
+
+  void setActioning(bool value) {
+    isActioning = value;
     notifyListeners();
   }
 }

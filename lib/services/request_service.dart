@@ -229,7 +229,7 @@ class RequestService {
 
     try {
       final response = await http.get(
-        Uri.parse("$url/student/requests/$requestId"),
+        Uri.parse("$url/request/request/$requestId"),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
@@ -237,9 +237,10 @@ class RequestService {
       );
 
       print("📡 Status of get request by id: ${response.statusCode}");
-
+      print(jsonDecode(response.body));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        print(data.keys);
         final request = RequestDetailApiResponse.fromJson(data);
         return right(request);
       } else {
