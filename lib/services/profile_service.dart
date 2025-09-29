@@ -202,9 +202,6 @@
 
 // lib/services/profile_service.dart
 
-
-
-
 // import 'dart:io';
 // import 'package:get/get.dart';
 // import 'package:dartz/dartz.dart';
@@ -363,7 +360,6 @@
 //   }
 // }
 
-
 import 'dart:io';
 import 'dart:convert';
 import 'package:get/get.dart';
@@ -495,6 +491,49 @@ class ProfileService {
       }
     } catch (e) {
       print("❌ Exception: $e");
+      return left("Exception: $e");
+    }
+  }
+
+  /// Fetch parent's child (student) profile from `/parent/student`
+  static Future<Either<String, List<StudentProfileModel>>>
+  getParentStudentProfile({required String token}) async {
+    try {
+      final response = await http.get(
+        Uri.parse("$url/parent/student"),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+      );
+
+      if (response.statusCode != 200) {
+        return left("Error: ${response.statusCode} - ${response.body}");
+      }
+
+      final decoded = response.body.isNotEmpty
+          ? jsonDecode(response.body)
+          : null;
+      print("he" * 90);
+      print(decoded);
+      if (decoded == null) {
+        return left(
+          decoded != null
+              ? decoded["error"].toString()
+              : "Unknown error while fetching child profile",
+        );
+      }
+
+      // Expected shape: { message, student: { student: {...}, parentsInfo: [...] } }
+      // final api = StudentApiResponse.fromJson(decoded);
+      // decode = [{child1},{child2},{child3}]
+      print("right below");
+      final result = (decoded as List)
+          .map((e) => StudentProfileModel.fromJson(e))
+          .toList();
+      print("result");
+      return right(result);
+    } catch (e) {
       return left("Exception: $e");
     }
   }

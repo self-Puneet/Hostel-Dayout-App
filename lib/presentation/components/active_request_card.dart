@@ -69,6 +69,7 @@ extension RequestStatusX1 on RequestStatus {
 }
 
 class ActiveRequestCard extends StatelessWidget {
+  final TimelineActor actor;
   final String reason;
   final String requestType;
   final RequestStatus status;
@@ -84,6 +85,7 @@ class ActiveRequestCard extends StatelessWidget {
 
   const ActiveRequestCard({
     Key? key,
+    required this.actor,
     required this.reason,
     required this.requestType,
     required this.status,
@@ -111,8 +113,17 @@ class ActiveRequestCard extends StatelessWidget {
       // onTap: () {
       // context.push('/request/$requestId');
       onTap: () {
-        context.pushNamed('request-detail', pathParameters: {'id': requestId});
-        // }
+        if (actor == TimelineActor.student) {
+          context.pushNamed(
+            'request-detail',
+            pathParameters: {'id': requestId},
+          );
+        } else if (actor == TimelineActor.parent) {
+          context.pushNamed(
+            'request-detail-parent',
+            pathParameters: {'id': requestId},
+          );
+        }
       },
       borderRadius: BorderRadius.circular(28),
       child: Container(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/request_status.dart';
+import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
@@ -125,6 +126,7 @@ class ParentHomePage extends StatelessWidget {
                                         return Container(
                                           margin: padding,
                                           child: ActiveRequestCard(
+                                            actor: TimelineActor.parent,
                                             showActions: true,
                                             reason: req.reason,
                                             requestId: req.requestId,
@@ -166,6 +168,7 @@ class ParentHomePage extends StatelessWidget {
                             ? Container(
                                 margin: padding,
                                 child: ActiveRequestCard(
+                                  actor: TimelineActor.student,
                                   showActions: true,
                                   reason: activeRequests.first.reason,
                                   requestId: activeRequests.first.requestId,

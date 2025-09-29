@@ -15,7 +15,9 @@ class AppRoutes {
   static const String parentHistory = '/parent/history';
   static const String requestForm = '/student/create-request';
   static const String requestDetails = '/student/request/:id';
+  static const String parentRequestDetails = '/parent/request/:id';
   static String requestDetailsPath(String id) => '/student/request/$id';
+  static String parentLayoutPath(String id) => '/parent/request/$id';
   static const String parentProfile = '/parent/profile';
 
   // static const String productDetails = '/student/product-details/:id';
@@ -42,8 +44,8 @@ class AppRoutes {
       parentProfile,
       login,
       parentHistory,
-
-      '/student/create-request',
+      '/parent/request',
+      '/parent/request/:id',
     ],
   };
 }

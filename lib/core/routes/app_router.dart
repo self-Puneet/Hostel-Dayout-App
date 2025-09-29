@@ -9,6 +9,7 @@ import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/login/login_layout.dart';
 import 'package:hostel_mgmt/presentation/view/parent/pages/parent_home.dart';
 import 'package:hostel_mgmt/presentation/view/parent/pages/parent_layout.dart';
+import 'package:hostel_mgmt/presentation/view/parent/pages/parent_profile_page.dart';
 import 'package:hostel_mgmt/presentation/view/parent/state/parent_state.dart';
 import 'package:hostel_mgmt/presentation/view/student/pages/request_page.dart';
 import 'package:hostel_mgmt/presentation/view/warden/pages/warden_home.dart';
@@ -28,11 +29,11 @@ String? _requireAuthRedirect(BuildContext context, GoRouterState state) {
   }
 
   final allowedRoutes = AppRoutes.routeAllowence[session.role] ?? [];
-  print("aaah" * 90);
-  print(state.matchedLocation);
-  print(
-    allowedRoutes.any((allowed) => state.matchedLocation.startsWith(allowed)),
-  );
+  // print("aaah" * 90);
+  // print(state.matchedLocation);
+  // print(
+  //   allowedRoutes.any((allowed) => state.matchedLocation.startsWith(allowed)),
+  // );
   // Already on allowed route → no redirect
   if (allowedRoutes.any(
     (allowed) => state.matchedLocation.startsWith(allowed),
@@ -147,6 +148,28 @@ class AppRouter {
                 child: const HistoryPage(),
               ),
             ),
+            GoRoute(
+              path: AppRoutes.parentProfile,
+              name: 'parent-profile',
+              pageBuilder: (context, state) => AppTransitionPage(
+                key: state.pageKey,
+                child: ParentProfilePage(),
+              ),
+            ),
+            GoRoute(
+              // Make this absolute and not a child: keep it as a sibling
+              path: AppRoutes
+                  .parentRequestDetails, // e.g. '/student/create-request/:id'
+              name: 'request-detail-parent',
+              pageBuilder: (context, state) {
+                final requestId = state.pathParameters['id'] ?? '';
+                final role = Get.find<LoginSession>().role;
+                return AppTransitionPage(
+                  key: state.pageKey,
+                  child: RequestPage(actor: role, requestId: requestId),
+                );
+              },
+            ),
           ],
         ),
 
@@ -179,26 +202,26 @@ class AppRouter {
               ),
             ),
             GoRoute(
+              // Make this absolute and not a child: keep it as a sibling
+              path: AppRoutes
+                  .requestDetails, // e.g. '/student/create-request/:id'
+              name: 'request-detail',
+              pageBuilder: (context, state) {
+                final requestId = state.pathParameters['id'] ?? '';
+                final role = Get.find<LoginSession>().role;
+                return AppTransitionPage(
+                  key: state.pageKey,
+                  child: RequestPage(actor: role, requestId: requestId),
+                );
+              },
+            ),
+            GoRoute(
               path: AppRoutes.requestForm,
               name: 'request',
               pageBuilder: (context, state) => AppTransitionPage(
                 key: state.pageKey,
                 child: RequestFormPage(),
               ),
-              routes: [
-                GoRoute(
-                  path: ':id',
-                  name: 'request-detail',
-                  pageBuilder: (context, state) {
-                    final requestId = state.pathParameters['id'] ?? '';
-                    final role = Get.find<LoginSession>().role;
-                    return AppTransitionPage(
-                      key: state.pageKey,
-                      child: RequestPage(actor: role, requestId: requestId),
-                    );
-                  },
-                ),
-              ],
             ),
             GoRoute(
               path: AppRoutes.profile,

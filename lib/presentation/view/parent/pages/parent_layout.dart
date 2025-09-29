@@ -55,7 +55,7 @@ class ParentLayout extends StatelessWidget {
                             onNewPressed: () =>
                                 context.push(AppRoutes.parentHistory),
                             onProfilePressed: () =>
-                                context.push(AppRoutes.parentHistory),
+                                context.push(AppRoutes.parentProfile),
 
                             leftIcon: Image.asset(
                               'assets/home.png',

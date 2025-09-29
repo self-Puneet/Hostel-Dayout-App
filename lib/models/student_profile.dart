@@ -1,3 +1,4 @@
+// student_profile.dart
 import 'parent_model.dart';
 
 class StudentProfileModel {
@@ -27,23 +28,31 @@ class StudentProfileModel {
     required this.parents,
   });
 
+  // Small helper to coerce any JSON value to String safely.
+  static String? _asString(dynamic v) => v == null ? null : v.toString();
+
   factory StudentProfileModel.fromJson(Map<String, dynamic> json) {
     return StudentProfileModel(
-      studentId: json['_id'] ?? '',
-      enrollmentNo: json['enrollment_no'] ?? '',
-      name: json['name'] ?? '',
-      email: json['email'] ?? '',
-      phoneNo: json['phone_no'] ?? '',
-      profilePic: json['profile_pic'] ?? '',
-      hostelName: json['hostel_id'] ?? '',
-      roomNo: json['room_no'] ?? '',
+      // Accept either `_id` or `student_id`
+      studentId: _asString(json['_id']) ?? _asString(json['student_id']) ?? '',
+      enrollmentNo: _asString(json['enrollment_no']) ?? '',
+      name: _asString(json['name']) ?? '',
+      email: _asString(json['email']) ?? '',
+      // Coerce possible int -> String
+      phoneNo: _asString(json['phone_no']) ?? '',
+      // Optional picture; coerce to String if present
+      profilePic: _asString(json['profile_pic']),
+      hostelName: _asString(json['hostel_id']) ?? '',
+      // Coerce possible int -> String
+      roomNo: _asString(json['room_no']) ?? '',
+      // Handle both int and String for semester
       semester: json['semester'] is int
-          ? json['semester']
-          : int.tryParse(json['semester']?.toString() ?? '') ?? 0,
-      branch: json['branch'] ?? '',
-      parents:
-          (json['parentsInfo'] as List<dynamic>?)
-              ?.map((p) => ParentModel.fromJson(p))
+          ? json['semester'] as int
+          : int.tryParse(_asString(json['semester']) ?? '') ?? 0,
+      branch: _asString(json['branch']) ?? '',
+      // Keep existing parents mapping; default to empty list if absent
+      parents: (json['parentsInfo'] as List<dynamic>?)
+              ?.map((p) => ParentModel.fromJson(p as Map<String, dynamic>))
               .toList() ??
           [],
     );
@@ -102,10 +111,9 @@ class StudentApiResponse {
 
   factory StudentApiResponse.fromJson(Map<String, dynamic> json) {
     return StudentApiResponse(
-      message: json['message'] ?? '',
+      message: (json['message'] ?? '').toString(),
       student: StudentProfileModel.fromJson(
-        json['student']['student'] ?? {}
-          ..['parentsInfo'] = json['student']['parentsInfo'],
+        (json['student']['student'] ?? {})..['parentsInfo'] = json['student']['parentsInfo'],
       ),
     );
   }

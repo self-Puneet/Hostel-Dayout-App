@@ -116,6 +116,7 @@ class _HomePageState extends State<HomePage> {
                                 return Container(
                                   margin: padding,
                                   child: ActiveRequestCard(
+                                    actor: TimelineActor.student,
                                     reason: req.reason,
                                     requestId: req.requestId,
                                     requestType: req.requestType.name
@@ -146,6 +147,8 @@ class _HomePageState extends State<HomePage> {
                           Container(
                             margin: padding,
                             child: ActiveRequestCard(
+                              
+                                            actor: TimelineActor.student,
                               reason: activeRequests.first.reason,
                               requestId: activeRequests.first.requestId,
                               requestType: activeRequests.first.requestType.name
