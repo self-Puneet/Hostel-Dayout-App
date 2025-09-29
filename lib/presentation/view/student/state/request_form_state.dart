@@ -59,8 +59,15 @@ class RequestFormState extends ChangeNotifier {
 
   // Presence gate
   bool get hasRequiredFieldsFilled => isDayout
-      ? dayoutDate != null && dayoutFromTime != null && dayoutToTime != null
-      : leaveFromDate != null;
+      ? dayoutDate != null &&
+            dayoutFromTime != null &&
+            dayoutToTime != null &&
+            reason.trim().isNotEmpty
+      : leaveFromDate != null &&
+            reason.trim().isNotEmpty &&
+            leaveToDate != null &&
+            leaveFromTime != null &&
+            leaveToTime != null;
 
   // Button gate
   bool get isSubmittable =>

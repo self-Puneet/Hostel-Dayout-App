@@ -43,7 +43,10 @@ class TimeCard extends StatelessWidget {
           ),
         ),
         GestureDetector(
-          onTap: onTap,
+          onTap: () {
+            FocusScope.of(context).unfocus();
+            onTap();
+          },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
             decoration: BoxDecoration(

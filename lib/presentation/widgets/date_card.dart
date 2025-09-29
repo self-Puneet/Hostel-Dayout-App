@@ -40,7 +40,10 @@ class DateCard extends StatelessWidget {
           ),
         ),
         GestureDetector(
-          onTap: onTap,
+          onTap: () {
+            FocusScope.of(context).unfocus();
+            onTap();
+          },
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 14, horizontal: 14),
             decoration: BoxDecoration(
