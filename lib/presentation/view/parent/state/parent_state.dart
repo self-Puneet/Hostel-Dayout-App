@@ -8,7 +8,7 @@ class ParentState extends ChangeNotifier {
   bool isErrored = false;
   String errorMessage = '';
 
-  bool isActioning = false; // NEW
+  bool isActioning = false; // NEWx 
 
   RequestApiResponse? _all;
   List<RequestModel> activeRequests = [];
@@ -94,7 +94,7 @@ class ParentState extends ChangeNotifier {
     if (filtered.isEmpty) return null;
     // Return the most recent request
     return filtered.reduce(
-      (curr, next) => curr.appliedAt.isBefore(next.appliedAt) ? curr : next,
+      (curr, next) => curr.lastUpdatedAt.isBefore(next.lastUpdatedAt) ? curr : next,
     );
   }
 

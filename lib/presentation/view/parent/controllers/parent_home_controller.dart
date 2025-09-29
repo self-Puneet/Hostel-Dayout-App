@@ -16,37 +16,39 @@ class ParentHomeController {
     final result = await ParentService.getAllRequests();
     result.fold((err) => state.setError(err), (resp) {
       state.setRequests(resp);
-      state.setHistoryRequests([
-        RequestModel(
-          id: '1',
-          requestId: 'REQ1',
-          requestType: RequestType.leave,
-          studentEnrollmentNumber: 'ENR001',
-          appliedFrom: DateTime.now().subtract(Duration(days: 2)),
-          appliedTo: DateTime.now().subtract(Duration(days: 1)),
-          reason: 'Approved request',
-          status: RequestStatus.approved,
-          active: true,
-          createdBy: 'admin',
-          appliedAt: DateTime.now().subtract(Duration(days: 1)),
-          lastUpdatedAt: DateTime.now(),
-        ),
-        RequestModel(
-          id: '2',
-          requestId: 'REQ2',
-          requestType: RequestType.leave,
-          studentEnrollmentNumber: 'ENR002',
-          appliedFrom: DateTime.now().subtract(Duration(days: 3)),
-          appliedTo: DateTime.now().subtract(Duration(days: 2)),
-          reason: 'Rejected request',
-          status: RequestStatus.rejected,
-          active: false,
-          createdBy: 'admin',
-          appliedAt: DateTime.now().subtract(Duration(days: 2)),
-          lastUpdatedAt: DateTime.now(),
-        ),
-      ]);
+      //   state.setHistoryRequests([
+      //     RequestModel(
+      //       id: '1',
+      //       requestId: 'REQ1',
+      //       requestType: RequestType.leave,
+      //       studentEnrollmentNumber: 'ENR001',
+      //       appliedFrom: DateTime.now().subtract(Duration(days: 2)),
+      //       appliedTo: DateTime.now().subtract(Duration(days: 1)),
+      //       reason: 'Approved request',
+      //       status: RequestStatus.approved,
+      //       active: true,
+      //       createdBy: 'admin',
+      //       appliedAt: DateTime.now().subtract(Duration(days: 1)),
+      //       lastUpdatedAt: DateTime.now(),
+      //     ),
+      //     RequestModel(
+      //       id: '2',
+      //       requestId: 'REQ2',
+      //       requestType: RequestType.leave,
+      //       studentEnrollmentNumber: 'ENR002',
+      //       appliedFrom: DateTime.now().subtract(Duration(days: 3)),
+      //       appliedTo: DateTime.now().subtract(Duration(days: 2)),
+      //       reason: 'Rejected request',
+      //       status: RequestStatus.rejected,
+      //       active: false,
+      //       createdBy: 'admin',
+      //       appliedAt: DateTime.now().subtract(Duration(days: 2)),
+      //       lastUpdatedAt: DateTime.now(),
+      //     ),
+      //   ]);
     });
+    await fetchHistoryRequests();
+
     state.setLoading(false);
   }
 
@@ -91,4 +93,16 @@ class ParentHomeController {
 
   Future<void> rejectById(String requestId) =>
       actionById(requestId: requestId, action: RequestAction.reject);
+
+  Future<void> fetchHistoryRequests({String filter = 'All'}) async {
+    try {
+      state.setLoading(true);
+      final requests = await RequestService.getRequestsByStatusKey(filter);
+      state.setHistoryRequests(requests);
+    } catch (e) {
+      print('History fetch error ($filter): $e');
+    } finally {
+      state.setLoading(false);
+    }
+  }
 }

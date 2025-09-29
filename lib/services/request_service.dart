@@ -183,6 +183,7 @@
 // }
 
 import 'dart:convert';
+import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
@@ -320,5 +321,66 @@ class RequestService {
       print("❌ Exception: $e");
       return left("Exception: $e");
     }
+  }
+
+  // Core fetch by single backend key
+  static Future<List<RequestModel>> _fetchByKey(String key) async {
+    final session = Get.find<LoginSession>();
+    final token =
+        session.token; // adapt to your session field (e.g., accessToken)
+    final uri = Uri.parse('$url/request/requests/$key');
+
+    final response = await http.get(
+      uri,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+    );
+    if (response.statusCode != 200) {
+      throw HttpException(
+        'Request fetch failed (${response.statusCode}): $key',
+      );
+    }
+
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    print(body);
+    // Adjust parsing if your API wraps data differently.
+    final list = (body['requests'] as List<dynamic>? ?? [])
+        .map((e) => RequestModel.fromJson(e as Map<String, dynamic>))
+        .toList();
+
+    return list;
+  }
+
+  // Public: fetch all requests for a given UI filter option ("All", "Approved", "Rejected", "Cancelled")
+  // When multiple backend keys are needed, fetch them concurrently and merge.
+
+  // static List<String> _filterToBackendKeys(String filter) {
+  //   switch (filter.toLowerCase()) {
+  //     case 'Approved':
+  //       return ['accepted_by_warden'];
+  //     case 'Rejected':
+  //       return ['rejected_by_parent', 'rejected_by_warden'];
+  //     case 'Cancelled':
+  //       return ['cancelled_by_student', 'cancelled_assitent_warden'];
+  //     case 'all':
+  //     default:
+  //       return ['All'];
+  //   }
+  // }
+  // static Future<List<RequestModel>> getRequestsForFilter(String filter) async {
+  //   final keys = _filterToBackendKeys(filter);
+  //   if (keys.length == 1) {
+  //     return _fetchByKey(keys.first);
+  //   }
+
+  //   // Fetch multiple groups in parallel and merge (Rejected/Cancelled cases).
+  //   final results = await Future.wait(keys.map(_fetchByKey));
+  //   return results.expand((x) => x).toList();
+  // }
+
+  static Future<List<RequestModel>> getRequestsByStatusKey(String key) {
+    return _fetchByKey(key);
   }
 }

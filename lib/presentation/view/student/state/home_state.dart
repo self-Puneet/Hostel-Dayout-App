@@ -43,6 +43,7 @@ class HomeState extends ChangeNotifier {
   List<RequestModel> requests;
 
   RequestModel? get filteredRequests {
+    print("meow" * 90);
     List<RequestModel> filtered;
     if (selectedStatus == 'All') {
       filtered = requests;
@@ -58,12 +59,14 @@ class HomeState extends ChangeNotifier {
     if (filtered.isEmpty) return null;
     // Return the most recent request
     return filtered.reduce(
-      (curr, next) => curr.appliedAt.isBefore(next.appliedAt) ? curr : next,
+      (curr, next) =>
+          curr.lastUpdatedAt.isBefore(next.lastUpdatedAt) ? curr : next,
     );
   }
 
   // set history requests
   void setHistoryRequests(List<RequestModel> historyRequests) {
+    print("Setting history requests: ${historyRequests.length} items");
     requests = historyRequests;
     notifyListeners();
   }

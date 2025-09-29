@@ -147,8 +147,7 @@ class _HomePageState extends State<HomePage> {
                           Container(
                             margin: padding,
                             child: ActiveRequestCard(
-                              
-                                            actor: TimelineActor.student,
+                              actor: TimelineActor.student,
                               reason: activeRequests.first.reason,
                               requestId: activeRequests.first.requestId,
                               requestType: activeRequests.first.requestType.name
@@ -271,7 +270,7 @@ class _HomePageState extends State<HomePage> {
                         // Spacer for bottom safe area as before
                         Container(
                           height:
-                              184 + MediaQuery.of(context).viewPadding.bottom,
+                              84 + MediaQuery.of(context).viewPadding.bottom,
                         ),
                       ],
                     ),

@@ -98,11 +98,12 @@ class _ProfilePageState extends State<ProfilePage>
               child: CustomScrollView(
                 slivers: [
                   SliverPadding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 31 * mediaQuery.width / 402,
+                    padding: EdgeInsets.only(
+                      left: 31 * mediaQuery.width / 402,
+                      right: 31 * mediaQuery.width / 402,
+                      top: mediaQuery.height * 25 / 874,
                     ),
                     sliver: OneUiCollapsingHeader(
-                      
                       // overallBackgroundColor: const Color(0xFFE9E9E9),
                       title: 'Profile',
                       vsync: this, // NEW
