@@ -68,7 +68,7 @@ String? _initialRoute() {
 
   switch (role) {
     case TimelineActor.student:
-      return AppRoutes.studentHome;
+      return AppRoutes.requestForm;
     case TimelineActor.assistentWarden:
       return AppRoutes.wardenHome;
     case TimelineActor.seniorWarden:

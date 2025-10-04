@@ -67,6 +67,7 @@ class _WardenLayoutState extends State<WardenLayout> {
                         enrollmentNumber: state.loginSession.identityId,
                         phoneNumber: state.loginSession.phone,
                         actor: actor,
+                        hostelName: state.loginSession.hostelIds!.join('\n'),
                         name: state.loginSession.username,
                         avatarUrl: state.loginSession.imageURL,
                         greeting: 'Welcome back,',

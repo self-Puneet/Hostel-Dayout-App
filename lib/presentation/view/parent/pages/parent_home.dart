@@ -88,6 +88,7 @@ class ParentHomePage extends StatelessWidget {
                   final s = context.read<ParentState>();
                   s.resetForRefresh();
                   await ParentHomeController(s).fetchActiveRequests();
+                  await ParentHomeController(s).fetchHistoryRequests();
                 },
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
@@ -109,7 +110,7 @@ class ParentHomePage extends StatelessWidget {
                             ? Column(
                                 children: [
                                   SizedBox(
-                                    height: 370,
+                                    height: 355,
                                     child: PageView.builder(
                                       controller: pageController,
                                       itemCount: activeRequests.length,
@@ -130,8 +131,7 @@ class ParentHomePage extends StatelessWidget {
                                             showActions: true,
                                             reason: req.reason,
                                             requestId: req.requestId,
-                                            requestType: req.requestType.name
-                                                .toUpperCase(),
+                                            requestType: req.requestType,
                                             status: req.status,
                                             fromDate: req.appliedFrom,
                                             toDate: req.appliedTo,
@@ -172,11 +172,7 @@ class ParentHomePage extends StatelessWidget {
                                   showActions: true,
                                   reason: activeRequests.first.reason,
                                   requestId: activeRequests.first.requestId,
-                                  requestType: activeRequests
-                                      .first
-                                      .requestType
-                                      .name
-                                      .toUpperCase(),
+                                  requestType: activeRequests.first.requestType,
                                   status: activeRequests.first.status,
                                   fromDate: activeRequests.first.appliedFrom,
                                   toDate: activeRequests.first.appliedTo,
@@ -205,7 +201,7 @@ class ParentHomePage extends StatelessWidget {
                               )
                             : Container(
                                 margin: padding,
-                                height: 330,
+                                height: 310,
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: Colors.white,
@@ -305,6 +301,8 @@ class ParentHomePage extends StatelessWidget {
                                   statusDate:
                                       state.filteredRequests!.lastUpdatedAt,
                                   reason: state.filteredRequests!.reason,
+                                  requestId: state.filteredRequests!.requestId,
+                                  actor: TimelineActor.parent,
                                 ),
                         ),
                       ),

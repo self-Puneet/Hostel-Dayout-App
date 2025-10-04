@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/core/util/input_convertor.dart';
 
 class DateCard extends StatelessWidget {
@@ -22,22 +23,21 @@ class DateCard extends StatelessWidget {
   String get dateStr {
     if (value == null) return placeholder;
     // Short Indian format: DD Mon
-
     return InputConverter.dateToMonthDay(value!);
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // if (value != null)
         Padding(
-          padding: EdgeInsets.only(left: 3.0),
-          child: Text(
-            label,
-            style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-          ),
+          padding: const EdgeInsets.only(left: 3.0, bottom: 4.0),
+          child: Text(label, style: textTheme.h7.w500),
         ),
         GestureDetector(
           onTap: () {
@@ -45,41 +45,39 @@ class DateCard extends StatelessWidget {
             onTap();
           },
           child: Container(
-            padding: EdgeInsets.symmetric(vertical: 14, horizontal: 14),
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colorScheme.surface,
               boxShadow: [
                 if (!touched && value == null)
                   BoxShadow(
                     color: Colors.grey.shade300,
                     blurRadius: 2,
                     spreadRadius: 0.5,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
               ],
-              border: Border.all(
-                color: error != null ? Colors.red : Colors.grey.shade300,
-                width: 1.2,
-              ),
+              // border: Border.all(
+              //   color: error != null ? colorScheme.error : greyColor,
+              //   width: 1.2,
+              // ),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
               children: [
-                Icon(Icons.calendar_month_rounded, color: Colors.grey[600]),
-                SizedBox(width: 10),
-                Text(dateStr, style: TextStyle(fontSize: 16)),
+                Icon(Icons.calendar_month_rounded, color: greyColor),
+                const SizedBox(width: 10),
+                Text(dateStr, style: textTheme.h5),
               ],
             ),
           ),
         ),
         if (error != null)
           Padding(
-            padding: EdgeInsets.only(top: 4.0, left: 3.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(error!, style: TextStyle(fontSize: 13, color: Colors.red)),
-              ],
+            padding: const EdgeInsets.only(top: 4.0, left: 3.0),
+            child: Text(
+              error!,
+              style: textTheme.h7.w300.copyWith(color: Colors.red),
             ),
           ),
       ],

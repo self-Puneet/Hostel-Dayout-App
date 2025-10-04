@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/instance_manager.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/presentation/view/student/controllers/request_form_controller.dart';
 import 'package:hostel_mgmt/presentation/view/student/state/request_form_state.dart';
 import 'package:hostel_mgmt/presentation/widgets/reason_card.dart';
@@ -83,7 +84,7 @@ class RequestFormPage extends StatelessWidget {
                   child: WelcomeHeader(
                     phoneNumber: loginSession.phone,
                     enrollmentNumber: loginSession.identityId,
-                    hostelName: loginSession.hostel,
+                    hostelName: loginSession.hostels!.first,
                     roomNumber: loginSession.roomNo,
                     actor: TimelineActor.student,
                     name: loginSession.username,
@@ -117,6 +118,7 @@ class _RequestFormView extends StatelessWidget {
       horizontal: 31 * mediaQuery.width / 402,
       vertical: 18,
     );
+    final textTheme = Theme.of(context).textTheme;
 
     return AppRefreshWrapper(
       onRefresh: () async {
@@ -189,11 +191,10 @@ class _RequestFormView extends StatelessWidget {
                 restriction: provider.restrictionWindow,
                 isLoading: provider.isLoadingRestriction,
                 isApplicable: provider.isDayout,
-                onRetry: () =>
-                    controller.loadRestriction(), // controller handles it
+                onRetry: () => controller.loadRestriction(),
               ),
               const SizedBox(height: 20),
-              const Text("OUTING  TYPE"),
+              Text("OUTING  TYPE", style: textTheme.h6),
               const SizedBox(height: 5),
               TypeToggle(
                 selected: provider.requestType,
@@ -389,7 +390,7 @@ class _RequestFormView extends StatelessWidget {
                           provider.isDayout
                               ? "Submit Dayout Request"
                               : "Submit Leave Request",
-                          style: const TextStyle(fontSize: 16),
+                          style: textTheme.h5.w500.copyWith(color: greyColor),
                         ),
                 ),
               ),

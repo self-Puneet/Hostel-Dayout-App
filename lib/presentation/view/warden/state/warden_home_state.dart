@@ -1,32 +1,33 @@
-// warden_home_state.dart
-
 import 'package:flutter/material.dart';
 import 'package:get/instance_manager.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
+import 'package:hostel_mgmt/models/student_profile.dart';
 
-// Add isSelected to the wrapper.
 class onScreenRequest {
   final RequestModel request;
+  final StudentProfileModel student;
   bool isActioning;
-  bool isSelected; // NEW
+  bool isSelected;
 
   onScreenRequest({
+    required this.student,
     required this.request,
     this.isActioning = false,
-    this.isSelected = false, // NEW
+    this.isSelected = false,
   });
 
   onScreenRequest copyWith({
     RequestModel? request,
     bool? isActioning,
-    bool? isSelected, // NEW
+    bool? isSelected,
   }) {
     return onScreenRequest(
+      student: student,
       request: request ?? this.request,
       isActioning: isActioning ?? this.isActioning,
-      isSelected: isSelected ?? this.isSelected, // NEW
+      isSelected: isSelected ?? this.isSelected,
     );
   }
 }
@@ -37,24 +38,60 @@ class WardenHomeState extends ChangeNotifier {
   bool _isActioning = false;
   String _errorMessage = '';
 
-  // Keep a derived global flag via getter rather than a mutable _isSelected.
-  final Set<String> _selectedIds = {}; // NEW
+  // Selection
+  final Set<String> _selectedIds = {};
+
+  // Hostels
+  List<String> hostelIds = [];
+  String? selectedHostelId;
+  bool hostelsInitialized = false;
 
   bool get isLoading => _isLoading;
   bool get isErrored => _isErrored;
   bool get isActioning => _isActioning;
   String get errorMessage => _errorMessage;
-  bool get hasSelection => _selectedIds.isNotEmpty; // NEW
+  bool get hasSelection => _selectedIds.isNotEmpty;
 
-  RequestApiResponse? _allRequests;
-  bool get hasData => _allRequests != null;
+  List<(RequestModel, StudentProfileModel)> _allRequests = [];
+
+  bool get hasData => _allRequests.isNotEmpty;
+
   List<onScreenRequest> currentOnScreenRequests = [];
-  List<RequestModel> selectedRequests = []; // optional mirror list if needed
+  List<RequestModel> selectedRequests = [];
 
   final TextEditingController filterController = TextEditingController();
 
   WardenHomeState() {
     filterController.addListener(_filterRequests);
+  }
+
+  // NEW: initialize hostel list and default selection.
+  void setHostelList(List<String> ids) {
+    hostelIds = ids;
+    if (selectedHostelId == null && ids.isNotEmpty) {
+      selectedHostelId = ids.first;
+    }
+    // hostelIds.add("value");
+    hostelsInitialized = true;
+    notifyListeners();
+  }
+
+  // NEW: select hostel id (does not auto-fetch, caller decides).
+  void setSelectedHostelId(String id) {
+    selectedHostelId = id;
+    notifyListeners();
+  }
+
+  // NEW: clear transient state but keep hostel selection/list.
+  void resetForHostelChange() {
+    _isErrored = false;
+    _errorMessage = '';
+    _allRequests = [];
+    currentOnScreenRequests = [];
+    _selectedIds.clear();
+    selectedRequests.clear();
+    filterController.clear();
+    notifyListeners();
   }
 
   void setIsLoading(bool value) {
@@ -73,40 +110,22 @@ class WardenHomeState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setRequests(RequestApiResponse response) {
+  void setRequests(List<(RequestModel, StudentProfileModel)> response) {
     _allRequests = response;
-    // Filter by actor queue before projecting selection
-    final actor = Get.find<LoginSession>().role;
-    final filtered = response.requests
-        .where((r) => belongsToActorQueue(r.status, actor))
-        .toList();
-
-    currentOnScreenRequests = filtered.map((req) {
-      return onScreenRequest(
-        request: req,
-        isSelected: _selectedIds.contains(req.requestId),
-      );
-    }).toList();
-
-    notifyListeners();
+    _filterRequests();
   }
 
-  // Helper: check if selected by id
-  bool isSelectedById(String id) => _selectedIds.contains(id); // NEW
+  bool isSelectedById(String id) => _selectedIds.contains(id);
 
-  // Toggle selection by id
   void toggleSelectedById(String id) {
-    // NEW
     if (_selectedIds.contains(id)) {
       _selectedIds.remove(id);
     } else {
       _selectedIds.add(id);
     }
-    // Update wrapper flags in place for immediate visual feedback
     for (var i = 0; i < currentOnScreenRequests.length; i++) {
       final req = currentOnScreenRequests[i];
-      final requestId =
-          req.request.requestId; // ensure consistency with RequestModel
+      final requestId = req.request.requestId;
       if (requestId == id) {
         currentOnScreenRequests[i] = req.copyWith(
           isSelected: _selectedIds.contains(id),
@@ -114,7 +133,6 @@ class WardenHomeState extends ChangeNotifier {
         break;
       }
     }
-    // Optionally maintain selectedRequests mirror
     selectedRequests = currentOnScreenRequests
         .where((w) => _selectedIds.contains(w.request.requestId))
         .map((w) => w.request)
@@ -122,9 +140,23 @@ class WardenHomeState extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Clear all selection (after bulk action)
+  void restrictSelectionToIds(Set<String> ids) {
+    _selectedIds.removeWhere((id) => !ids.contains(id));
+    for (var i = 0; i < currentOnScreenRequests.length; i++) {
+      final req = currentOnScreenRequests[i];
+      final id = req.request.requestId;
+      currentOnScreenRequests[i] = req.copyWith(
+        isSelected: _selectedIds.contains(id),
+      );
+    }
+    selectedRequests = currentOnScreenRequests
+        .where((w) => _selectedIds.contains(w.request.requestId))
+        .map((w) => w.request)
+        .toList();
+    notifyListeners();
+  }
+
   void clearSelection() {
-    // NEW
     _selectedIds.clear();
     selectedRequests.clear();
     for (var i = 0; i < currentOnScreenRequests.length; i++) {
@@ -137,7 +169,7 @@ class WardenHomeState extends ChangeNotifier {
 
   void setIsActioningbyId(String id, bool value) {
     final index = currentOnScreenRequests.indexWhere(
-      (req) => req.request.requestId == id, // align with RequestModel.requestId
+      (req) => req.request.requestId == id,
     );
     if (index != -1) {
       currentOnScreenRequests[index] = currentOnScreenRequests[index].copyWith(
@@ -150,37 +182,30 @@ class WardenHomeState extends ChangeNotifier {
   void _filterRequests() {
     final query = filterController.text.trim().toLowerCase();
 
-    // If data not loaded, clear and notify
-    if (_allRequests == null) {
+    if (_allRequests.isEmpty) {
       currentOnScreenRequests = [];
       notifyListeners();
       return;
     }
 
-    final all = _allRequests!.requests;
+    final actor = Get.find<LoginSession>().role;
 
-    // Build the base wrapped list with projected selection
-    final wrapped = all.map((req) {
-      return onScreenRequest(
-        request: req,
-        isSelected: _selectedIds.contains(req.requestId),
+    Iterable<(RequestModel, StudentProfileModel)> base = _allRequests.where(
+      (r) => belongsToActorQueue(r.$1.status, actor),
+    );
+
+    if (query.isNotEmpty) {
+      base = base.where(
+        (r) => r.$2.name.toLowerCase().contains(query),
       );
-    }).toList();
-
-    if (query.isEmpty) {
-      currentOnScreenRequests = wrapped;
-      notifyListeners();
-      return;
     }
 
-    String _safeName(onScreenRequest w) {
-      final n = w.request.studentEnrollmentNumber;
-      return n.toLowerCase();
-    }
-
-    currentOnScreenRequests = wrapped.where((w) {
-      final nameLower = _safeName(w);
-      return nameLower.contains(query);
+    currentOnScreenRequests = base.map((req) {
+      return onScreenRequest(
+        request: req.$1,
+        student: req.$2,
+        isSelected: _selectedIds.contains(req.$1.requestId),
+      );
     }).toList();
 
     notifyListeners();
@@ -192,29 +217,12 @@ class WardenHomeState extends ChangeNotifier {
     super.dispose();
   }
 
-  // clear whole state
-  void clearState() {
-    _isLoading = false;
-    _isErrored = false;
-    _isActioning = false;
-    _errorMessage = '';
-    _allRequests = null;
-    currentOnScreenRequests = [];
-    _selectedIds.clear();
-    selectedRequests.clear();
-    filterController.clear();
-    notifyListeners();
-  }
-
-  // In WardenHomeState
   static bool belongsToActorQueue(RequestStatus s, TimelineActor actor) {
     switch (actor) {
       case TimelineActor.assistentWarden:
-        // waiting at assistant: newly requested or student-cancel review
         return s == RequestStatus.requested ||
             s == RequestStatus.cancelledStudent;
       case TimelineActor.seniorWarden:
-        // waiting at senior: referred by assistant and parent approved
         return s == RequestStatus.referred || s == RequestStatus.parentApproved;
       default:
         return false;
@@ -225,19 +233,27 @@ class WardenHomeState extends ChangeNotifier {
     notifyListeners();
   }
 
-  // void setRequests(RequestApiResponse response) {
-  //   _allRequests = response;
-  //   // Filter by actor queue before projecting selection
-  //   final actor = Get.find<LoginSession>().role;
-  //   final filtered = response.requests.where((r) => belongsToActorQueue(r.status, actor)).toList();
+  RequestType? _typeFilter;
+  RequestType? get typeFilter => _typeFilter;
+  void setTypeFilter(RequestType? value) {
+    _typeFilter = value;
+    _filterRequests();
+  }
 
-  //   currentOnScreenRequests = filtered.map((req) {
-  //     return onScreenRequest(
-  //       request: req,
-  //       isSelected: _selectedIds.contains(req.requestId),
-  //     );
-  //   }).toList();
-
-  //   notifyListeners();
-  // }
+  // Full clear
+  void clearState() {
+    _isLoading = false;
+    _isErrored = false;
+    _isActioning = false;
+    _errorMessage = '';
+    _allRequests = [];
+    currentOnScreenRequests = [];
+    _selectedIds.clear();
+    selectedRequests.clear();
+    _typeFilter = null;
+    filterController.clear();
+    // Note: keep hostelIds and selectedHostelId intact only if you want,
+    // or reset them here if needed.
+    notifyListeners();
+  }
 }

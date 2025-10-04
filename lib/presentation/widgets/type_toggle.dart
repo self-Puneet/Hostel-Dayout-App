@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/enums/request_type.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 
 class TypeToggle extends StatelessWidget {
   final RequestType selected;
@@ -58,6 +59,7 @@ class _OptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     final Color borderColor = isActive
         ? const Color(0xFF3B82F6)
         : const Color(0x22000000);
@@ -90,21 +92,13 @@ class _OptionCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF1F2937),
-                  ),
+                  style: textTheme.h4.w500,
                   textAlign: TextAlign.center,
                 ),
-                // const SizedBox(height: 6),
+                const SizedBox(height: 6),
                 Text(
                   subtitle,
-                  // style: TextStyle(
-                  //   fontSize: 15,
-                  //   color: Colors.grey[600],
-                  //   fontWeight: FontWeight.w500,
-                  // ),
+                  style: textTheme.h6.w500,
                   textAlign: TextAlign.center,
                 ),
               ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:timelines_plus/timelines_plus.dart';
 
 enum CheckpointState { completed, notCompleted, rejected }
@@ -34,7 +35,7 @@ class HorizontalCheckpointTimeline extends StatelessWidget {
                 case CheckpointState.completed:
                   return DotIndicator(
                     size: 26,
-                    color: Color(0xFF5CE65C),
+                    color: Color.fromRGBO(92, 230, 92, 1),
                     child: Icon(Icons.check, color: Colors.white, size: 22),
                   );
                 case CheckpointState.notCompleted:
@@ -60,8 +61,8 @@ class HorizontalCheckpointTimeline extends StatelessWidget {
               return SolidLineConnector(
                 thickness: 3,
                 color: isActive
-                    ? Color(0xFF5CE65C)
-                    : Color.fromRGBO(178, 178, 178, 1),
+                    ? Color.fromRGBO(92, 230, 92, 1)
+                    : Color.fromRGBO(117, 117, 117, 1),
               );
             },
             // Fix each content width to itemWidth
@@ -72,18 +73,11 @@ class HorizontalCheckpointTimeline extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Text(
-                    checkpoint.title.split(" ").join("\n"),
+                    checkpoint.title,
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w400,
-                      fontStyle: FontStyle.normal,
-                      fontSize: 8,
-                      height: 1.0,
-                      letterSpacing: 0,
-                    ),
+                    style: Theme.of(context).textTheme.h7.w300,
                   ),
                 ),
               );

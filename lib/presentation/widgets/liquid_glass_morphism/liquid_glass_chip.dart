@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 class LiquidGlassChip extends StatelessWidget {
@@ -18,6 +19,7 @@ class LiquidGlassChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return SizedBox(
       width: width, // constrain chip size from parent
       height: height,
@@ -30,6 +32,7 @@ class LiquidGlassChip extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: borderRadius,
                 border: Border.all(color: const Color(0xFFC1C1C1), width: 1),
+                // boxShadow: BoxBorder.all()
               ),
               child: LiquidGlass(
                 shape: LiquidRoundedSuperellipse(
@@ -66,11 +69,7 @@ class LiquidGlassChip extends StatelessWidget {
           Text(
             label,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontWeight: FontWeight.w500,
-              fontSize: 14,
-              color: Colors.black,
-            ),
+            style: textTheme.h6.w300, // use directly
           ),
         ],
       ),

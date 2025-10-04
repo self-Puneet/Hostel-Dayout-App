@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 
 class ClickableText extends StatelessWidget {
   final String text;
@@ -9,23 +10,15 @@ class ClickableText extends StatelessWidget {
     Key? key,
     required this.text,
     required this.onTap,
-    this.color = Colors.blue, // default clickable color
+    this.color = Colors.black, // default clickable color
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return GestureDetector(
       onTap: onTap,
-      child: Text(
-        text,
-        style: TextStyle(
-          fontFamily: "Poppins",
-          fontWeight: FontWeight.w400,
-          fontStyle: FontStyle.normal,
-          fontSize: 16,
-          color: color,
-        ),
-      ),
+      child: Text(text, style: textTheme.h5),
     );
   }
 }

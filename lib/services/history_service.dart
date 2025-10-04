@@ -3,12 +3,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:get/get.dart';
+import 'package:hostel_mgmt/core/config/constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 
 class StudentHistoryService {
-  static const String _baseUrl = 'http://172.16.40.17:4141/api';
+  static const String _baseUrl = baseUrl;
 
   // GET /api/student/inactive-requests
   static Future<Either<String, RequestApiResponse>>

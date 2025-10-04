@@ -14,6 +14,7 @@ class SimpleActionRequestCard extends StatelessWidget {
   final DateTime toDate;
   final VoidCallback? onRejection; // null => disabled (handled by parent)
   final VoidCallback? onAcceptence; // null => disabled (handled by parent)
+  final String? profileImageUrl;
 
   // Selection UI + gestures
   final bool selected;
@@ -33,6 +34,7 @@ class SimpleActionRequestCard extends StatelessWidget {
     this.selected = false,
     this.onLongPress,
     this.onTap,
+    required this.profileImageUrl,
   });
 
   @override
@@ -128,11 +130,7 @@ class SimpleActionRequestCard extends StatelessWidget {
                       // Header row
                       Row(
                         children: [
-                          const CircleAvatar(
-                            radius: 20,
-                            backgroundColor: Colors.grey,
-                            child: Icon(Icons.person, color: Colors.white),
-                          ),
+                          _buildAvatar(),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
@@ -251,6 +249,16 @@ class SimpleActionRequestCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildAvatar() {
+    final hasImage = (profileImageUrl != null && profileImageUrl!.isNotEmpty);
+    return CircleAvatar(
+      radius: 20,
+      backgroundColor: Colors.grey,
+      backgroundImage: hasImage ? NetworkImage(profileImageUrl!) : null,
+      child: hasImage ? null : const Icon(Icons.person, color: Colors.white),
     );
   }
 }

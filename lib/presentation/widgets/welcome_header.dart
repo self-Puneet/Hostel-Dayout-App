@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/core/util/string_extensions.dart';
 import 'package:hostel_mgmt/login/login_controller.dart';
 import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/liquid_glass_chip.dart';
@@ -35,6 +36,7 @@ class WelcomeHeader extends StatelessWidget {
   // Derive initials from a full name (e.g., "Alvaro Morte" -> "AM").
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     final pillText = DateFormat('EEE, MMM d').format(date); // Thu, Aug 27
     final hasAvatar = (avatarUrl?.trim().isNotEmpty ?? false);
     return Container(
@@ -78,25 +80,10 @@ class WelcomeHeader extends StatelessWidget {
             child: CircleAvatar(
               radius: 22,
               backgroundColor: Colors.blue.shade100,
-              // Option A: use backgroundImage
               backgroundImage: hasAvatar ? NetworkImage(avatarUrl!) : null,
-              // If using foregroundImage instead, same condition applies:
-              // foregroundImage: hasAvatar ? NetworkImage(avatarUrl!) : null,
-
-              // Show initials only when no URL
               child: hasAvatar
                   ? null
-                  : Text(
-                      name.initials,
-                      style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        height: 1.0,
-                        letterSpacing: 0.0,
-                        color: Colors.black87,
-                      ),
-                    ),
+                  : Text(name.initials, style: textTheme.h3.w500),
             ),
           ),
           const SizedBox(width: 12),
@@ -104,60 +91,12 @@ class WelcomeHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  greeting,
-                  textHeightBehavior: const TextHeightBehavior(
-                    leadingDistribution: TextLeadingDistribution.even,
-                  ),
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    color: Colors.grey.shade600,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    height: 1.0, // 100% line-height
-                    letterSpacing: 0.0, // 0% letter-spacing
-                  ),
-                ),
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    color: Colors.black,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    height: 1.0,
-                    letterSpacing: 0.0,
-                  ),
-                ),
+                Text(greeting, style: textTheme.h5),
+                Text(name, style: textTheme.h2),
               ],
             ),
           ),
           LiquidGlassChip(label: pillText),
-          // const SizedBox(width: 12),
-          // Container(
-          //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          //   decoration: BoxDecoration(
-          //     color: Colors.grey.shade200,
-          //     borderRadius: BorderRadius.circular(18),
-          //     boxShadow: const [
-          //       BoxShadow(
-          //         color: Color(0x11000000),
-          //         blurRadius: 6,
-          //         offset: Offset(0, 2),
-          //       ),
-          //     ],
-          //   ),
-          //   child: Text(
-          //     pillText,
-          //     style: const TextStyle(
-          //       fontFamily: 'Poppins',
-          //       fontSize: 14,
-          //       fontWeight: FontWeight.w500,
-          //       height: 1.0,
-          //       letterSpacing: 0.0,
-          //     ),
-          //   ),
-          // ),
         ],
       ),
     );

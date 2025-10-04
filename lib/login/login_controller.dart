@@ -120,7 +120,7 @@ class LoginController {
               diSession.role = session.role;
               diSession.imageURL = profile.profilePic;
               diSession.roomNo = profile.roomNo;
-              diSession.hostel = profile.hostelName;
+              diSession.hostels = [profile.hostelName];
 
               await diSession.saveToPrefs();
               print(diSession.roomNo);

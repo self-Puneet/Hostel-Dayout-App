@@ -9,11 +9,10 @@ class AppRefreshWrapper extends StatelessWidget {
     required this.child,
     required this.onRefresh,
   });
-
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      color: Colors.deepPurple,
+      color: Colors.black,
       backgroundColor: Colors.white,
       strokeWidth: 3,
       displacement: 60,

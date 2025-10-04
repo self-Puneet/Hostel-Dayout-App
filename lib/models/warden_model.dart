@@ -1,14 +1,21 @@
-import 'package:hostel_mgmt/models/hostels_model.dart';
-
-enum WardenRole { assitentWarden, seniorWarden }
+enum WardenRole { assistantWarden, seniorWarden }
 
 extension WardenRoleX on WardenRole {
   String get displayName {
     switch (this) {
-      case WardenRole.assitentWarden:
-        return "Assistent Warden";
+      case WardenRole.assistantWarden:
+        return "Assistant Warden";
       case WardenRole.seniorWarden:
         return "Senior Warden";
+    }
+  }
+
+  String get apiValue {
+    switch (this) {
+      case WardenRole.assistantWarden:
+        return "warden";
+      case WardenRole.seniorWarden:
+        return "senior_warden";
     }
   }
 }
@@ -18,7 +25,7 @@ class WardenModel {
   final String empId;
   final String name;
   final String phoneNo;
-  final HostelModel? hostelModel;
+  final List<String> hostels;
   final String? profilePicUrl;
   final WardenRole wardenRole;
   final String? email;
@@ -29,49 +36,57 @@ class WardenModel {
     required this.empId,
     required this.name,
     required this.phoneNo,
-    this.hostelModel,
+    required this.hostels,
     this.profilePicUrl,
     required this.wardenRole,
     this.email,
     this.languagePreference,
   });
 
-  static WardenRole _roleFromString(String status) {
-    switch (status) {
+  /// Convert string role from API → Enum
+  static WardenRole _roleFromString(String? role) {
+    switch (role) {
       case "senior_warden":
         return WardenRole.seniorWarden;
       case "warden":
-        return WardenRole.assitentWarden;
+        return WardenRole.assistantWarden;
       default:
-        return WardenRole.assitentWarden;
+        return WardenRole.assistantWarden;
     }
   }
 
   factory WardenModel.fromJson(Map<String, dynamic> json) {
+    final hostels_ =
+        (json['hostel_id'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [];
+    // print(hostels_);
+    // print(hostels_.runtimeType);
     return WardenModel(
-      wardenId: json['warden_id'],
-      empId: json['emp_id'],
-      name: json['name'],
-      wardenRole: _roleFromString(json['role']),
-      // hostelModel: HostelModel.fromJson(json['hostel']),
-      profilePicUrl: json['profile_pic'],
+      wardenId: json['warden_id'] ?? '',
+      empId: json['emp_id'] ?? '',
+      name: json['name'] ?? '',
       phoneNo: json['phone_no'] ?? '',
+      profilePicUrl: json['profile_pic'],
+      wardenRole: _roleFromString(json['role']),
       email: json['email'],
       languagePreference: json['language_preference'],
+      hostels: hostels_,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'parent_id': wardenId,
+      'warden_id': wardenId,
       'emp_id': empId,
       'name': name,
-      'role': wardenRole,
-      if (profilePicUrl != null) 'profile_pic': profilePicUrl,
       'phone_no': phoneNo,
-      'hostel_id': hostelModel!.hostelId,
+      'role': wardenRole.apiValue,
+      if (profilePicUrl != null) 'profile_pic': profilePicUrl,
       if (email != null) 'email': email,
       if (languagePreference != null) 'language_preference': languagePreference,
+      'hostels': hostels,
     };
   }
 }

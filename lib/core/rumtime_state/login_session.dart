@@ -8,8 +8,8 @@ class LoginSession {
   String username;
   String? email;
   String? primaryId;
-  String? hostel_id;
-  String? hostel;
+  List<String>? hostelIds;
+  List<String>? hostels;
   String? identityId;
   DateTime? expiry;
   String? phone;
@@ -28,8 +28,8 @@ class LoginSession {
     this.phone,
     this.fcmToken,
     required this.role,
-    this.hostel_id,
-    this.hostel,
+    this.hostelIds = const [],
+    this.hostels = const [],
     this.imageURL,
     this.roomNo,
   });
@@ -43,8 +43,8 @@ class LoginSession {
     "phone": phone,
     "fcm_token": fcmToken,
     "role": TimelineActorX.toShortString(role),
-    "hostel_id": hostel_id,
-    "hostel": hostel,
+    "hostel_id": hostelIds,
+    "hostel": hostels,
     "imageURL": imageURL,
     "primaryId": primaryId,
     "room_no": roomNo
@@ -59,8 +59,14 @@ class LoginSession {
     phone: json["phone"],
     fcmToken: json["fcm_token"],
     role: TimelineActorX.fromString(json["role"]),
-    hostel_id: json["hostel_id"],
-    hostel: json["hostel"],
+    hostelIds: (json["hostel_id"] as List<dynamic>?)
+                ?.map((e) => e.toString())
+                .toList() ??
+            [],
+        hostels: (json["hostel"] as List<dynamic>?)
+                ?.map((e) => e.toString())
+                .toList() ??
+            [],
     imageURL: json["imageURL"],
     primaryId: json["primaryId"],
     roomNo: json['room_no']

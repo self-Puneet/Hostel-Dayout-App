@@ -2,6 +2,9 @@
 /// Updated to display 12-hour format with AM/PM using MaterialLocalizations.
 
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
+
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 
 class TimeCard extends StatelessWidget {
   final TimeOfDay? value;
@@ -23,6 +26,7 @@ class TimeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     final localizations = MaterialLocalizations.of(context);
     final display = value == null
         ? placeholder
@@ -36,11 +40,8 @@ class TimeCard extends StatelessWidget {
       children: [
         // if (value != null)
         Padding(
-          padding: const EdgeInsets.only(left: 3.0),
-          child: Text(
-            label,
-            style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-          ),
+          padding: const EdgeInsets.only(left: 3.0, bottom: 4.0),
+          child: Text(label, style: Theme.of(context).textTheme.h7.w500),
         ),
         GestureDetector(
           onTap: () {
@@ -70,7 +71,7 @@ class TimeCard extends StatelessWidget {
               children: [
                 Icon(Icons.access_time, color: Colors.grey[600]),
                 const SizedBox(width: 10),
-                Text(display, style: const TextStyle(fontSize: 16)),
+                Text(display, style: textTheme.h5),
               ],
             ),
           ),
@@ -83,7 +84,7 @@ class TimeCard extends StatelessWidget {
               children: [
                 Text(
                   error!,
-                  style: const TextStyle(fontSize: 13, color: Colors.red),
+                  style: textTheme.h7.w300.copyWith(color: Colors.red),
                 ),
               ],
             ),

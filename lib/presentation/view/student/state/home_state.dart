@@ -43,7 +43,6 @@ class HomeState extends ChangeNotifier {
   List<RequestModel> requests;
 
   RequestModel? get filteredRequests {
-    print("meow" * 90);
     List<RequestModel> filtered;
     if (selectedStatus == 'All') {
       filtered = requests;

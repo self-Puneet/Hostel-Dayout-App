@@ -1,7 +1,6 @@
 // parent_home_controller.dart
 import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
-import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:hostel_mgmt/presentation/view/parent/state/parent_state.dart';
 import 'package:hostel_mgmt/services/parent_service.dart';
 import 'package:hostel_mgmt/services/request_service.dart';

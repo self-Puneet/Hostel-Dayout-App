@@ -1,8 +1,10 @@
 // lib/presentation/view/student/history_page.dart
 import 'package:flutter/material.dart';
+import 'package:get/instance_manager.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
+import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/presentation/components/month_requests_card.dart';
 import 'package:provider/provider.dart';
 
@@ -135,6 +137,7 @@ class HistoryListView extends StatelessWidget {
     final mediaQuery = MediaQuery.of(context);
     final padding = 31 * mediaQuery.size.width / 402;
 
+    final profile = Get.find<LoginSession>();
     return Consumer<HistoryState>(
       builder: (context, state, _) {
         if (state.isErrored) {
@@ -185,7 +188,11 @@ class HistoryListView extends StatelessWidget {
               final items = grouped[key]!;
               return Padding(
                 padding: EdgeInsetsGeometry.symmetric(horizontal: padding),
-                child: MonthGroupCard(monthTitle: key, requests: items),
+                child: MonthGroupCard(
+                  monthTitle: key,
+                  requests: items,
+                  actor: profile.role,
+                ),
               );
             },
           ),

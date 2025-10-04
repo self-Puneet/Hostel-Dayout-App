@@ -1,17 +1,20 @@
 // lib/presentation/view/student/widgets/month_group_card.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:hostel_mgmt/presentation/components/simple_request_card.dart';
 
 class MonthGroupCard extends StatefulWidget {
   final String monthTitle;
   final List<RequestModel> requests;
+  final TimelineActor actor;
 
   const MonthGroupCard({
     super.key,
     required this.monthTitle,
     required this.requests,
+    required this.actor,
   });
 
   @override
@@ -139,6 +142,8 @@ class _MonthGroupCardState extends State<MonthGroupCard> {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: SimpleRequestCard(
+            requestId: r.id,
+            actor: widget.actor,
             requestType: r.requestType,
             fromDate: r.appliedFrom,
             toDate: r.appliedTo,

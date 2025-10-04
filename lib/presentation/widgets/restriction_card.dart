@@ -1,12 +1,5 @@
-/// RestrictionCard widget: clean static card with soft shadow + applicability & error states.
-/// - No glow/animation/border color changes.
-/// - Allowed: green check + "Day-out Allowed Today" + "Allowed time: ...".
-/// - Not allowed: red alert icon + "Day-out Not Allowed Today" + note as reason.
-/// - Error-loading: explicit red error row when `restriction.errroLoading == true`.
-/// - Times use 12-hour AM/PM via MaterialLocalizations.
-/// - `isApplicable` dims the whole card when false (e.g., in Leave mode).
-
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/models/restriction_window.dart';
 
 class RestrictionCard extends StatelessWidget {
@@ -28,7 +21,7 @@ class RestrictionCard extends StatelessWidget {
     final card = Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
         boxShadow: const [
           BoxShadow(
@@ -44,40 +37,44 @@ class RestrictionCard extends StatelessWidget {
 
     return Opacity(
       opacity: isApplicable ? 1.0 : 0.5,
-      child: AbsorbPointer(
-        absorbing: !isApplicable,
-        child: card,
-      ),
+      child: AbsorbPointer(absorbing: !isApplicable, child: card),
     );
   }
 
   Widget _buildContent(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
+
     if (isLoading) {
-      return const SizedBox(
+      return SizedBox(
         height: 72,
         child: Center(
           child: Text(
             "Loading restriction…",
-            style: TextStyle(color: Color(0xFF757575), fontStyle: FontStyle.italic),
+            style: textTheme.bodySmall!.w300.copyWith(
+              color: colorScheme.onSurface.withOpacity(0.6),
+              fontStyle: FontStyle.italic,
+            ),
           ),
         ),
       );
     }
 
-    // If no data at all
     if (restriction == null) {
       return _errorRow(
-        leading: const Icon(Icons.error_outline, color: Colors.redAccent),
+        context: context,
+        leading: Icon(Icons.error_outline, color: colorScheme.error),
         title: "Unable to load restriction",
         subtitle: "Check connection or try again.",
         showRetry: onRetry != null,
       );
     }
 
-    // If data object signals error explicitly
     if (restriction!.errroLoading == true) {
       return _errorRow(
-        leading: const Icon(Icons.error_outline, color: Colors.redAccent),
+        context: context,
+        leading: Icon(Icons.error_outline, color: colorScheme.error),
         title: "Error loading restriction",
         subtitle: restriction!.note.isNotEmpty
             ? restriction!.note
@@ -89,10 +86,16 @@ class RestrictionCard extends StatelessWidget {
     final r = restriction!;
     final isAllowed = r.allowedToday;
     final icon = isAllowed
-        ? const Icon(Icons.check_circle, color: Colors.green, size: 22)
-        : const Icon(Icons.error_outline, color: Colors.red, size: 22);
+        ? Icon(
+            Icons.check_circle_outline_outlined,
+            color: Colors.green[700],
+            size: 35,
+          )
+        : Icon(Icons.error_outline_outlined, color: Colors.red[700], size: 35);
 
-    final title = isAllowed ? "Day-out Allowed Today" : "Day-out Not Allowed Today";
+    final title = isAllowed
+        ? "Day-out Allowed Today"
+        : "Day-out Not Allowed Today";
     final subtitle = isAllowed
         ? "Allowed time: ${_format12h(context, r.minTime)} – ${_format12h(context, r.maxTime)}"
         : (r.note.isNotEmpty ? r.note : "Not allowed today.");
@@ -108,10 +111,14 @@ class RestrictionCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-                const SizedBox(height: 4),
-                Text(subtitle, style: const TextStyle(color: Color(0xFF616161), fontSize: 13)),
+                Text(
+                  title,
+                  style: textTheme.h4.w500.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(subtitle, style: textTheme.h6),
               ],
             ),
           ),
@@ -121,11 +128,16 @@ class RestrictionCard extends StatelessWidget {
   }
 
   Widget _errorRow({
+    required BuildContext context,
     required Widget leading,
     required String title,
     required String subtitle,
     required bool showRetry,
   }) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
+
     return Padding(
       padding: const EdgeInsets.all(14),
       child: Row(
@@ -136,14 +148,22 @@ class RestrictionCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                Text(
+                  title,
+                  style: textTheme.h4.w500.copyWith(color: colorScheme.error),
+                ),
                 const SizedBox(height: 4),
-                Text(subtitle, style: const TextStyle(color: Color(0xFF616161), fontSize: 13)),
+                Text(
+                  subtitle,
+                  style: textTheme.h3.copyWith(
+                    color: colorScheme.onSurface.withOpacity(0.7),
+                  ),
+                ),
               ],
             ),
           ),
-          if (showRetry) TextButton(onPressed: onRetry, child: const Text("Retry")),
+          if (showRetry)
+            TextButton(onPressed: onRetry, child: const Text("Retry")),
         ],
       ),
     );
@@ -151,7 +171,8 @@ class RestrictionCard extends StatelessWidget {
 
   // 12-hour AM/PM formatting
   String _format12h(BuildContext context, TimeOfDay t) {
-    return MaterialLocalizations.of(context)
-        .formatTimeOfDay(t, alwaysUse24HourFormat: false);
+    return MaterialLocalizations.of(
+      context,
+    ).formatTimeOfDay(t, alwaysUse24HourFormat: false);
   }
 }

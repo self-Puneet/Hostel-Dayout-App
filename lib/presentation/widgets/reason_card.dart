@@ -1,5 +1,6 @@
 // presentation/widgets/reason_card.dart
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 
 class ReasonCard extends StatefulWidget {
   final String value;
@@ -55,6 +56,7 @@ class _ReasonCardState extends State<ReasonCard> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     final value = widget.value;
     final label = widget.label;
     final touched = widget.touched;
@@ -66,10 +68,7 @@ class _ReasonCardState extends State<ReasonCard> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 3.0, bottom: 4),
-          child: Text(
-            label,
-            style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-          ),
+          child: Text(label, style: textTheme.h6.w500),
         ),
         Container(
           decoration: BoxDecoration(
@@ -98,6 +97,7 @@ class _ReasonCardState extends State<ReasonCard> {
               isDense: true,
               border: InputBorder.none,
               hintText: "Write a brief reason for the request",
+              hintStyle: textTheme.h5.copyWith(color: greyColor),
               counterText: "",
               counter: Align(
                 alignment: Alignment.bottomRight,
@@ -105,7 +105,7 @@ class _ReasonCardState extends State<ReasonCard> {
                   padding: const EdgeInsets.only(right: 4, bottom: 4),
                   child: Text(
                     "${value.length}/$maxLength",
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    style: textTheme.h6.copyWith(color: greyColor),
                   ),
                 ),
               ),
@@ -117,10 +117,7 @@ class _ReasonCardState extends State<ReasonCard> {
         if (error != null)
           Padding(
             padding: const EdgeInsets.only(left: 3.0),
-            child: Text(
-              error,
-              style: const TextStyle(fontSize: 13, color: Colors.red),
-            ),
+            child: Text(error, style: textTheme.h6.copyWith(color: Colors.red)),
           ),
       ],
     );

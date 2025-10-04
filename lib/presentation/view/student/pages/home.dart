@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/instance_manager.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
+import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/presentation/components/active_request_card.dart';
 import 'package:hostel_mgmt/presentation/components/simple_request_card.dart';
 import 'package:hostel_mgmt/presentation/view/student/controllers/home_controller.dart';
@@ -27,13 +29,22 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
     final mediaQuery = MediaQuery.of(context);
     final padding = EdgeInsets.symmetric(
       horizontal: 31 * mediaQuery.size.width / 402,
     );
-
-    // Keep exactly the same top spacing as before.
     final topGap = mediaQuery.size.height * 50 / 874;
+
+    Widget yourRequestsTitle() {
+      return Container(
+        margin: padding + const EdgeInsets.only(left: 12),
+        child: Text(
+          'Your Requests',
+          style: textTheme.h1.copyWith(fontWeight: FontWeight.w600),
+        ),
+      );
+    }
 
     return MultiProvider(
       providers: [
@@ -52,8 +63,10 @@ class _HomePageState extends State<HomePage> {
             final dropdown = Dropdown<String>(
               items: state.statusOptions
                   .map(
-                    (status) =>
-                        DropdownMenuItem(value: status, child: Text(status)),
+                    (status) => DropdownMenuItem(
+                      value: status,
+                      child: Text(status, style: textTheme.h5),
+                    ),
                   )
                   .toList(),
               value: state.selectedStatus,
@@ -63,6 +76,79 @@ class _HomePageState extends State<HomePage> {
                 }
               },
             );
+
+            Widget activeRequestView() {
+              if (hasMultiple) {
+                return SizedBox(
+                  height: 315,
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: activeRequests.length,
+                    itemBuilder: (context, index) {
+                      final req = activeRequests[index];
+                      return Container(
+                        margin: padding,
+                        child: ActiveRequestCard(
+                          actor: TimelineActor.student,
+                          reason: req.reason,
+                          requestId: req.requestId,
+                          requestType: req.requestType,
+                          status: req.status,
+                          fromDate: req.appliedFrom,
+                          toDate: req.appliedTo,
+                          timeline: Container(),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              } else if (activeRequests.isNotEmpty) {
+                final req = activeRequests.first;
+                return Container(
+                  margin: padding,
+                  child: ActiveRequestCard(
+                    actor: TimelineActor.student,
+                    reason: req.reason,
+                    requestId: req.requestId,
+                    requestType: req.requestType,
+                    status: req.status,
+                    fromDate: req.appliedFrom,
+                    toDate: req.appliedTo,
+                    timeline: Container(),
+                  ),
+                );
+              } else {
+                return Container(
+                  margin: padding,
+                  height: 315,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.25),
+                          offset: const Offset(0, 0),
+                          blurRadius: 14,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 0,
+                      vertical: 24,
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 20,
+                      ),
+                      child: Center(child: Text("No active requests")),
+                    ),
+                  ),
+                );
+              }
+            }
 
             // Header is now OUTSIDE the refreshable area.
             return Column(
@@ -76,7 +162,7 @@ class _HomePageState extends State<HomePage> {
                   child: WelcomeHeader(
                     phoneNumber: profile.phone,
                     enrollmentNumber: profile.identityId,
-                    hostelName: profile.hostel,
+                    hostelName: profile.hostels!.first,
                     roomNumber: profile.roomNo,
                     actor: TimelineActor.student,
                     name: state.profile?.name ?? '',
@@ -89,47 +175,23 @@ class _HomePageState extends State<HomePage> {
 
                 // Scrollable + refreshable content BELOW header
                 Expanded(
-                  child: RefreshIndicator(
-                    color: Colors.deepPurple,
-                    backgroundColor: Colors.white,
-                    strokeWidth: 3,
-                    displacement: 60,
-                    // edgeOffset omitted: the list edge is already under the fixed header
+                  child: AppRefreshWrapper(
                     onRefresh: () async {
                       state.clear();
                       await context
                           .read<HomeController>()
                           .fetchProfileAndRequests();
+                      context.read<HomeController>().fetchHistoryRequests();
                     },
                     child: ListView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: EdgeInsets.zero,
                       children: [
+                        SizedBox(height: 60),
+                        yourRequestsTitle(),
+                        activeRequestView(),
+
                         if (hasMultiple) ...[
-                          SizedBox(
-                            height: 330,
-                            child: PageView.builder(
-                              controller: _pageController,
-                              itemCount: activeRequests.length,
-                              itemBuilder: (context, index) {
-                                final req = activeRequests[index];
-                                return Container(
-                                  margin: padding,
-                                  child: ActiveRequestCard(
-                                    actor: TimelineActor.student,
-                                    reason: req.reason,
-                                    requestId: req.requestId,
-                                    requestType: req.requestType.name
-                                        .toUpperCase(),
-                                    status: req.status,
-                                    fromDate: req.appliedFrom,
-                                    toDate: req.appliedTo,
-                                    timeline: Container(), // timeline widget
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
                           Center(
                             child: SmoothPageIndicator(
                               controller: _pageController,
@@ -140,53 +202,6 @@ class _HomePageState extends State<HomePage> {
                                 activeDotColor: Colors.black,
                                 dotColor: Colors.grey[300]!,
                                 jumpScale: 1,
-                              ),
-                            ),
-                          ),
-                        ] else if (activeRequests.isNotEmpty) ...[
-                          Container(
-                            margin: padding,
-                            child: ActiveRequestCard(
-                              actor: TimelineActor.student,
-                              reason: activeRequests.first.reason,
-                              requestId: activeRequests.first.requestId,
-                              requestType: activeRequests.first.requestType.name
-                                  .toUpperCase(),
-                              status: activeRequests.first.status,
-                              fromDate: activeRequests.first.appliedFrom,
-                              toDate: activeRequests.first.appliedTo,
-                              timeline: Container(), // timeline widget
-                            ),
-                          ),
-                        ] else ...[
-                          Container(
-                            margin: padding,
-                            height: 330,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(28),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.25),
-                                    offset: const Offset(0, 0),
-                                    blurRadius: 14,
-                                    spreadRadius: 2,
-                                  ),
-                                ],
-                              ),
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 0,
-                                vertical: 24,
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 20,
-                                ),
-                                child: Center(
-                                  child: Text("No active requests"),
-                                ),
                               ),
                             ),
                           ),
@@ -215,14 +230,7 @@ class _HomePageState extends State<HomePage> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'History',
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 24,
-                                    ),
-                                  ),
+                                  Text('History', style: textTheme.h2.w500),
                                   const SizedBox(width: 12),
                                   dropdown,
                                 ],
@@ -263,6 +271,9 @@ class _HomePageState extends State<HomePage> {
                                     statusDate:
                                         state.filteredRequests!.lastUpdatedAt,
                                     reason: state.filteredRequests!.reason,
+                                    requestId:
+                                        state.filteredRequests!.requestId,
+                                    actor: TimelineActor.student,
                                   ),
                           ),
                         ),

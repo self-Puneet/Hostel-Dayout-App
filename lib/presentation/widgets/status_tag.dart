@@ -21,17 +21,13 @@ class StatusTag extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Center(
         child: Text(
           textAlign: TextAlign.center,
           overflow ? status.split(' ').join('\n') : status,
-          style: TextStyle(
-            fontSize: fontSize,
-            color: Colors.white,
-            fontWeight: FontWeight.w500,
-          ),
+          style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w500),
         ),
       ),
     );
