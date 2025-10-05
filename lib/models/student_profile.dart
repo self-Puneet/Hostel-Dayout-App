@@ -32,9 +32,11 @@ class StudentProfileModel {
   static String? _asString(dynamic v) => v == null ? null : v.toString();
 
   factory StudentProfileModel.fromJson(Map<String, dynamic> json) {
+    // print(json['profile_pic']);
+    // print("aaaaaaaaaaaaaaaaaaaaaaaaaa");
     return StudentProfileModel(
       // Accept either `_id` or `student_id`
-      studentId: _asString(json['_id']) ?? _asString(json['student_id']) ?? '',
+      studentId: _asString(json['student_id']) ?? '',
       enrollmentNo: _asString(json['enrollment_no']) ?? '',
       name: _asString(json['name']) ?? '',
       email: _asString(json['email']) ?? '',
@@ -51,7 +53,8 @@ class StudentProfileModel {
           : int.tryParse(_asString(json['semester']) ?? '') ?? 0,
       branch: _asString(json['branch']) ?? '',
       // Keep existing parents mapping; default to empty list if absent
-      parents: (json['parentsInfo'] as List<dynamic>?)
+      parents:
+          (json['parentsInfo'] as List<dynamic>?)
               ?.map((p) => ParentModel.fromJson(p as Map<String, dynamic>))
               .toList() ??
           [],
@@ -113,7 +116,8 @@ class StudentApiResponse {
     return StudentApiResponse(
       message: (json['message'] ?? '').toString(),
       student: StudentProfileModel.fromJson(
-        (json['student']['student'] ?? {})..['parentsInfo'] = json['student']['parentsInfo'],
+        (json['student']['student'] ?? {})
+          ..['parentsInfo'] = json['student']['parentsInfo'],
       ),
     );
   }

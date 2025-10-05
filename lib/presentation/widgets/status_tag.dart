@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 
 class StatusTag extends StatelessWidget {
   final String status;
@@ -10,12 +11,13 @@ class StatusTag extends StatelessWidget {
     super.key,
     required this.status,
     this.fontSize = 12,
-    this.overflow = true,
+    this.overflow = false,
     required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 2),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -27,7 +29,7 @@ class StatusTag extends StatelessWidget {
         child: Text(
           textAlign: TextAlign.center,
           overflow ? status.split(' ').join('\n') : status,
-          style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w500),
+          style: textTheme.h6.w500,
         ),
       ),
     );

@@ -297,14 +297,13 @@ class _WardenTabBody extends StatelessWidget {
                           : req.studentEnrollmentNumber);
 
                 // Optional: if profilePic may be relative, join with base URL here
-                final safeProfileUrl = (stu.profilePic ?? '').trim();
-
                 final selected = state.isSelectedById(req.requestId);
 
                 return SimpleActionRequestCard(
-                  profileImageUrl: safeProfileUrl.isNotEmpty
-                      ? safeProfileUrl
-                      : null,
+                  // profileImageUrl: safeProfileUrl.isNotEmpty
+                  //     ? safeProfileUrl
+                  //     : null,
+                  profileImageUrl: stu.profilePic,
                   reason: req.reason,
                   name: safeName,
                   status: req.status,
@@ -344,6 +343,7 @@ class _WardenTabBody extends StatelessWidget {
                             requestId: req.requestId,
                           );
                           context.goNamed(
+                            // AppRoutes.wardenHome,
                             "warden-home",
                             queryParameters: {
                               'ts': DateTime.now().millisecondsSinceEpoch

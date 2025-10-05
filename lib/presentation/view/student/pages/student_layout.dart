@@ -1,3 +1,4 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
@@ -55,14 +56,22 @@ class StudentLayout extends StatelessWidget {
                             onNewPressed: () =>
                                 context.push(AppRoutes.requestForm),
                             onProfilePressed: () =>
-                                context.push(AppRoutes.history),
-                            rightIcon: Icons.history,
-                            leftIcon: Image.asset(
-                              'assets/home.png',
-                              width: 34,
-                              height: 34,
+                                context.push(AppRoutes.profile),
+                            rightIcon: Left(
+                              Image.asset(
+                                'assets/user.png',
+                                width: 34,
+                                height: 34,
+                              ),
                             ),
-                            middleIcon: Icons.add,
+                            leftIcon: Left(
+                              Image.asset(
+                                'assets/home.png',
+                                width: 34,
+                                height: 34,
+                              ),
+                            ),
+                            middleIcon: Right(Icons.add),
                             middleText: "NEW",
                           ),
                         ),

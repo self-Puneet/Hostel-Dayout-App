@@ -132,6 +132,7 @@ class RequestService {
         final updated = RequestModel.fromJson(data["request"] ?? data);
         return right(updated);
       } else {
+        print("Error: ${response.body}");
         return left("Error: ${response.body}");
       }
     } catch (e) {

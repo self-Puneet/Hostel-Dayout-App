@@ -31,31 +31,25 @@ class WardenService {
       }
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
+      print(data);
       final list = (data['requests'] as List?) ?? const [];
 
       final results = <(RequestModel, StudentProfileModel)>[];
 
       for (final raw in list) {
-        final item = (raw as Map).cast<String, dynamic>();
+        final item = raw as Map<String, dynamic>;
         final req = RequestModel.fromJson(item);
-
+        print(req.reason);
         // Try multiple keys for student info; fallback to top-level if present.
-        final dynamic studentAny =
-            item['student'] ??
-            item['student_profile'] ??
-            data['student'] ??
-            (item['studentInfo'] is Map
-                ? (item['studentInfo'] as Map)['student']
-                : null) ??
-            const <String, dynamic>{};
-
-        final studentJson = studentAny is Map<String, dynamic>
-            ? studentAny
-            : <String, dynamic>{};
-
+        final studentJson = item['student_info'] as Map<String, dynamic>;
+        print(studentJson);
+        print("()" * 90);
         final student = StudentProfileModel.fromJson(studentJson);
+        print("aaah");
         results.add((req, student));
       }
+
+      print(results.length);
 
       return right(results);
     } catch (e) {
@@ -79,8 +73,6 @@ class WardenService {
         final data = jsonDecode(response.body);
         print("📡 getWardenProfile - Response: $data");
         final warden = WardenModel.fromJson(data['profile']);
-
-        print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhhhhhhhhhhhhh");
         return right(warden);
       } else {
         return left("Error: ${response.body}");

@@ -1,3 +1,4 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
@@ -7,9 +8,9 @@ class LiquidGlassNavBar extends StatelessWidget {
   final VoidCallback onHomePressed;
   final VoidCallback onNewPressed;
   final VoidCallback onProfilePressed;
-  final dynamic leftIcon;
-  final dynamic middleIcon;
-  final dynamic rightIcon;
+  final Either<Image, IconData> leftIcon;
+  final Either<Image, IconData> middleIcon;
+  final Either<Image, IconData> rightIcon;
   final String middleText;
 
   const LiquidGlassNavBar({
@@ -71,7 +72,7 @@ class LiquidGlassNavBar extends StatelessWidget {
                             Colors.transparent,
                           ),
                         ),
-                        icon: leftIcon,
+                        icon: hello(leftIcon),
                         onPressed: onHomePressed,
                       ),
                     ),
@@ -99,7 +100,8 @@ class LiquidGlassNavBar extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(middleIcon, color: Colors.white, size: 24.3),
+                              hello(middleIcon),
+                              // Icon(middleIcon, color: Colors.white, size: 24.3),
                               SizedBox(width: 6),
                               Text(
                                 middleText,
@@ -134,7 +136,7 @@ class LiquidGlassNavBar extends StatelessWidget {
                             Colors.transparent,
                           ),
                         ),
-                        icon: Icon(rightIcon, size: 34),
+                        icon: hello(rightIcon),
                         onPressed: onProfilePressed,
                       ),
                     ),
@@ -147,7 +149,8 @@ class LiquidGlassNavBar extends StatelessWidget {
       ),
     );
   }
-}
+  Widget hello (icon) {return icon.fold((image) => image, (icon) => Icon(icon, color: Colors.white, size: 24.3)); 
+  }}
 
 /// ✅ Outer-only shadow painter
 class _OuterShadowPainter extends CustomPainter {

@@ -38,11 +38,11 @@ extension RequestStatusX on RequestStatus {
       case RequestStatus.requested:
         return 'Requested';
       case RequestStatus.referred:
-        return 'In Progress';
+        return 'Pending';
       case RequestStatus.cancelled:
         return 'Rejected';
       case RequestStatus.parentApproved:
-        return 'In Progress';
+        return 'Pending';
       case RequestStatus.parentDenied:
         return 'Rejected';
       case RequestStatus.rejected:

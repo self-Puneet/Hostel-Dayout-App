@@ -27,7 +27,7 @@ class AuthService {
       print("📡 Status: ${response.statusCode}");
 
       if (response.statusCode != 200) {
-        return left("Error: ${response.body}");
+        return left("${jsonDecode(response.body)["error"]}");
       }
 
       final data = jsonDecode(response.body);
@@ -76,7 +76,7 @@ class AuthService {
       );
 
       if (response.statusCode != 200) {
-        return left("Error: ${response.body}");
+        return left("${jsonDecode(response.body)["error"]}");
       }
 
       final data = jsonDecode(response.body);
@@ -135,7 +135,7 @@ class AuthService {
       );
 
       if (response.statusCode != 200) {
-        return left("Error: ${response.body}");
+        return left("${jsonDecode(response.body)["error"]}");
       }
 
       final data = jsonDecode(response.body);
@@ -211,7 +211,7 @@ class AuthService {
       if (response.statusCode == 200) {
         return right(true);
       } else {
-        return left("Error: ${response.body}");
+        return left("${response.body}");
       }
     } catch (e) {
       print("❌ Exception: $e");

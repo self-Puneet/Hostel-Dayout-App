@@ -1,3 +1,4 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
@@ -57,13 +58,15 @@ class ParentLayout extends StatelessWidget {
                             onProfilePressed: () =>
                                 context.push(AppRoutes.parentProfile),
 
-                            leftIcon: Image.asset(
-                              'assets/home.png',
-                              width: 36,
-                              height: 36,
+                            leftIcon: Left(
+                              Image.asset(
+                                'assets/home.png',
+                                width: 36,
+                                height: 36,
+                              ),
                             ),
-                            rightIcon: Icons.person_outline_outlined,
-                            middleIcon: Icons.history,
+                            rightIcon: Right(Icons.person_outline_outlined),
+                            middleIcon: Right(Icons.history_outlined),
                             middleText: "HIST",
                           ),
                         ),
