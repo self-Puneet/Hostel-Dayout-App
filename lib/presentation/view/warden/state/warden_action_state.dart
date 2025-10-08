@@ -502,7 +502,7 @@ class WardenActionState extends ChangeNotifier {
     );
 
     if (query.isNotEmpty) {
-      base = base.where((r) => (r.$2.name ?? '').toLowerCase().contains(query));
+      base = base.where((r) => (r.$2.name).toLowerCase().contains(query));
     }
 
     currentOnScreenRequests = base.map((pair) {
