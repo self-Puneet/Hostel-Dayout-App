@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/presentation/view/student/state/history_state.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/liquid_back_button.dart';
-import 'package:hostel_mgmt/presentation/widgets/segmented_button.dart';
+import 'package:hostel_mgmt/presentation/widgets/glass_segmented_button.dart';
 import 'package:provider/provider.dart';
 
 class ParentHistoryPage extends StatelessWidget {

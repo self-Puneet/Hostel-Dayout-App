@@ -3,7 +3,7 @@ import 'package:hostel_mgmt/core/helpers/unfocus.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 import 'package:hostel_mgmt/login/login_form.dart';
 import 'package:hostel_mgmt/login/login_state.dart';
-import 'package:hostel_mgmt/presentation/widgets/segmented_button.dart';
+import 'package:hostel_mgmt/presentation/widgets/glass_segmented_button.dart';
 import 'package:provider/provider.dart';
 
 class LoginLayout extends StatelessWidget {

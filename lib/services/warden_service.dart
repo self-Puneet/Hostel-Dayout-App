@@ -3,6 +3,7 @@ import 'package:dartz/dartz.dart';
 import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/config/constants.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
+import 'package:hostel_mgmt/models/parent_model.dart';
 import 'package:hostel_mgmt/models/warden_statistics.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
 import 'package:hostel_mgmt/models/warden_model.dart';
@@ -52,6 +53,60 @@ class WardenService {
 
       print(results.length);
 
+      return right(results);
+    } catch (e) {
+      return left("Exception: $e");
+    }
+  }
+
+  static Future<Either<String, List<(RequestModel, StudentProfileModel)>>>
+  getAllActiveRequestsForWarden(String hostelId) async {
+    final session = Get.find<LoginSession>();
+    final token = session.token;
+
+    try {
+      final response = await http.get(
+        Uri.parse("$url/warden/allActiveRequests/$hostelId"),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+      );
+
+      if (response.statusCode != 200) {
+        return left("Error: ${response.body}");
+      }
+
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      print(data["requests"][0]["parent_Info"].runtimeType);
+
+      final list = (data['requests'] as List?) ?? const [];
+      final results = <(RequestModel, StudentProfileModel)>[];
+
+      for (final raw in list) {
+        final item = raw as Map<String, dynamic>;
+        final req = RequestModel.fromJson(item);
+
+        // Student info — assuming same structure as /allRequest
+        final studentJson = item['student_Info'] as Map<String, dynamic>;
+        final student = StudentProfileModel.fromJson(studentJson);
+
+        final parentJson = item['parent_Info'] as List<dynamic>? ?? [];
+        final parentList = parentJson
+            .map((p) => ParentModel.fromJson(p as Map<String, dynamic>))
+            .toList();
+
+        final updatedStudent = student.copyWith(parents: parentList);
+        results.add((req, updatedStudent));
+
+        results.add((req, student));
+      }
+      for (int i = 0; i < results.length; i++) {
+        // print("8" * 89);
+        // print(results[i].$1.status);
+      }
+
+      print("Fetched active requests: ${results.length}");
       return right(results);
     } catch (e) {
       return left("Exception: $e");

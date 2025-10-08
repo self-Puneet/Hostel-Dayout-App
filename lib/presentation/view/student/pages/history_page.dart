@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:hostel_mgmt/presentation/view/student/state/history_state.dart';
 import 'package:hostel_mgmt/presentation/view/student/controllers/history_controller.dart';
 import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/liquid_back_button.dart';
-import 'package:hostel_mgmt/presentation/widgets/segmented_button.dart';
+import 'package:hostel_mgmt/presentation/widgets/glass_segmented_button.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({super.key});

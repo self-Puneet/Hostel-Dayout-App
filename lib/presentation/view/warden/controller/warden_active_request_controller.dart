@@ -3,7 +3,7 @@ import 'package:hostel_mgmt/core/enums/request_status.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
-import 'package:hostel_mgmt/presentation/view/warden/state/warden_action_state.dart';
+import 'package:hostel_mgmt/presentation/view/warden/state/warden_active_request_state.dart';
 import 'package:hostel_mgmt/services/request_service.dart';
 import 'package:hostel_mgmt/services/warden_service.dart';
 
@@ -23,24 +23,16 @@ class WardenActionPageController {
     state.setError(false, '');
     try {
       final session = Get.find<LoginSession>();
-      final String? resolvedHostelId =
-          hostelId ??
+      final String? resolvedHostelId = hostelId ??
           state.selectedHostelId ??
-          ((session.hostelIds?.isNotEmpty ?? false)
-              ? session.hostelIds!.first
-              : null);
+          ((session.hostelIds?.isNotEmpty ?? false) ? session.hostelIds!.first : null);
 
       if (resolvedHostelId == null) {
         state.setError(true, 'No hostel selected for fetching requests.');
         return;
       }
-      final result = await WardenService.getAllActiveRequestsForWarden(
-        resolvedHostelId,
-      );
 
-      // final result = await WardenService.getAllRequestsForWarden(
-      //   resolvedHostelId,
-      // );
+      final result = await WardenService.getAllRequestsForWarden(resolvedHostelId);
       result.fold(
         (error) => state.setError(true, error),
         (response) => state.setRequests(response),
@@ -89,9 +81,7 @@ class WardenActionPageController {
             );
             state.notifyListenerMethod();
           } else {
-            state.currentOnScreenRequests = state.currentOnScreenRequests.map((
-              w,
-            ) {
+            state.currentOnScreenRequests = state.currentOnScreenRequests.map((w) {
               if (w.request.requestId == requestId) {
                 return w.copyWith(request: updatedRequestModel);
               }
@@ -119,20 +109,5 @@ class WardenActionPageController {
     } finally {
       state.setIsActioning(false);
     }
-  }
-
-  List<OnScreenRequest> getRequestByStatus({
-    required RequestStatus status_,
-  }) {
-    final requests = state.allRequests;
-    print("hheheheheh");
-    print(requests.length);
-    final List<OnScreenRequest> onScreenRequest = [];
-    for (int i = 0; i < requests.length; i++) {
-      if (requests[i].$1.status == status_) {
-        onScreenRequest.add( OnScreenRequest.fromRequest(requests[i]));
-      }
-    }
-    return onScreenRequest;
   }
 }
