@@ -7,7 +7,6 @@ import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/core/routes/app_transition_page.dart'; // 👈 import here
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/login/login_layout.dart';
-import 'package:hostel_mgmt/models/warden_statistics.dart';
 import 'package:hostel_mgmt/presentation/view/parent/pages/parent_home.dart';
 import 'package:hostel_mgmt/presentation/view/parent/pages/parent_layout.dart';
 import 'package:hostel_mgmt/presentation/view/parent/pages/parent_profile_page.dart';
@@ -153,21 +152,6 @@ class AppRouter {
               },
             ),
 
-            // action page
-            // GoRoute(
-            //   path: AppRoutes.wardenActionPage,
-            //   name: 'warden-action-page',
-            //   pageBuilder: (context, state) {
-            //     final profile = context.read<WardenProfileState>();
-            //     return AppTransitionPage(
-            //       key: state.pageKey,
-            //       child: ChangeNotifierProvider(
-            //         create: (_) => WardenActionState(),
-            //         child: WardenHomePage(actor: profile.loginSession.role),
-            //       ),
-            //     );
-            //   },
-            // ),
             GoRoute(
               path: AppRoutes.wardenHistory,
               name: 'warden-history',

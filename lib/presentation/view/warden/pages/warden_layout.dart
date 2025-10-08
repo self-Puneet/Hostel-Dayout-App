@@ -108,7 +108,7 @@ class WardenLayout extends StatelessWidget {
                                 onHomePressed: () =>
                                     context.push(AppRoutes.wardenHome),
                                 onNewPressed: () =>
-                                    context.push(AppRoutes.requestForm),
+                                    context.push(AppRoutes.wardenActionPage),
                                 onProfilePressed: () =>
                                     context.push(AppRoutes.profile),
                                 rightIcon: Right(

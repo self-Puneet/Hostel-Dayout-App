@@ -20,11 +20,10 @@ class AppRoutes {
   static String parentLayoutPath(String id) => '/parent/request/$id';
   static const String parentProfile = '/parent/profile';
 
-
   static const String wardenProfile = '/warden/profile';
   static const String wardenHistory = '/warden/history';
   static const String wardenActionPage = '/warden/action-page';
-  
+
   // static const String productDetails = '/student/product-details/:id';
   // static String productDetailsPath(String id) => '/student/product-details/$id';
 
@@ -37,12 +36,19 @@ class AppRoutes {
       login,
       '/student/request',
     ],
-    TimelineActor.assistentWarden: [wardenHome, profile, login, requestDetails],
+    TimelineActor.assistentWarden: [
+      wardenHome,
+      profile,
+      login,
+      requestDetails,
+      wardenActionPage,
+    ],
     TimelineActor.seniorWarden: [
       seniorWardenHome,
       profile,
       login,
       requestDetails,
+      wardenActionPage,
     ],
     TimelineActor.parent: [
       parentHome,
