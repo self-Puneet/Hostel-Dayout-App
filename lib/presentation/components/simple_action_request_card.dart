@@ -152,7 +152,7 @@ class SimpleActionRequestCard extends StatelessWidget {
                           ),
                           StatusTag(
                             status: status.displayName,
-                            color: status.statusColor,
+                            color: status.minimalStatusColor,
                           ),
                         ],
                       ),

@@ -8,9 +8,9 @@ class LiquidGlassNavBar extends StatelessWidget {
   final VoidCallback onHomePressed;
   final VoidCallback onNewPressed;
   final VoidCallback onProfilePressed;
-  final Either<Image, Icon> leftIcon;
-  final Either<Image, Icon> middleIcon;
-  final Either<Image, Icon> rightIcon;
+  final Either<Image, IconData> leftIcon;
+  final Either<Image, IconData> middleIcon;
+  final Either<Image, IconData> rightIcon;
   final String middleText;
 
   const LiquidGlassNavBar({
@@ -149,11 +149,8 @@ class LiquidGlassNavBar extends StatelessWidget {
       ),
     );
   }
-
-  Widget hello(icon) {
-    return icon.fold((image) => image, (icon) => icon);
-  }
-}
+  Widget hello (icon) {return icon.fold((image) => image, (icon) => Icon(icon, color: Colors.white, size: 24.3)); 
+  }}
 
 /// ✅ Outer-only shadow painter
 class _OuterShadowPainter extends CustomPainter {

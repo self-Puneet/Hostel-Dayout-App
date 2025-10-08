@@ -36,6 +36,17 @@ class StudentLayout extends StatelessWidget {
                 left: 0,
                 right: 0,
                 bottom: barBottomOffset,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 31 * media.size.width / 402,
+                  ),
+                  child: const SizedBox(height: 60),
+                ),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: barBottomOffset,
                 child: Center(
                   child: IgnorePointer(
                     ignoring: !showNavBar,
@@ -71,7 +82,9 @@ class StudentLayout extends StatelessWidget {
                                 height: 34,
                               ),
                             ),
-                            middleIcon: Right(Icons.add),
+                            middleIcon: Right(
+                              Icon(Icons.add, size: 34, color: Colors.white),
+                            ),
                             middleText: "NEW",
                           ),
                         ),

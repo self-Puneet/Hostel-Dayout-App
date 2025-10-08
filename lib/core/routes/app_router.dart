@@ -7,13 +7,17 @@ import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/core/routes/app_transition_page.dart'; // 👈 import here
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/login/login_layout.dart';
+import 'package:hostel_mgmt/models/warden_statistics.dart';
 import 'package:hostel_mgmt/presentation/view/parent/pages/parent_home.dart';
 import 'package:hostel_mgmt/presentation/view/parent/pages/parent_layout.dart';
 import 'package:hostel_mgmt/presentation/view/parent/pages/parent_profile_page.dart';
 import 'package:hostel_mgmt/presentation/view/parent/state/parent_state.dart';
 import 'package:hostel_mgmt/presentation/view/student/pages/request_page.dart';
-import 'package:hostel_mgmt/presentation/view/warden/pages/warden_home.dart';
+import 'package:hostel_mgmt/presentation/view/warden/controller/warden_home_controller.dart';
+import 'package:hostel_mgmt/presentation/view/warden/pages/warden_action_page.dart';
+import 'package:hostel_mgmt/presentation/view/warden/pages/warden_home_page.dart';
 import 'package:hostel_mgmt/presentation/view/warden/pages/warden_layout.dart';
+import 'package:hostel_mgmt/presentation/view/warden/state/warden_action_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_home_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_profile_state.dart';
 import 'package:provider/provider.dart';
@@ -38,7 +42,10 @@ String? _requireAuthRedirect(BuildContext context, GoRouterState state) {
   if (allowedRoutes.any(
     (allowed) => state.matchedLocation.startsWith(allowed),
   )) {
+    print("Allowed route, no redirect");
     return null;
+  } else {
+    print("Not allowed route, redirecting to home");
   }
 
   // Otherwise, redirect user to home based on role
@@ -88,6 +95,17 @@ class AppRouter {
       redirect: _requireAuthRedirect,
       routes: [
         /// Warden shell
+
+        // testing route
+        GoRoute(
+          path: '/test',
+          name: 'test',
+          pageBuilder: (context, state) => AppTransitionPage(
+            key: state.pageKey,
+            child: const Scaffold(body: Center(child: Text("Test Page"))),
+          ),
+        ),
+
         ShellRoute(
           builder: (context, state, child) => ChangeNotifierProvider(
             create: (_) => WardenProfileState(),
@@ -95,28 +113,70 @@ class AppRouter {
           ),
           routes: [
             GoRoute(
-              path: AppRoutes.seniorWardenHome,
-              name: 'senior-warden-home',
+              path: AppRoutes.wardenActionPage,
+              name: 'warden-action-page',
               pageBuilder: (context, state) {
                 final profile = context.read<WardenProfileState>();
                 return AppTransitionPage(
                   key: state.pageKey,
                   child: ChangeNotifierProvider(
-                    create: (_) => WardenHomeState(),
+                    create: (_) => WardenActionState(),
                     child: WardenHomePage(actor: profile.loginSession.role),
                   ),
                 );
               },
             ),
             GoRoute(
-              path: AppRoutes.wardenHome,
-              name: 'warden-home',
+              path: AppRoutes.seniorWardenHome,
+              name: 'warden-home-statistics',
+              pageBuilder: (context, state) {
+                // Instead of only providing state, provide both state and controller
+                return AppTransitionPage(
+                  key: state.pageKey,
+                  child: MultiProvider(
+                    providers: [
+                      ChangeNotifierProvider(
+                        create: (_) => WardenStatisticsState(),
+                      ),
+                      ProxyProvider<
+                        WardenStatisticsState,
+                        WardenStatisticsController
+                      >(
+                        // ProxyProvider injects the state into the controller
+                        update: (_, wardenState, __) =>
+                            WardenStatisticsController(wardenState),
+                      ),
+                    ],
+                    child: HomeDashboardPage(),
+                  ),
+                );
+              },
+            ),
+
+            // action page
+            // GoRoute(
+            //   path: AppRoutes.wardenActionPage,
+            //   name: 'warden-action-page',
+            //   pageBuilder: (context, state) {
+            //     final profile = context.read<WardenProfileState>();
+            //     return AppTransitionPage(
+            //       key: state.pageKey,
+            //       child: ChangeNotifierProvider(
+            //         create: (_) => WardenActionState(),
+            //         child: WardenHomePage(actor: profile.loginSession.role),
+            //       ),
+            //     );
+            //   },
+            // ),
+            GoRoute(
+              path: AppRoutes.wardenHistory,
+              name: 'warden-history',
               pageBuilder: (context, state) {
                 final profile = context.read<WardenProfileState>();
                 return AppTransitionPage(
                   key: state.pageKey,
                   child: ChangeNotifierProvider(
-                    create: (_) => WardenHomeState(),
+                    create: (_) => WardenActionState(),
                     child: WardenHomePage(actor: profile.loginSession.role),
                   ),
                 );

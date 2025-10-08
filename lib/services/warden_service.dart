@@ -3,6 +3,7 @@ import 'package:dartz/dartz.dart';
 import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/config/constants.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
+import 'package:hostel_mgmt/models/warden_statistics.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
 import 'package:hostel_mgmt/models/warden_model.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
@@ -79,6 +80,36 @@ class WardenService {
       }
     } catch (e) {
       return left("Exception: $e");
+    }
+  }
+
+  static Future<Either<String, WardenStatistics>> fetchStatistics({
+    required String hostelCode,
+    required String token,
+    http.Client? client,
+  }) async {
+    final c = client ?? http.Client();
+    try {
+      final res = await c.get(
+        Uri.parse('$baseUrl/warden/statistics/$hostelCode'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (res.statusCode == 200) {
+        final Map<String, dynamic> data =
+            jsonDecode(res.body) as Map<String, dynamic>;
+        print(data);
+        final stats = WardenStatistics.fromJson(data);
+        return right(stats);
+      } else {
+        return left('Error ${res.statusCode}: ${res.body}');
+      }
+    } catch (e) {
+      return left('Exception: $e');
+    } finally {
+      if (client == null) c.close();
     }
   }
 }

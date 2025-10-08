@@ -65,8 +65,20 @@ class ParentLayout extends StatelessWidget {
                                 height: 36,
                               ),
                             ),
-                            rightIcon: Right(Icons.person_outline_outlined),
-                            middleIcon: Right(Icons.history_outlined),
+                            rightIcon: Right(
+                              Icon(
+                                Icons.person_outline_outlined,
+                                color: Colors.black,
+                                size: 34,
+                              ),
+                            ),
+                            middleIcon: Right(
+                              Icon(
+                                Icons.history_outlined,
+                                size: 34,
+                                color: Colors.white,
+                              ),
+                            ),
                             middleText: "HIST",
                           ),
                         ),

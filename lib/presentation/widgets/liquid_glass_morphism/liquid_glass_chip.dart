@@ -43,7 +43,7 @@ class LiquidGlassChip extends StatelessWidget {
                   blur: 6,
                   chromaticAberration: 0.01,
                   lightAngle: pi * 5 / 18,
-                  lightIntensity: 0,
+                  lightIntensity: 0.5,
                   refractiveIndex: 1.4,
                   saturation: 1,
                   lightness: 1,
@@ -51,14 +51,14 @@ class LiquidGlassChip extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: borderRadius,
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withAlpha((0.1 * 225).toInt()),
-                      ],
-                    ),
+                    // gradient: LinearGradient(
+                    //   begin: Alignment.bottomCenter,
+                    //   end: Alignment.topCenter,
+                    //   colors: [
+                    //     Colors.transparent,
+                    //     Colors.black.withAlpha((0.1 * 225).toInt()),
+                    //   ],
+                    // ),
                   ),
                 ),
               ),

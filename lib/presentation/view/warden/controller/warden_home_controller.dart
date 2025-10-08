@@ -1,117 +1,66 @@
-// warden_home_controller.dart
-
-import 'dart:convert';
-
+// lib/controllers/warden_statistics_controller.dart
+import 'package:dartz/dartz.dart';
 import 'package:get/get.dart';
-import 'package:hostel_mgmt/core/enums/request_status.dart';
-import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
-import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
+import 'package:hostel_mgmt/models/warden_statistics.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_home_state.dart';
-import 'package:hostel_mgmt/services/request_service.dart';
 import 'package:hostel_mgmt/services/warden_service.dart';
 
-class WardenHomeController {
-  final WardenHomeState state;
-  WardenHomeController(this.state);
+class WardenStatisticsController {
+  final WardenStatisticsState state;
 
-  // NEW: Initialize hostel list and default selection from session.
-  void loadHostelsFromSession() {
+  WardenStatisticsController(this.state);
+
+  // Initialize hostels from session and auto-fetch if possible
+  Future<void> initFromSession() async {
     final session = Get.find<LoginSession>();
     final ids = session.hostelIds ?? <String>[];
     state.setHostelList(ids);
-  }
-
-  Future<void> fetchRequestsFromApi({String? hostelId}) async {
-    state.setIsLoading(true);
-    state.setError(false, '');
-    try {
-      final session = Get.find<LoginSession>();
-      final String? resolvedHostelId = hostelId ??
-          state.selectedHostelId ??
-          ((session.hostelIds?.isNotEmpty ?? false) ? session.hostelIds!.first : null);
-
-      if (resolvedHostelId == null) {
-        state.setError(true, 'No hostel selected for fetching requests.');
-        return;
-      }
-
-      final result = await WardenService.getAllRequestsForWarden(resolvedHostelId);
-      result.fold(
-        (error) => state.setError(true, error),
-        (response) => state.setRequests(response),
-      );
-    } catch (e) {
-      state.setError(true, 'Failed to load requests: $e');
-    } finally {
-      state.setIsLoading(false);
+    if (state.selectedHostelId != null) {
+      await _fetchFor(state.selectedHostelId!, session.token);
     }
   }
 
-  Future<void> actionRequestById({
-    required String requestId,
-    required RequestAction action,
-  }) async {
+  // Dropdown selection handler (called by UI)
+  Future<void> selectHostel(String id) async {
     final session = Get.find<LoginSession>();
-    final TimelineActor actor = session.role;
-
-    state.setIsActioningbyId(requestId, true);
-    state.setError(false, '');
-
-    try {
-      final targetStatus = action.statusAfterAction(actor);
-      final String statusApi = targetStatus.statusToApiString;
-
-      final result = await RequestService.updateRequestStatus(
-        requestId: requestId,
-        status: statusApi,
-        remark: 'ok done',
-      );
-      // print(jsonDecode(result))
-
-      await result.fold(
-        (error) async {
-          state.setError(true, error);
-        },
-        (updatedRequestModel) async {
-          final keep = WardenHomeState.belongsToActorQueue(
-            updatedRequestModel.status,
-            actor,
-          );
-
-          if (!keep) {
-            state.currentOnScreenRequests.removeWhere(
-              (w) => w.request.requestId == requestId,
-            );
-            state.notifyListenerMethod();
-          } else {
-            state.currentOnScreenRequests = state.currentOnScreenRequests.map((w) {
-              if (w.request.requestId == requestId) {
-                return w.copyWith(request: updatedRequestModel);
-              }
-              return w;
-            }).toList();
-            state.notifyListenerMethod();
-          }
-        },
-      );
-    } catch (e) {
-      state.setError(true, 'Action failed: $e');
-    } finally {
-      state.setIsActioningbyId(requestId, false);
-    }
+    state.setSelectedHostelId(id);
+    state.resetForHostelChange();
+    await _fetchFor(id, session.token);
   }
 
-  Future<void> bulkActionSelected({required RequestAction action}) async {
-    if (!state.hasSelection) return;
-    state.setIsActioning(true);
-    try {
-      final ids = state.selectedRequests.map((r) => r.requestId).toList();
-      for (final id in ids) {
-        await actionRequestById(requestId: id, action: action);
-      }
-    } finally {
-      state.setIsActioning(false);
-    }
+  // Pull-to-refresh
+  Future<void> refresh() async {
+    final session = Get.find<LoginSession>();
+    final id = state.selectedHostelId;
+    if (id == null) return;
+    await _fetchFor(id, session.token);
+  }
+
+  // Centralized fetch with Either handling
+  Future<void> _fetchFor(String hostelCode, String token) async {
+    state.setLoading(true);
+    state.setError(null);
+    final Either<String, WardenStatistics> either =
+        await WardenService.fetchStatistics(
+      hostelCode: hostelCode,
+      token: token,
+    );
+    either.fold(
+      (err) {
+        state.setStats(null);
+        state.setError(err);
+      },
+      (stats) {
+        state.setStats(stats);
+        state.setError(null);
+      },
+    );
+    state.setLoading(false);
+  }
+
+  // Card taps (future navigation/side-effects)
+  void onCardTap(String cardId) {
+    // e.g., Get.toNamed('/$cardId', arguments: ...);
   }
 }
