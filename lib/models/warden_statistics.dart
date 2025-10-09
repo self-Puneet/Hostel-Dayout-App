@@ -2,10 +2,11 @@
 import 'dart:math';
 
 class WardenStatistics {
-  final int count;       // This month
-  final int outCount;    // Students out (total)
-  final int lateCount;   // Late students (total)
+  final int count; // This month
+  final int outCount; // Students out (total)
+  final int lateCount; // Late students (total)
   final int actionCount; // Active requests
+  final int monthCount;
 
   // Temporary fabricated breakdowns
   final int outLeaveCount;
@@ -22,6 +23,7 @@ class WardenStatistics {
     required this.outOutingCount,
     required this.lateLeaveCount,
     required this.lateOutingCount,
+    required this.monthCount,
   });
 
   factory WardenStatistics.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class WardenStatistics {
     final out = (json['outCount'] ?? 0) as int;
     final late = (json['lateCount'] ?? 0) as int;
     final action = (json['actionCount'] ?? 0) as int;
+    final month = (json['monthCount'] ?? 0) as int;
 
     int split60(int total) => (total * 0.6).round();
     int split40(int total) => (total * 0.4).round();
@@ -47,6 +50,7 @@ class WardenStatistics {
       outOutingCount: outOuting,
       lateLeaveCount: lateLeave,
       lateOutingCount: lateOuting,
+      monthCount: month,
     );
   }
 }

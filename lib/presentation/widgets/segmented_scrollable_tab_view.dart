@@ -100,7 +100,7 @@ class SegmentedTabs extends StatelessWidget {
     super.key,
     required this.controller,
     required this.labels,
-    this.radius = 10,
+    this.radius = 0,
     this.labelPadding = const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
     this.barBackground = const Color(0x14000000),
     this.selectedPillColor = Colors.black,
@@ -161,7 +161,7 @@ class SegmentedTabs extends StatelessWidget {
                 ),
                 child: Text(
                   t,
-                  style: textTheme.h7.copyWith(
+                  style: textTheme.h6.copyWith(
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                     color: isSelected ? Colors.black : unselectedTextColor,
                   ),

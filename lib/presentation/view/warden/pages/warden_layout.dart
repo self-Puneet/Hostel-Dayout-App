@@ -48,12 +48,12 @@ class WardenLayout extends StatelessWidget {
                   Positioned.fill(
                     child: Padding(
                       padding: EdgeInsets.only(top: headerTop),
-                      child: Padding(
-                        padding: horizontalPad,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            WelcomeHeader(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: horizontalPad,
+                            child: WelcomeHeader(
                               enrollmentNumber: state.loginSession.identityId,
                               phoneNumber: state.loginSession.phone,
                               actor: actor,
@@ -64,26 +64,26 @@ class WardenLayout extends StatelessWidget {
                               avatarUrl: state.loginSession.imageURL,
                               greeting: 'Welcome back,',
                             ),
-                            const SizedBox(height: 20),
-                            Expanded(child: child),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(height: 20),
+                          Expanded(child: child),
+                        ],
                       ),
                     ),
                   ),
 
                   // Spacer under the bar so content can scroll past it
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: barBottomOffset,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 31 * media.size.width / 402,
-                      ),
-                      child: const SizedBox(height: 60),
-                    ),
-                  ),
+                  // Positioned(
+                  //   left: 0,
+                  //   right: 0,
+                  //   bottom: barBottomOffset,
+                  //   child: Padding(
+                  //     padding: EdgeInsets.symmetric(
+                  //       horizontal: 31 * media.size.width / 402,
+                  //     ),
+                  //     child: const SizedBox(height: 60),
+                  //   ),
+                  // ),
 
                   // Floating bottom bar (like StudentLayout), hides when keyboard opens
                   Positioned(

@@ -78,7 +78,7 @@ String? _initialRoute() {
     case TimelineActor.assistentWarden:
       return AppRoutes.wardenHome;
     case TimelineActor.seniorWarden:
-      return AppRoutes.wardenActionPage;
+      return AppRoutes.wardenHome;
     case TimelineActor.parent:
       return AppRoutes.parentHome;
     default:

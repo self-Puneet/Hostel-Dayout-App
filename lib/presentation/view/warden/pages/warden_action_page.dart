@@ -51,9 +51,13 @@ class _WardenHomePageState extends State<WardenHomePage>
 
   @override
   Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
     final labels = WardenTab.values.map((t) => t.label).toList();
     final state = context.read<WardenActionState>();
     final controller = WardenActionPageController(state);
+    final horizontalPad = EdgeInsets.symmetric(
+      horizontal: 31 * media.size.width / 402,
+    );
 
     return RefreshIndicator(
       triggerMode: RefreshIndicatorTriggerMode.anywhere,
@@ -85,15 +89,13 @@ class _WardenHomePageState extends State<WardenHomePage>
             });
           }
 
-          if (s.isLoading && !s.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
           return Column(
             children: [
               // Search + hostel picker
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 0, vertical: 8) +
+                    horizontalPad,
                 child: Row(
                   children: [
                     Expanded(
@@ -230,45 +232,51 @@ class _WardenHomePageState extends State<WardenHomePage>
 
               // Segmented, scrollable tabs
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 0),
+                padding: horizontalPad,
                 child: SegmentedTabs(controller: _tabs, labels: labels),
               ),
-              const SizedBox(height: 12),
-
+              const SizedBox(height: 6),
+              Padding(
+                padding: horizontalPad,
+                child: Divider(thickness: 2, color: Colors.grey.shade300),
+              ),
               // Tab contents
               Expanded(
-                child: TabBarView(
-                  controller: _tabs,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    // Pending Approval (selection + actions)
-                    _PendingApprovalList(
-                      actor: widget.actor,
-                      stateController: controller,
-                      state: state,
-                      status: RequestStatus.approved,
-                    ),
-                    // Approved
-                    _StatusList(
-                      actor: widget.actor,
-                      stateController: controller,
-                      status: RequestStatus.approved,
-                    ),
-                    // Pending Parent
-                    _StatusList(
-                      actor: widget.actor,
-                      stateController: controller,
-                      status: RequestStatus.referred,
-                    ),
-                    // Requested
-                    _StatusList(
-                      actor: widget.actor,
-                      stateController: controller,
-                      status: RequestStatus.requested,
-                    ),
-                  ],
-                ),
+                child: (s.isLoading && !s.hasData)
+                    ? const Center(child: CircularProgressIndicator())
+                    : TabBarView(
+                        controller: _tabs,
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: [
+                          // Pending Approval (selection + actions)
+                          _PendingApprovalList(
+                            actor: widget.actor,
+                            stateController: controller,
+                            state: state,
+                            status: RequestStatus.approved,
+                          ),
+                          // Approved
+                          _StatusList(
+                            actor: widget.actor,
+                            stateController: controller,
+                            status: RequestStatus.approved,
+                          ),
+                          // Pending Parent
+                          _StatusList(
+                            actor: widget.actor,
+                            stateController: controller,
+                            status: RequestStatus.referred,
+                          ),
+                          // Requested
+                          _StatusList(
+                            actor: widget.actor,
+                            stateController: controller,
+                            status: RequestStatus.requested,
+                          ),
+                        ],
+                      ),
               ),
+              Container(height: 84 + MediaQuery.of(context).viewPadding.bottom),
             ],
           );
         },
@@ -292,6 +300,10 @@ class _PendingApprovalList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
+    final horizontalPad = EdgeInsets.symmetric(
+      horizontal: 31 * media.size.width / 402,
+    );
     return Consumer<WardenActionState>(
       builder: (context, s, _) {
         final List<OnScreenRequest> result = stateController.getRequestByStatus(
@@ -461,78 +473,87 @@ class _StatusList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<WardenActionState>(
-      builder: (context, s, _) {
-        final List<OnScreenRequest> reqeusts = stateController
-            .getRequestByStatus(status_: status);
-        print(reqeusts.length);
-        if (reqeusts.isEmpty) {
-          final q = s.filterController.text.trim();
-          return Center(
-            child: Text(q.isEmpty ? 'Nothing here yet' : 'No matches for "$q"'),
-          );
-        }
-        return ListView.separated(
-          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-          itemCount: reqeusts.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 10),
-          itemBuilder: (context, i) {
-            final wrap = reqeusts[i];
-            final req = wrap.request;
-            final stu = wrap.student;
-            final selected = wrap.isSelected;
-            final safeName = (stu.name).isEmpty ? 'Unknown' : stu.name;
-
-            return SimpleActionRequestCard(
-              profileImageUrl: stu.profilePic,
-              reason: req.reason,
-              name: safeName,
-              status: req.status,
-              leaveType: req.requestType,
-              fromDate: req.appliedFrom,
-              toDate: req.appliedTo,
-              selected: selected,
-              isRejection: false,
-              isLate: req.appliedTo.isBefore(DateTime.now()),
-              borderColor: req.appliedTo.isBefore(DateTime.now())
-                  ? Colors.red
-                  : null,
-              acceptenceIcon: Icons.phone,
-              accrptenceCOlor: Colors.blue,
-              onLongPress: (!s.isActioning && !s.hasSelection)
-                  ? () => s.toggleSelectedById(req.requestId)
-                  : null,
-              onTap: (!s.isActioning && s.hasSelection)
-                  ? () => s.toggleSelectedById(req.requestId)
-                  : null,
-              onRejection: (!s.hasSelection && !s.isActioning)
-                  ? () async {
-                      await stateController.actionRequestById(
-                        action: actor == TimelineActor.assistentWarden
-                            ? RequestAction.cancel
-                            : RequestAction.reject,
-                        requestId: req.requestId,
-                      );
-                      if (context.mounted) {
-                        context.goNamed(
-                          AppRoutes.wardenHome,
-                          queryParameters: {
-                            'ts': DateTime.now().millisecondsSinceEpoch
-                                .toString(),
-                          },
-                        );
-                      }
-                    }
-                  : null,
-              onAcceptence: (!s.hasSelection && !s.isActioning)
-                  ? () async {
-                      _openDialer(stu.phoneNo);
-                    }
-                  : null,
+    final media = MediaQuery.of(context);
+    final horizontalPad = EdgeInsets.symmetric(
+      horizontal: 31 * media.size.width / 402,
+    );
+    return Container(
+      margin: horizontalPad,
+      child: Consumer<WardenActionState>(
+        builder: (context, s, _) {
+          final List<OnScreenRequest> reqeusts = stateController
+              .getRequestByStatus(status_: status);
+          print(reqeusts.length);
+          if (reqeusts.isEmpty) {
+            final q = s.filterController.text.trim();
+            return Center(
+              child: Text(
+                q.isEmpty ? 'Nothing here yet' : 'No matches for "$q"',
+              ),
             );
-          },
-        );
-      },
+          }
+          return ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+            itemCount: reqeusts.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            itemBuilder: (context, i) {
+              final wrap = reqeusts[i];
+              final req = wrap.request;
+              final stu = wrap.student;
+              final selected = wrap.isSelected;
+              final safeName = (stu.name).isEmpty ? 'Unknown' : stu.name;
+
+              return SimpleActionRequestCard(
+                profileImageUrl: stu.profilePic,
+                reason: req.reason,
+                name: safeName,
+                status: req.status,
+                leaveType: req.requestType,
+                fromDate: req.appliedFrom,
+                toDate: req.appliedTo,
+                selected: selected,
+                isRejection: false,
+                isLate: req.appliedTo.isBefore(DateTime.now()),
+                borderColor: req.appliedTo.isBefore(DateTime.now())
+                    ? Colors.red
+                    : null,
+                acceptenceIcon: Icons.phone,
+                accrptenceCOlor: Colors.blue,
+                onLongPress: (!s.isActioning && !s.hasSelection)
+                    ? () => s.toggleSelectedById(req.requestId)
+                    : null,
+                onTap: (!s.isActioning && s.hasSelection)
+                    ? () => s.toggleSelectedById(req.requestId)
+                    : null,
+                onRejection: (!s.hasSelection && !s.isActioning)
+                    ? () async {
+                        await stateController.actionRequestById(
+                          action: actor == TimelineActor.assistentWarden
+                              ? RequestAction.cancel
+                              : RequestAction.reject,
+                          requestId: req.requestId,
+                        );
+                        if (context.mounted) {
+                          context.goNamed(
+                            AppRoutes.wardenHome,
+                            queryParameters: {
+                              'ts': DateTime.now().millisecondsSinceEpoch
+                                  .toString(),
+                            },
+                          );
+                        }
+                      }
+                    : null,
+                onAcceptence: (!s.hasSelection && !s.isActioning)
+                    ? () async {
+                        _openDialer(stu.phoneNo);
+                      }
+                    : null,
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
