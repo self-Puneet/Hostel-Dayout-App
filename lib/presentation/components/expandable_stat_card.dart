@@ -4,13 +4,12 @@ import 'package:hostel_mgmt/models/expandable_stat_card_data.dart';
 
 class ExpandableStatCard extends StatefulWidget {
   final ExpandableStatCardData data;
-  final VoidCallback? onTap; // NEW: tap handler
+   // NEW: tap handler
   final bool enableExpandOnCardTap; // NEW: optional expand-on-tap
 
   const ExpandableStatCard({
     super.key,
     required this.data,
-    this.onTap,
     this.enableExpandOnCardTap = false,
   });
 
@@ -42,7 +41,7 @@ class _ExpandableStatCardState extends State<ExpandableStatCard> {
             if (widget.enableExpandOnCardTap && hasBreakdown) {
               setState(() => _expanded = !_expanded);
             }
-            widget.onTap?.call();
+            data.onTap?.call();
           },
           child: Padding(
             padding: const EdgeInsets.all(15),

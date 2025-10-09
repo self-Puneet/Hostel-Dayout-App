@@ -8,6 +8,7 @@ class ExpandableStatCardData {
   final String valueLabel;
   final String title;
   final List<Map<String, dynamic>> breakdown;
+  final VoidCallback? onTap;
 
   const ExpandableStatCardData({
     required this.icon,
@@ -17,5 +18,6 @@ class ExpandableStatCardData {
     required this.valueLabel,
     required this.title,
     this.breakdown = const [],
+    this.onTap,
   });
 }

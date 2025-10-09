@@ -21,7 +21,13 @@ Future<void> _openDialer(String number) async {
 
 class WardenHomePage extends StatefulWidget {
   final TimelineActor actor;
-  const WardenHomePage({super.key, required this.actor});
+  final WardenTab? initialTab; // NEW
+
+  const WardenHomePage({
+    super.key,
+    required this.actor,
+    this.initialTab, // NEW
+  });
 
   @override
   State<WardenHomePage> createState() => _WardenHomePageState();
@@ -34,11 +40,21 @@ class _WardenHomePageState extends State<WardenHomePage>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: WardenTab.values.length, vsync: this);
+    final initTab = widget.initialTab ?? WardenTab.pendingApproval;
+    _tabs = TabController(
+      length: WardenTab.values.length,
+      vsync: this,
+      initialIndex: initTab.index, // NEW: select specific tab on build
+    );
     _tabs.addListener(() {
       if (!_tabs.indexIsChanging) {
         final tab = WardenTabX.fromIndex(_tabs.index);
         context.read<WardenActionState>().setCurrentTab(tab);
+      }
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<WardenActionState>().setCurrentTab(initTab);
       }
     });
   }

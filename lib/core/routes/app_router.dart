@@ -116,15 +116,30 @@ class AppRouter {
               name: 'warden-action-page',
               pageBuilder: (context, state) {
                 final profile = context.read<WardenProfileState>();
+
+                // Read ?tab=<enumName> from the URL, e.g., ?tab=approved
+                final tabParam = state.uri.queryParameters['tab'];
+
+                // Map name → enum safely
+                final initialTab = WardenTab.values.firstWhere(
+                  (t) => t.name == tabParam,
+                  orElse: () => WardenTab.pendingApproval,
+                );
+
                 return AppTransitionPage(
                   key: state.pageKey,
                   child: ChangeNotifierProvider(
                     create: (_) => WardenActionState(),
-                    child: WardenHomePage(actor: profile.loginSession.role),
+                    child: WardenHomePage(
+                      actor: profile.loginSession.role,
+                      initialTab:
+                          initialTab, // requires WardenHomePage(initialTab)
+                    ),
                   ),
                 );
               },
             ),
+
             GoRoute(
               path: AppRoutes.seniorWardenHome,
               name: 'warden-home-statistics',
@@ -152,6 +167,7 @@ class AppRouter {
               },
             ),
 
+            // go_router config
             GoRoute(
               path: AppRoutes.wardenHistory,
               name: 'warden-history',

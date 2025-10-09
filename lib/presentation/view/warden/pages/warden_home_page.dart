@@ -1,11 +1,14 @@
 // lib/ui/home_dashboard_page.dart
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
+import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/models/expandable_stat_card_data.dart';
 import 'package:hostel_mgmt/models/warden_statistics.dart';
 import 'package:hostel_mgmt/presentation/components/expandable_stat_card.dart';
 import 'package:hostel_mgmt/presentation/view/warden/controller/warden_home_controller.dart';
+import 'package:hostel_mgmt/presentation/view/warden/state/warden_action_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_home_state.dart';
 import 'package:provider/provider.dart';
 
@@ -328,6 +331,16 @@ class DashboardGrid extends StatelessWidget {
         valueLabel: "Active Requests",
         title: "Active Requests",
         breakdown: const [],
+        onTap: () {
+          context.push(AppRoutes.wardenActionPage);
+          // Example: jump to the Approved tab
+          context.goNamed(
+            'warden-action-page',
+            queryParameters: {
+              'tab': WardenTab.approved.name, // "approved"
+            },
+          );
+        },
       ),
       ExpandableStatCardData(
         icon: Icons.assignment_turned_in_outlined,
@@ -337,6 +350,14 @@ class DashboardGrid extends StatelessWidget {
         valueLabel: "Pending Approvals",
         title: "Pending Approvals",
         breakdown: const [],
+        onTap: () {
+          context.goNamed(
+            'warden-action-page',
+            queryParameters: {
+              'tab': WardenTab.pendingParent.name, // "approved"
+            },
+          );
+        },
       ),
     ];
 
@@ -354,6 +375,9 @@ class DashboardGrid extends StatelessWidget {
           {"label": "Outing", "value": stats.outLeaveCount},
           {"label": "Outing", "value": 7},
         ],
+        onTap: () {
+          context.push(AppRoutes.wardenActionPage);
+        },
       ),
       ExpandableStatCardData(
         icon: Icons.people_outline,
@@ -366,10 +390,16 @@ class DashboardGrid extends StatelessWidget {
           {"label": "Leave", "value": stats.lateOutingCount},
           {"label": "Outing", "value": stats.outOutingCount},
         ],
+        onTap: () {
+          context.push(AppRoutes.wardenActionPage);
+        },
       ),
     ];
 
-    Widget buildRow(List<ExpandableStatCardData> dataRow, {required bool showDetails}) {
+    Widget buildRow(
+      List<ExpandableStatCardData> dataRow, {
+      required bool showDetails,
+    }) {
       return IntrinsicHeight(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -380,18 +410,6 @@ class DashboardGrid extends StatelessWidget {
                   data: data,
                   // If desired, allow tapping whole card to expand when breakdown exists
                   enableExpandOnCardTap: false,
-                  onTap: () {
-                    // Example: navigate and pass data to details page using named routes
-                    Navigator.pushNamed(
-                      context,
-                      '/details',
-                      arguments: {
-                        'title': data.title,
-                        'value': data.value,
-                        'label': data.valueLabel,
-                      },
-                    );
-                  },
                 ),
               ),
           ],
@@ -406,19 +424,7 @@ class DashboardGrid extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             for (final data in row1)
-              Expanded(
-                child: ExpandableStatCard(
-                  data: data,
-                  onTap: () {
-                    // Different action for second-row cards if needed
-                    Navigator.pushNamed(
-                      context,
-                      '/breakdown',
-                      arguments: {'title': data.title, 'breakdown': data.breakdown},
-                    );
-                  },
-                ),
-              ),
+              Expanded(child: ExpandableStatCard(data: data)),
           ],
         ),
       ],

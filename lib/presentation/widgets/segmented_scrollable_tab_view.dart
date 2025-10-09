@@ -100,7 +100,7 @@ class SegmentedTabs extends StatelessWidget {
     super.key,
     required this.controller,
     required this.labels,
-    this.radius = 0,
+    this.radius = 3,
     this.labelPadding = const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
     this.barBackground = const Color(0x14000000),
     this.selectedPillColor = Colors.black,
@@ -126,46 +126,61 @@ class SegmentedTabs extends StatelessWidget {
             controller: controller,
             isScrollable: true,
             tabAlignment: TabAlignment.start,
-            indicator: const BoxDecoration(), // disable default indicator
+            indicator: const BoxDecoration(),
             dividerColor: Colors.transparent,
             labelPadding: labelPadding,
             padding: EdgeInsets.only(bottom: 4),
             splashBorderRadius: BorderRadius.circular(radius),
             tabs: labels.map((t) {
               final isSelected = controller.index == labels.indexOf(t);
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 15,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE9E9E9),
-                  // color: isSelected ? selectedPillColor : Colors.grey.shade400,
-                  borderRadius: BorderRadius.circular(radius),
-                  boxShadow: isSelected
-                      ? [
-                          const BoxShadow(
-                            color: Colors.black,
-                            blurRadius: 0,
-                            spreadRadius: 0,
-                            offset: Offset(
-                              0,
-                              3,
-                            ), // 👈 moves shadow slightly down
-                          ),
-                        ]
-                      : [],
-
-                  // border: Border.all(color: Colors.black, width: 1.5),
-                ),
-                child: Text(
-                  t,
-                  style: textTheme.h6.copyWith(
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                    color: isSelected ? Colors.black : unselectedTextColor,
+              return Stack(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 0,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 15,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE9E9E9),
+                      // color: Colors.amber,
+                      borderRadius: BorderRadius.circular(radius),
+                    ),
+                    child: Center(
+                      child: Text(
+                        t,
+                        style: textTheme.h6.copyWith(
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.w500,
+                          color: isSelected
+                              ? Colors.black
+                              : unselectedTextColor,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+
+                  if (isSelected)
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(5),
+                            bottom: Radius.circular(0),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               );
             }).toList(),
           ),
