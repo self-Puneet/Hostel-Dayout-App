@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/core/util/input_convertor.dart';
 import 'package:hostel_mgmt/presentation/widgets/status_tag.dart';
 
@@ -24,13 +25,16 @@ class SimpleActionRequestCard extends StatelessWidget {
   final bool isAcceptence; // show/hide accept button
   final Color rejectionColor; // reject button color
   final Color accrptenceCOlor; // accept button color (kept spelling)
-  final Color cardBackgroundColor; // base color for card, rendered pale
+  final Color? borderColor; // base color for card, rendered pale
 
   // New icon customization fields
   final IconData acceptenceIcon; // default: Icons.check
-  final IconData declineIcon;    // default: Icons.close
+  final IconData declineIcon; // default: Icons.close
+
+  final bool isLate;
 
   const SimpleActionRequestCard({
+    this.isLate = false,
     super.key,
     required this.reason,
     required this.name,
@@ -50,17 +54,12 @@ class SimpleActionRequestCard extends StatelessWidget {
     this.isAcceptence = true,
     this.rejectionColor = Colors.red,
     this.accrptenceCOlor = Colors.green,
-    this.cardBackgroundColor = Colors.white,
+    this.borderColor,
 
     // New defaults as requested
     this.acceptenceIcon = Icons.check,
     this.declineIcon = Icons.close,
   });
-
-  // Produce a pale tint of the base color by alpha blending over white.
-  static Color _paleOf(Color c, [double opacity = 0.08]) {
-    return Color.alphaBlend(c.withOpacity(opacity), Colors.white);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +108,6 @@ class SimpleActionRequestCard extends StatelessWidget {
     );
 
     final BorderRadius radius = BorderRadius.circular(16);
-    final Color paleBase = _paleOf(cardBackgroundColor);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8), // vertical margin
@@ -120,7 +118,10 @@ class SimpleActionRequestCard extends StatelessWidget {
           borderRadius: radius,
           side: selected
               ? const BorderSide(color: selectedColor, width: 2)
-              : const BorderSide(color: Colors.transparent, width: 0),
+              : BorderSide(
+                  color: Colors.transparent,
+                  width: 2,
+                ), // Use borderColor here
         ),
         clipBehavior: Clip.antiAlias, // ensures rounded clipping
         child: Ink(
@@ -128,7 +129,9 @@ class SimpleActionRequestCard extends StatelessWidget {
             // Keep existing selected blue tint; otherwise use pale background.
             color: selected
                 ? selectedColor.withAlpha((0.08 * 255).toInt())
-                : paleBase,
+                : (borderColor == null)
+                ? Colors.white
+                : borderColor!.withAlpha((0.08 * 255).toInt()),
             shape: RoundedRectangleBorder(
               borderRadius: radius,
               side: BorderSide(
@@ -218,12 +221,21 @@ class SimpleActionRequestCard extends StatelessWidget {
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
-                                    const Icon(Icons.south_west, size: 16),
+                                    Icon(
+                                      Icons.south_west,
+                                      size: 16,
+                                      color: isLate ? Colors.red : Colors.black,
+                                    ),
                                     const SizedBox(width: 6),
                                     Flexible(
                                       child: Text(
                                         InputConverter.dateFormater(toDate),
                                         overflow: TextOverflow.ellipsis,
+                                        style: theme.textTheme.h5.w500.copyWith(
+                                          color: isLate
+                                              ? Colors.red
+                                              : Colors.black,
+                                        ),
                                       ),
                                     ),
                                   ],

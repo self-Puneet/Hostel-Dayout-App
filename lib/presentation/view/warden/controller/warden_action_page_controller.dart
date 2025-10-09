@@ -129,6 +129,9 @@ class WardenActionPageController {
         onScreenRequest.add(OnScreenRequest.fromRequest(requests[i]));
       }
     }
+    if (status_ == RequestStatus.referred) {
+      print(onScreenRequest.length);
+    }
     return onScreenRequest.toList();
   }
 }

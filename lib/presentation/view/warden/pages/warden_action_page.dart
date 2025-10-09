@@ -2,13 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
-import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/presentation/components/simple_action_request_card.dart';
 import 'package:hostel_mgmt/presentation/widgets/segmented_scrollable_tab_view.dart';
 import 'package:provider/provider.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_action_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/controller/warden_action_page_controller.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+Future<void> _openDialer(String number) async {
+  final Uri phoneUri = Uri(scheme: 'tel', path: number);
+  if (await canLaunchUrl(phoneUri)) {
+    await launchUrl(phoneUri);
+  } else {
+    throw 'Could not open dialer for $number';
+  }
+}
 
 class WardenHomePage extends StatefulWidget {
   final TimelineActor actor;
@@ -230,6 +239,7 @@ class _WardenHomePageState extends State<WardenHomePage>
               Expanded(
                 child: TabBarView(
                   controller: _tabs,
+                  physics: const NeverScrollableScrollPhysics(),
                   children: [
                     // Pending Approval (selection + actions)
                     _PendingApprovalList(
@@ -367,7 +377,7 @@ class _PendingApprovalList extends StatelessWidget {
                 itemCount: result.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (context, i) {
-                  final wrap = s.currentOnScreenRequests[i];
+                  final wrap = result[i];
                   final req = wrap.request;
                   final stu = wrap.student;
                   final selected = wrap.isSelected;
@@ -455,6 +465,7 @@ class _StatusList extends StatelessWidget {
       builder: (context, s, _) {
         final List<OnScreenRequest> reqeusts = stateController
             .getRequestByStatus(status_: status);
+        print(reqeusts.length);
         if (reqeusts.isEmpty) {
           final q = s.filterController.text.trim();
           return Center(
@@ -463,10 +474,10 @@ class _StatusList extends StatelessWidget {
         }
         return ListView.separated(
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-          itemCount: s.currentOnScreenRequests.length,
+          itemCount: reqeusts.length,
           separatorBuilder: (_, __) => const SizedBox(height: 10),
           itemBuilder: (context, i) {
-            final wrap = s.currentOnScreenRequests[i];
+            final wrap = reqeusts[i];
             final req = wrap.request;
             final stu = wrap.student;
             final selected = wrap.isSelected;
@@ -482,8 +493,10 @@ class _StatusList extends StatelessWidget {
               toDate: req.appliedTo,
               selected: selected,
               isRejection: false,
-              // phone student
-              cardBackgroundColor: Colors.red,
+              isLate: req.appliedTo.isBefore(DateTime.now()),
+              borderColor: req.appliedTo.isBefore(DateTime.now())
+                  ? Colors.red
+                  : null,
               acceptenceIcon: Icons.phone,
               accrptenceCOlor: Colors.blue,
               onLongPress: (!s.isActioning && !s.hasSelection)
@@ -513,21 +526,7 @@ class _StatusList extends StatelessWidget {
                   : null,
               onAcceptence: (!s.hasSelection && !s.isActioning)
                   ? () async {
-                      await stateController.actionRequestById(
-                        action: actor == TimelineActor.assistentWarden
-                            ? RequestAction.refer
-                            : RequestAction.approve,
-                        requestId: req.requestId,
-                      );
-                      if (context.mounted) {
-                        context.goNamed(
-                          AppRoutes.wardenHome,
-                          queryParameters: {
-                            'ts': DateTime.now().millisecondsSinceEpoch
-                                .toString(),
-                          },
-                        );
-                      }
+                      _openDialer(stu.phoneNo);
                     }
                   : null,
             );
@@ -537,207 +536,3 @@ class _StatusList extends StatelessWidget {
     );
   }
 }
-
-//               // Bulk actions
-//               Row(
-//                 children: [
-//                   Expanded(
-//                     child: ElevatedButton(
-//                       style: ElevatedButton.styleFrom(
-//                         backgroundColor:
-//                             state.isActioning || !state.hasSelection
-//                             ? Colors.grey
-//                             : Colors.red,
-//                         foregroundColor:
-//                             state.isActioning || !state.hasSelection
-//                             ? Colors.black
-//                             : Colors.white,
-//                       ),
-//                       onPressed: (!state.isActioning && state.hasSelection)
-//                           ? () {
-//                               if (actor == TimelineActor.assistentWarden) {
-//                                 controller.bulkActionSelected(
-//                                   action: RequestAction.cancel,
-//                                 );
-//                               } else {
-//                                 controller.bulkActionSelected(
-//                                   action: RequestAction.reject,
-//                                 );
-//                               }
-//                             }
-//                           : null,
-//                       child: actor == TimelineActor.assistentWarden
-//                           ? Text(RequestAction.cancel.name)
-//                           : Text(RequestAction.reject.name),
-//                     ),
-//                   ),
-//                   const SizedBox(width: 12),
-//                   Expanded(
-//                     child: ElevatedButton(
-//                       style: ElevatedButton.styleFrom(
-//                         backgroundColor:
-//                             state.isActioning || !state.hasSelection
-//                             ? Colors.grey
-//                             : Colors.green,
-//                         foregroundColor:
-//                             state.isActioning || !state.hasSelection
-//                             ? Colors.black
-//                             : Colors.white,
-//                       ),
-//                       onPressed: (!state.isActioning && state.hasSelection)
-//                           ? () {
-//                               if (actor == TimelineActor.assistentWarden) {
-//                                 controller.bulkActionSelected(
-//                                   action: RequestAction.refer,
-//                                 );
-//                               } else {
-//                                 controller.bulkActionSelected(
-//                                   action: RequestAction.approve,
-//                                 );
-//                               }
-//                             }
-//                           : null,
-//                       child: actor == TimelineActor.assistentWarden
-//                           ? Text(RequestAction.refer.name)
-//                           : Text(RequestAction.approve.name),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//               const SizedBox(height: 12),
-
-//               // Tabs + content: keep views non-scrollable; the page ListView scrolls everything
-//               // If your GlassSegmentedTabs requires a bounded height, keep SizedBox; contents below are non-scrollable.
-//               GlassSegmentedTabs(
-//                 options: const ['All', 'Dayout', 'Leave'],
-//                 onTabChanged: (_) {
-//                   context.read<WardenActionState>().clearSelection();
-//                 },
-//                 views: [
-//                   _WardenTabBody(actor: actor, type: null),
-//                   _WardenTabBody(actor: actor, type: RequestType.dayout),
-//                   _WardenTabBody(actor: actor, type: RequestType.leave),
-//                 ],
-//                 labelFontSize: 12,
-//                 selectedLabelFontSize: 12,
-//                 showTabs: true,
-//                 margin: 0,
-//               ),
-//             ],
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
-
-// class _WardenTabBody extends StatelessWidget {
-//   final TimelineActor actor;
-//   final RequestType? type; // null = All
-
-//   const _WardenTabBody({required this.actor, required this.type});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     const double padHeight = 48.0;
-//     final state = context.watch<WardenActionState>();
-//     final controller = WardenActionPageController(state);
-
-//     final wrapped = state.currentOnScreenRequests.where((w) {
-//       if (type == null) return true;
-//       return w.request.requestType == type;
-//     }).toList();
-
-//     return Column(
-//       mainAxisSize: MainAxisSize.min, // shrink to content
-//       children: [
-//         const SizedBox(height: padHeight / 2),
-//         const Divider(height: 1, thickness: 1),
-//         const SizedBox(height: 12),
-
-//         if (state.isActioning)
-//           const Padding(
-//             padding: EdgeInsets.symmetric(vertical: 24),
-//             child: Center(child: CircularProgressIndicator()),
-//           )
-//         else if (wrapped.isEmpty)
-//           const Padding(
-//             padding: EdgeInsets.symmetric(vertical: 24),
-//             child: Center(child: Text("no request currently")),
-//           )
-//         else
-//           ListView.separated(
-//             padding: EdgeInsets.zero,
-//             physics: const NeverScrollableScrollPhysics(),
-//             shrinkWrap: true, // measure to content
-//             itemCount: wrapped.length,
-//             separatorBuilder: (_, __) => const SizedBox(height: 0),
-//             itemBuilder: (context, index) {
-//               final w = wrapped[index];
-//               final req = w.request;
-//               final stu = w.student;
-
-//               final safeName = (stu.name.trim().isNotEmpty)
-//                   ? stu.name
-//                   : (stu.enrollmentNo.trim().isNotEmpty
-//                         ? stu.enrollmentNo
-//                         : req.studentEnrollmentNumber);
-
-//               final selected = state.isSelectedById(req.requestId);
-
-//               return SimpleActionRequestCard(
-//                 profileImageUrl: stu.profilePic,
-//                 reason: req.reason,
-//                 name: safeName,
-//                 status: req.status,
-//                 leaveType: req.requestType,
-//                 fromDate: req.appliedFrom,
-//                 toDate: req.appliedTo,
-//                 selected: selected,
-//                 onLongPress: (!state.isActioning && !state.hasSelection)
-//                     ? () => state.toggleSelectedById(req.requestId)
-//                     : null,
-//                 onTap: (!state.isActioning && state.hasSelection)
-//                     ? () => state.toggleSelectedById(req.requestId)
-//                     : null,
-//                 onRejection: (!state.hasSelection && !state.isActioning)
-//                     ? () {
-//                         controller.actionRequestById(
-//                           action: actor == TimelineActor.assistentWarden
-//                               ? RequestAction.cancel
-//                               : RequestAction.reject,
-//                           requestId: req.requestId,
-//                         );
-//                         context.goNamed(
-//                           AppRoutes.wardenHome,
-//                           queryParameters: {
-//                             'ts': DateTime.now().millisecondsSinceEpoch
-//                                 .toString(),
-//                           },
-//                         );
-//                       }
-//                     : null,
-//                 onAcceptence: (!state.hasSelection && !state.isActioning)
-//                     ? () {
-//                         controller.actionRequestById(
-//                           action: actor == TimelineActor.assistentWarden
-//                               ? RequestAction.refer
-//                               : RequestAction.approve,
-//                           requestId: req.requestId,
-//                         );
-//                         context.goNamed(
-//                           "warden-home",
-//                           queryParameters: {
-//                             'ts': DateTime.now().millisecondsSinceEpoch
-//                                 .toString(),
-//                           },
-//                         );
-//                       }
-//                     : null,
-//               );
-//             },
-//           ),
-//       ],
-//     );
-//   }
-// }

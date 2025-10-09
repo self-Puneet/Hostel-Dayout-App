@@ -100,7 +100,7 @@ class SegmentedTabs extends StatelessWidget {
     super.key,
     required this.controller,
     required this.labels,
-    this.radius = 999,
+    this.radius = 10,
     this.labelPadding = const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
     this.barBackground = const Color(0x14000000),
     this.selectedPillColor = Colors.black,
@@ -118,13 +118,18 @@ class SegmentedTabs extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.only(top: 4, right: 0, bottom: 4, left: 0),
           child: TabBar(
+            splashFactory: NoSplash.splashFactory,
+
+            // 👇 Make overlay transparent
+            overlayColor: WidgetStateProperty.all(Colors.transparent),
+
             controller: controller,
             isScrollable: true,
             tabAlignment: TabAlignment.start,
             indicator: const BoxDecoration(), // disable default indicator
             dividerColor: Colors.transparent,
             labelPadding: labelPadding,
-            padding: EdgeInsets.zero,
+            padding: EdgeInsets.only(bottom: 4),
             splashBorderRadius: BorderRadius.circular(radius),
             tabs: labels.map((t) {
               final isSelected = controller.index == labels.indexOf(t);
@@ -135,15 +140,30 @@ class SegmentedTabs extends StatelessWidget {
                   vertical: 15,
                 ),
                 decoration: BoxDecoration(
-                  color: isSelected ? selectedPillColor : Colors.grey.shade400,
-                  borderRadius: BorderRadius.circular(10),
+                  color: const Color(0xFFE9E9E9),
+                  // color: isSelected ? selectedPillColor : Colors.grey.shade400,
+                  borderRadius: BorderRadius.circular(radius),
+                  boxShadow: isSelected
+                      ? [
+                          const BoxShadow(
+                            color: Colors.black,
+                            blurRadius: 0,
+                            spreadRadius: 0,
+                            offset: Offset(
+                              0,
+                              3,
+                            ), // 👈 moves shadow slightly down
+                          ),
+                        ]
+                      : [],
+
                   // border: Border.all(color: Colors.black, width: 1.5),
                 ),
                 child: Text(
                   t,
                   style: textTheme.h7.copyWith(
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                    color: isSelected ? selectedTextColor : unselectedTextColor,
+                    color: isSelected ? Colors.black : unselectedTextColor,
                   ),
                 ),
               );
