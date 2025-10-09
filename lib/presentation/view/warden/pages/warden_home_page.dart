@@ -332,12 +332,12 @@ class DashboardGrid extends StatelessWidget {
         title: "Active Requests",
         breakdown: const [],
         onTap: () {
-          context.push(AppRoutes.wardenActionPage);
+          // context.push(AppRoutes.wardenActionPage);
           // Example: jump to the Approved tab
           context.goNamed(
-            'warden-action-page',
+            AppRoutes.wardenActionPage,
             queryParameters: {
-              'tab': WardenTab.approved.name, // "approved"
+              'tab': WardenTab.pendingApproval.name, // "approved"
             },
           );
         },
@@ -352,7 +352,7 @@ class DashboardGrid extends StatelessWidget {
         breakdown: const [],
         onTap: () {
           context.goNamed(
-            'warden-action-page',
+            AppRoutes.wardenActionPage,
             queryParameters: {
               'tab': WardenTab.pendingParent.name, // "approved"
             },
@@ -376,7 +376,12 @@ class DashboardGrid extends StatelessWidget {
           {"label": "Outing", "value": 7},
         ],
         onTap: () {
-          context.push(AppRoutes.wardenActionPage);
+          context.goNamed(
+            AppRoutes.wardenActionPage,
+            queryParameters: {
+              'tab': WardenTab.approved.name, // "approved"
+            },
+          );
         },
       ),
       ExpandableStatCardData(
@@ -391,7 +396,12 @@ class DashboardGrid extends StatelessWidget {
           {"label": "Outing", "value": stats.outOutingCount},
         ],
         onTap: () {
-          context.push(AppRoutes.wardenActionPage);
+          context.goNamed(
+            AppRoutes.wardenActionPage,
+            queryParameters: {
+              'tab': WardenTab.approved.name, // "approved"
+            },
+          );
         },
       ),
     ];

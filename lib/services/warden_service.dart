@@ -171,4 +171,55 @@ class WardenService {
       if (client == null) c.close();
     }
   }
+
+  static Future<Either<String, List<(RequestModel, StudentProfileModel)>>>
+  getRequestsForMonth({
+    required String hostelId,
+    required String yearMonth, // "yyyy-MM"
+  }) async {
+    final session = Get.find<LoginSession>();
+    final token = session.token;
+    print(yearMonth);
+
+    try {
+      final base = url; // assumes same global base as other services
+      final path = "$base/warden/requests/$hostelId/$yearMonth";
+      final response = await http.get(
+        Uri.parse(path),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+      );
+      print("pppppppppppppppppppppppppp");
+
+      print(jsonDecode(response.body));
+      if (response.statusCode != 200) {
+        return left("Error: ${response.body}");
+      }
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      final list = (data['requests'] as List?) ?? const [];
+      final results = <(RequestModel, StudentProfileModel)>[];
+
+      for (final raw in list) {
+        final item = raw as Map<String, dynamic>;
+        final req = RequestModel.fromJson(item);
+
+        final studentJson = item['student_Info'] as Map<String, dynamic>;
+        final student = StudentProfileModel.fromJson(studentJson);
+
+        final parentJson = item['parent_Info'] as List<dynamic>? ?? [];
+        final parentList = parentJson
+            .map((p) => ParentModel.fromJson(p as Map<String, dynamic>))
+            .toList();
+
+        final updatedStudent = student.copyWith(parents: parentList);
+        results.add((req, updatedStudent));
+      }
+
+      return right(results);
+    } catch (e) {
+      return left("Exception: $e");
+    }
+  }
 }

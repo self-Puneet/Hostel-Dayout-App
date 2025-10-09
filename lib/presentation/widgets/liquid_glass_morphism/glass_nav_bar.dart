@@ -102,7 +102,7 @@ class LiquidGlassNavBar extends StatelessWidget {
                             children: [
                               hello(middleIcon),
                               // Icon(middleIcon, color: Colors.white, size: 24.3),
-                              SizedBox(width: 6),
+                              SizedBox(width: 20),
                               Text(
                                 middleText,
                                 style: TextStyle(

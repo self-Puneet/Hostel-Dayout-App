@@ -66,6 +66,7 @@ class WardenLayout extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 20),
+                          // Expanded(child: Container(color: Colors.red)),
                           Expanded(child: child),
                         ],
                       ),
@@ -106,11 +107,11 @@ class WardenLayout extends StatelessWidget {
                               ),
                               child: LiquidGlassNavBar(
                                 onHomePressed: () =>
-                                    context.push(AppRoutes.wardenHome),
+                                    context.goNamed(AppRoutes.seniorWardenHome),
                                 onNewPressed: () =>
-                                    context.push(AppRoutes.wardenActionPage),
+                                    context.goNamed(AppRoutes.wardenActionPage),
                                 onProfilePressed: () =>
-                                    context.push(AppRoutes.profile),
+                                    context.goNamed(AppRoutes.wardenHistory),
                                 rightIcon: Right(
                                   Icon(
                                     Icons.history,

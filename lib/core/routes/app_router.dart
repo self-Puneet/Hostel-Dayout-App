@@ -14,9 +14,11 @@ import 'package:hostel_mgmt/presentation/view/parent/state/parent_state.dart';
 import 'package:hostel_mgmt/presentation/view/student/pages/request_page.dart';
 import 'package:hostel_mgmt/presentation/view/warden/controller/warden_home_controller.dart';
 import 'package:hostel_mgmt/presentation/view/warden/pages/warden_action_page.dart';
+import 'package:hostel_mgmt/presentation/view/warden/pages/warden_history_page.dart';
 import 'package:hostel_mgmt/presentation/view/warden/pages/warden_home_page.dart';
 import 'package:hostel_mgmt/presentation/view/warden/pages/warden_layout.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_action_state.dart';
+import 'package:hostel_mgmt/presentation/view/warden/state/warden_history_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_home_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_profile_state.dart';
 import 'package:provider/provider.dart';
@@ -78,7 +80,7 @@ String? _initialRoute() {
     case TimelineActor.assistentWarden:
       return AppRoutes.wardenHome;
     case TimelineActor.seniorWarden:
-      return AppRoutes.wardenHome;
+      return AppRoutes.wardenActionPage;
     case TimelineActor.parent:
       return AppRoutes.parentHome;
     default:
@@ -111,9 +113,10 @@ class AppRouter {
             child: WardenLayout(child: child),
           ),
           routes: [
+            // warden action page route
             GoRoute(
               path: AppRoutes.wardenActionPage,
-              name: 'warden-action-page',
+              name: AppRoutes.wardenActionPage,
               pageBuilder: (context, state) {
                 final profile = context.read<WardenProfileState>();
 
@@ -140,9 +143,10 @@ class AppRouter {
               },
             ),
 
+            // // warden home page route
             GoRoute(
               path: AppRoutes.seniorWardenHome,
-              name: 'warden-home-statistics',
+              name: AppRoutes.seniorWardenHome,
               pageBuilder: (context, state) {
                 // Instead of only providing state, provide both state and controller
                 return AppTransitionPage(
@@ -167,17 +171,17 @@ class AppRouter {
               },
             ),
 
-            // go_router config
+            // warden history page route
             GoRoute(
-              path: AppRoutes.wardenHistory,
+              path: AppRoutes.wardenHistory, // e.g., '/warden/history'
               name: 'warden-history',
               pageBuilder: (context, state) {
                 final profile = context.read<WardenProfileState>();
                 return AppTransitionPage(
                   key: state.pageKey,
                   child: ChangeNotifierProvider(
-                    create: (_) => WardenActionState(),
-                    child: WardenHomePage(actor: profile.loginSession.role),
+                    create: (_) => WardenHistoryState(),
+                    child: WardenHistoryPage(actor: profile.loginSession.role),
                   ),
                 );
               },

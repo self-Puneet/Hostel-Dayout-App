@@ -129,14 +129,18 @@ class SimpleActionRequestCard extends StatelessWidget {
             // Keep existing selected blue tint; otherwise use pale background.
             color: selected
                 ? selectedColor.withAlpha((0.08 * 255).toInt())
-                : (borderColor == null)
-                ? Colors.white
-                : borderColor!.withAlpha((0.08 * 255).toInt()),
+                // : (borderColor == null)
+                : Colors.white,
+            // : borderColor!.withAlpha((0.08 * 255).toInt()),
             shape: RoundedRectangleBorder(
               borderRadius: radius,
               side: BorderSide(
-                color: selected ? selectedColor : Colors.transparent,
-                width: selected ? 2 : 0,
+                color: selected
+                    ? selectedColor
+                    : (borderColor != null)
+                    ? borderColor!.withAlpha((1 * 255).toInt())
+                    : Colors.yellow,
+                width: selected ? 2 : 0.8,
               ),
             ),
           ),

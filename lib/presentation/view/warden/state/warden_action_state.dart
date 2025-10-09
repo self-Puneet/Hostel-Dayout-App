@@ -76,7 +76,7 @@ class WardenActionState extends ChangeNotifier {
 
   // Tabs
   WardenTab _currentTab = WardenTab.pendingApproval;
-  WardenTab get currentTab => _currentTab;
+WardenTab get currentTab => _currentTab;
 
   bool get isLoading => _isLoading;
   bool get isErrored => _isErrored;
