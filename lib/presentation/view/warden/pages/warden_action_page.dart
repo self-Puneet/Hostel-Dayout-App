@@ -1,4 +1,3 @@
-// lib/presentation/view/warden/ui/warden_home_page.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/actions.dart';
@@ -47,7 +46,15 @@ class _WardenHomePageState extends State<WardenHomePage>
     final state = context.read<WardenActionState>();
     final controller = WardenActionPageController(state);
 
-    return AppRefreshWrapper(
+    return RefreshIndicator(
+      triggerMode: RefreshIndicatorTriggerMode.anywhere,
+      color: Colors.black,
+      backgroundColor: Colors.white,
+
+      notificationPredicate: (notification) =>
+          notification.metrics.axis == Axis.vertical && notification.depth > 0,
+      strokeWidth: 3,
+      displacement: 60,
       onRefresh: () async {
         state.resetForHostelChange();
         await controller.fetchRequestsFromApi();
@@ -280,8 +287,6 @@ class _PendingApprovalList extends StatelessWidget {
         final List<OnScreenRequest> result = stateController.getRequestByStatus(
           status_: RequestStatus.parentApproved,
         );
-        print(result.length);
-        print("aaaaaaah");
         if (result.isEmpty) {
           final q = s.filterController.text.trim();
           return Center(
@@ -357,6 +362,7 @@ class _PendingApprovalList extends StatelessWidget {
             // 👇 This makes the list take the remaining space properly
             Expanded(
               child: ListView.separated(
+                physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
                 itemCount: result.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
@@ -460,66 +466,72 @@ class _StatusList extends StatelessWidget {
           itemCount: s.currentOnScreenRequests.length,
           separatorBuilder: (_, __) => const SizedBox(height: 10),
           itemBuilder: (context, i) {
-final wrap = s.currentOnScreenRequests[i];
-                  final req = wrap.request;
-                  final stu = wrap.student;
-                  final selected = wrap.isSelected;
-                  final safeName = (stu.name).isEmpty ? 'Unknown' : stu.name;
+            final wrap = s.currentOnScreenRequests[i];
+            final req = wrap.request;
+            final stu = wrap.student;
+            final selected = wrap.isSelected;
+            final safeName = (stu.name).isEmpty ? 'Unknown' : stu.name;
 
-                  return SimpleActionRequestCard(
-                    profileImageUrl: stu.profilePic,
-                    reason: req.reason,
-                    name: safeName,
-                    status: req.status,
-                    leaveType: req.requestType,
-                    fromDate: req.appliedFrom,
-                    toDate: req.appliedTo,
-                    selected: selected,
-                    onLongPress: (!s.isActioning && !s.hasSelection)
-                        ? () => s.toggleSelectedById(req.requestId)
-                        : null,
-                    onTap: (!s.isActioning && s.hasSelection)
-                        ? () => s.toggleSelectedById(req.requestId)
-                        : null,
-                    onRejection: (!s.hasSelection && !s.isActioning)
-                        ? () async {
-                            await stateController.actionRequestById(
-                              action: actor == TimelineActor.assistentWarden
-                                  ? RequestAction.cancel
-                                  : RequestAction.reject,
-                              requestId: req.requestId,
-                            );
-                            if (context.mounted) {
-                              context.goNamed(
-                                AppRoutes.wardenHome,
-                                queryParameters: {
-                                  'ts': DateTime.now().millisecondsSinceEpoch
-                                      .toString(),
-                                },
-                              );
-                            }
-                          }
-                        : null,
-                    onAcceptence: (!s.hasSelection && !s.isActioning)
-                        ? () async {
-                            await stateController.actionRequestById(
-                              action: actor == TimelineActor.assistentWarden
-                                  ? RequestAction.refer
-                                  : RequestAction.approve,
-                              requestId: req.requestId,
-                            );
-                            if (context.mounted) {
-                              context.goNamed(
-                                AppRoutes.wardenHome,
-                                queryParameters: {
-                                  'ts': DateTime.now().millisecondsSinceEpoch
-                                      .toString(),
-                                },
-                              );
-                            }
-                          }
-                        : null,
-                  );          },
+            return SimpleActionRequestCard(
+              profileImageUrl: stu.profilePic,
+              reason: req.reason,
+              name: safeName,
+              status: req.status,
+              leaveType: req.requestType,
+              fromDate: req.appliedFrom,
+              toDate: req.appliedTo,
+              selected: selected,
+              isRejection: false,
+              // phone student
+              cardBackgroundColor: Colors.red,
+              acceptenceIcon: Icons.phone,
+              accrptenceCOlor: Colors.blue,
+              onLongPress: (!s.isActioning && !s.hasSelection)
+                  ? () => s.toggleSelectedById(req.requestId)
+                  : null,
+              onTap: (!s.isActioning && s.hasSelection)
+                  ? () => s.toggleSelectedById(req.requestId)
+                  : null,
+              onRejection: (!s.hasSelection && !s.isActioning)
+                  ? () async {
+                      await stateController.actionRequestById(
+                        action: actor == TimelineActor.assistentWarden
+                            ? RequestAction.cancel
+                            : RequestAction.reject,
+                        requestId: req.requestId,
+                      );
+                      if (context.mounted) {
+                        context.goNamed(
+                          AppRoutes.wardenHome,
+                          queryParameters: {
+                            'ts': DateTime.now().millisecondsSinceEpoch
+                                .toString(),
+                          },
+                        );
+                      }
+                    }
+                  : null,
+              onAcceptence: (!s.hasSelection && !s.isActioning)
+                  ? () async {
+                      await stateController.actionRequestById(
+                        action: actor == TimelineActor.assistentWarden
+                            ? RequestAction.refer
+                            : RequestAction.approve,
+                        requestId: req.requestId,
+                      );
+                      if (context.mounted) {
+                        context.goNamed(
+                          AppRoutes.wardenHome,
+                          queryParameters: {
+                            'ts': DateTime.now().millisecondsSinceEpoch
+                                .toString(),
+                          },
+                        );
+                      }
+                    }
+                  : null,
+            );
+          },
         );
       },
     );

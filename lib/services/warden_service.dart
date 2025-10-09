@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:dartz/dartz.dart';
 import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/config/constants.dart';
@@ -78,9 +79,15 @@ class WardenService {
       }
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
-      print(data["requests"][0]["parent_Info"].runtimeType);
+      final hehe = [];
+      data["requests"].map((e) {
+        hehe.add(e['request_id']);
+      }).toString();
+      print("duplicate${hehe.length}");
+      print("duplicate-nahi${hehe.toSet().length}");
 
       final list = (data['requests'] as List?) ?? const [];
+      print(list.length);
       final results = <(RequestModel, StudentProfileModel)>[];
 
       for (final raw in list) {
@@ -98,8 +105,6 @@ class WardenService {
 
         final updatedStudent = student.copyWith(parents: parentList);
         results.add((req, updatedStudent));
-
-        results.add((req, student));
       }
       for (int i = 0; i < results.length; i++) {
         // print("8" * 89);

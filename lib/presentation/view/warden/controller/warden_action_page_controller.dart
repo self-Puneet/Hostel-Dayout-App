@@ -41,10 +41,10 @@ class WardenActionPageController {
       // final result = await WardenService.getAllRequestsForWarden(
       //   resolvedHostelId,
       // );
-      result.fold(
-        (error) => state.setError(true, error),
-        (response) => state.setRequests(response),
-      );
+      result.fold((error) => state.setError(true, error), (response) {
+        print(response.length);
+        state.setRequests(response);
+      });
     } catch (e) {
       state.setError(true, 'Failed to load requests: $e');
     } finally {
@@ -121,18 +121,14 @@ class WardenActionPageController {
     }
   }
 
-  List<OnScreenRequest> getRequestByStatus({
-    required RequestStatus status_,
-  }) {
+  List<OnScreenRequest> getRequestByStatus({required RequestStatus status_}) {
     final requests = state.allRequests;
-    print("hheheheheh");
-    print(requests.length);
     final List<OnScreenRequest> onScreenRequest = [];
     for (int i = 0; i < requests.length; i++) {
       if (requests[i].$1.status == status_) {
-        onScreenRequest.add( OnScreenRequest.fromRequest(requests[i]));
+        onScreenRequest.add(OnScreenRequest.fromRequest(requests[i]));
       }
     }
-    return onScreenRequest;
+    return onScreenRequest.toList();
   }
 }

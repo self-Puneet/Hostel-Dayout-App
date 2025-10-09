@@ -1,5 +1,3 @@
-// simple_action_request_card.dart
-
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/util/input_convertor.dart';
@@ -21,6 +19,17 @@ class SimpleActionRequestCard extends StatelessWidget {
   final VoidCallback? onLongPress; // first selection when none selected
   final VoidCallback? onTap; // toggle when selection mode is active
 
+  // Customization fields (added earlier)
+  final bool isRejection; // show/hide reject button
+  final bool isAcceptence; // show/hide accept button
+  final Color rejectionColor; // reject button color
+  final Color accrptenceCOlor; // accept button color (kept spelling)
+  final Color cardBackgroundColor; // base color for card, rendered pale
+
+  // New icon customization fields
+  final IconData acceptenceIcon; // default: Icons.check
+  final IconData declineIcon;    // default: Icons.close
+
   const SimpleActionRequestCard({
     super.key,
     required this.reason,
@@ -35,20 +44,36 @@ class SimpleActionRequestCard extends StatelessWidget {
     this.onLongPress,
     this.onTap,
     required this.profileImageUrl,
+
+    // Defaults
+    this.isRejection = true,
+    this.isAcceptence = true,
+    this.rejectionColor = Colors.red,
+    this.accrptenceCOlor = Colors.green,
+    this.cardBackgroundColor = Colors.white,
+
+    // New defaults as requested
+    this.acceptenceIcon = Icons.check,
+    this.declineIcon = Icons.close,
   });
+
+  // Produce a pale tint of the base color by alpha blending over white.
+  static Color _paleOf(Color c, [double opacity = 0.08]) {
+    return Color.alphaBlend(c.withOpacity(opacity), Colors.white);
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     const selectedColor = Colors.blue; // force blue selected visuals
 
-    // Button styles (WidgetStateProperty works on recent Flutter)
+    // Button styles (WidgetStateProperty on recent Flutter)
     final ButtonStyle dangerStyle = ButtonStyle(
       backgroundColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.disabled)) {
           return theme.colorScheme.surfaceContainerHighest;
         }
-        return Colors.red;
+        return rejectionColor;
       }),
       foregroundColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.disabled)) {
@@ -68,7 +93,7 @@ class SimpleActionRequestCard extends StatelessWidget {
         if (states.contains(WidgetState.disabled)) {
           return theme.colorScheme.surfaceContainerHighest;
         }
-        return Colors.green;
+        return accrptenceCOlor;
       }),
       foregroundColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.disabled)) {
@@ -84,6 +109,7 @@ class SimpleActionRequestCard extends StatelessWidget {
     );
 
     final BorderRadius radius = BorderRadius.circular(16);
+    final Color paleBase = _paleOf(cardBackgroundColor);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8), // vertical margin
@@ -99,11 +125,10 @@ class SimpleActionRequestCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias, // ensures rounded clipping
         child: Ink(
           decoration: ShapeDecoration(
+            // Keep existing selected blue tint; otherwise use pale background.
             color: selected
-                ? selectedColor.withAlpha(
-                    (0.08 * 255).toInt(),
-                  ) // subtle blue tint
-                : theme.colorScheme.surface,
+                ? selectedColor.withAlpha((0.08 * 255).toInt())
+                : paleBase,
             shape: RoundedRectangleBorder(
               borderRadius: radius,
               side: BorderSide(
@@ -115,7 +140,6 @@ class SimpleActionRequestCard extends StatelessWidget {
           child: InkWell(
             onTap: onTap,
             onLongPress: onLongPress,
-            // ensure ink uses the same rounded shape for ripple
             customBorder: RoundedRectangleBorder(borderRadius: radius),
             splashColor: selectedColor.withAlpha((0.12 * 255).toInt()),
             highlightColor: selectedColor.withAlpha((0.06 * 255).toInt()),
@@ -210,21 +234,24 @@ class SimpleActionRequestCard extends StatelessWidget {
 
                           const SizedBox(width: 12),
 
-                          // Icon-only actions
+                          // Icon-only actions (conditional)
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              ElevatedButton(
-                                onPressed: onRejection, // null => disabled
-                                style: dangerStyle,
-                                child: const Icon(Icons.close, size: 20),
-                              ),
-                              const SizedBox(width: 8),
-                              ElevatedButton(
-                                onPressed: onAcceptence, // null => disabled
-                                style: successStyle,
-                                child: const Icon(Icons.check, size: 20),
-                              ),
+                              if (isRejection)
+                                ElevatedButton(
+                                  onPressed: onRejection, // null => disabled
+                                  style: dangerStyle,
+                                  child: Icon(declineIcon, size: 20),
+                                ),
+                              if (isRejection && isAcceptence)
+                                const SizedBox(width: 8),
+                              if (isAcceptence)
+                                ElevatedButton(
+                                  onPressed: onAcceptence, // null => disabled
+                                  style: successStyle,
+                                  child: Icon(acceptenceIcon, size: 20),
+                                ),
                             ],
                           ),
                         ],

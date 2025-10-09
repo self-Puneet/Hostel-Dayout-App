@@ -135,9 +135,9 @@ class SegmentedTabs extends StatelessWidget {
                   vertical: 15,
                 ),
                 decoration: BoxDecoration(
-                  color: isSelected ? selectedPillColor : Colors.transparent,
+                  color: isSelected ? selectedPillColor : Colors.grey.shade400,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.black, width: 1.5),
+                  // border: Border.all(color: Colors.black, width: 1.5),
                 ),
                 child: Text(
                   t,
