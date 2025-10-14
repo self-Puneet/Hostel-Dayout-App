@@ -95,18 +95,18 @@ class WardenHistoryState extends ChangeNotifier {
   void _applyFilters() {
     final q = filterController.text.trim().toLowerCase();
 
-    Iterable<RequestModel> base = _all;
+    Iterable<OnScreenHistoryItem> onScreenRequests = currentOnScreen;
 
     if (_typeFilter != null) {
-      base = base.where((e) => e.requestType == _typeFilter);
+      onScreenRequests = onScreenRequests.where((e) => e.request.requestType == _typeFilter);
     }
 
-    // if (q.isNotEmpty) {
-    //   base = base.where((e) => (e.name).toLowerCase().contains(q));
-    // }
+    if (q.isNotEmpty) {
+      onScreenRequests = onScreenRequests.where((e) => (e.student.name).toLowerCase().contains(q));
+    }
 
-    currentOnScreen = base
-        .map((e) => OnScreenHistoryItem(request: e, student: null!))
+    currentOnScreen = onScreenRequests
+      .map((e) => OnScreenHistoryItem(request: e.request, student: e.student))
         .toList();
 
     notifyListeners();
