@@ -173,7 +173,7 @@ class AuthService {
   }
 
   static Future<void> logoutStudent() async {
-    await LoginSession.clearPrefs();
+    await Get.find<LoginSession>().clearPrefs();
   }
 
   static Future<LoginSession?> getSavedStudentSession() async {

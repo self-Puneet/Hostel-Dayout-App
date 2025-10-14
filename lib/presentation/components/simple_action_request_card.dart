@@ -128,7 +128,7 @@ class SimpleActionRequestCard extends StatelessWidget {
           decoration: ShapeDecoration(
             // Keep existing selected blue tint; otherwise use pale background.
             color: selected
-                ? selectedColor.withAlpha((0.08 * 255).toInt())
+                ? selectedColor.withAlpha((1 * 255).toInt())
                 // : (borderColor == null)
                 : Colors.white,
             // : borderColor!.withAlpha((0.08 * 255).toInt()),
@@ -139,7 +139,7 @@ class SimpleActionRequestCard extends StatelessWidget {
                     ? selectedColor
                     : (borderColor != null)
                     ? borderColor!.withAlpha((1 * 255).toInt())
-                    : Colors.yellow,
+                    : Colors.transparent,
                 width: selected ? 2 : 0.8,
               ),
             ),

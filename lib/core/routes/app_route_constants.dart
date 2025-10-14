@@ -42,6 +42,8 @@ class AppRoutes {
       login,
       requestDetails,
       wardenActionPage,
+      wardenHistory,
+      seniorWardenHome,
     ],
     TimelineActor.seniorWarden: [
       seniorWardenHome,
@@ -49,6 +51,7 @@ class AppRoutes {
       login,
       requestDetails,
       wardenActionPage,
+      wardenHistory,
     ],
     TimelineActor.parent: [
       parentHome,

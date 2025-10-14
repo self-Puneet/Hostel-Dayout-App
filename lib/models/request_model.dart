@@ -157,9 +157,15 @@ class RequestModel {
 
   /// Deserialize from JSON
   factory RequestModel.fromJson(Map<String, dynamic> json) {
-    print(
-      "Parsing request with status: ${json['request_status']} -> ${json['request_status']}",
-    );
+    // print(json.keys);
+    json.containsKey("assistent_warden_action")
+        ? print(
+            "Parsing request with status: ${json['assistent_warden_action']['action_by'].runtimeType}",
+          )
+        : print("nahi hai");
+
+    // print(json['senior_warden_action']['createdAt']);
+    print("aaaaaah");
     return RequestModel(
       id: json['_id'] ?? '',
       requestId: json['request_id'] ?? '',
@@ -205,18 +211,16 @@ class RequestModel {
       //         actionAt: DateTime.parse(json['parent_action']['action_at']),
       //       )
       //     : null,
-      // assistantWardenAction: json['assistant_warden_action'] != null
+      // assistantWardenAction: json['assistent_warden_action'] != null
       //     ? AssistantWardenAction(
       //         assistantWardenModel: WardenModel.fromJson(
-      //           json['assistant_warden_action']['action_by'],
+      //           json['assistent_warden_action']['action_by'],
       //         ),
-      //         action: RequestAction.values.firstWhere(
-      //           (e) =>
-      //               e.toString().split('.').last ==
-      //               json['assistant_warden_action']['action'],
+      //         action: RequestActionX.ApiStringToAction(
+      //           json['assistent_warden_action']['action'],
       //         ),
       //         actionAt: DateTime.parse(
-      //           json['assistant_warden_action']['action_at'],
+      //           json['assistent_warden_action']['createdAt'],
       //         ),
       //       )
       //     : null,
@@ -225,13 +229,11 @@ class RequestModel {
       //         seniorWardenModel: StudentProfileModel.fromJson(
       //           json['senior_warden_action']['action_by'],
       //         ),
-      //         action: RequestAction.values.firstWhere(
-      //           (e) =>
-      //               e.toString().split('.').last ==
-      //               json['senior_warden_action']['action'],
+      //         action: RequestActionX.ApiStringToAction(
+      //           json['senior_warden_action']['action'],
       //         ),
       //         actionAt: DateTime.parse(
-      //           json['senior_warden_action']['action_at'],
+      //           json['senior_warden_action']['createdAt'],
       //         ),
       //       )
       //     : null,
@@ -240,13 +242,11 @@ class RequestModel {
       //         securityGuardModel: SecurityGuardModel.fromJson(
       //           json['security_guard_action']['action_by'],
       //         ),
-      //         action: RequestAction.values.firstWhere(
-      //           (e) =>
-      //               e.toString().split('.').last ==
-      //               json['security_guard_action']['action'],
+      //         action: RequestActionX.ApiStringToAction(
+      //           json['security_guard_action']['action'],
       //         ),
       //         actionAt: DateTime.parse(
-      //           json['security_guard_action']['action_at'],
+      //           json['security_guard_action']['createdAt'],
       //         ),
       //       )
       //     : null,
@@ -371,6 +371,7 @@ class RequestApiResponse {
   RequestApiResponse({required this.message, required this.requests});
 
   factory RequestApiResponse.fromJson(Map<String, dynamic> json) {
+    print(json['requests'].runtimeType);
     return RequestApiResponse(
       message: json['message'] ?? '',
       requests: (json['requests'] as List<dynamic>)

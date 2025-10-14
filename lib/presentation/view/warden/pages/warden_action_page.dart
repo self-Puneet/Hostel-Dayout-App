@@ -59,7 +59,7 @@ class _WardenHomePageState extends State<WardenHomePage>
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
-    final labels = WardenTab.values.map((t) => t.label).toList();
+    final labels = WardenTab.values.map((t) => t.label(widget.actor)).toList();
     final state = context.read<WardenActionState>();
     final controller = WardenActionPageController(state);
     final horizontalPad = EdgeInsets.symmetric(
@@ -169,15 +169,28 @@ class _WardenHomePageState extends State<WardenHomePage>
                             requestedTab(controller),
                           ] else if (widget.actor ==
                               TimelineActor.assistentWarden) ...[
-                            requestedTab(controller),
-                            parentPendingTab(controller),
-                            approvedTab(controller),
-                            finalApprovalTab(controller, state),
+                            _PendingApprovalList(
+                              actor: widget.actor,
+                              stateController: controller,
+                              state: state,
+                              status: RequestStatus.requested,
+                            ),
+                            StatusList(
+                              actor: widget.actor,
+                              stateController: controller,
+                              status: RequestStatus.approved,
+                            ),
+                            StatusList(
+                              actor: widget.actor,
+                              stateController: controller,
+                              status: RequestStatus.referred,
+                            ),
+                            StatusList(
+                              actor: widget.actor,
+                              stateController: controller,
+                              status: RequestStatus.parentApproved,
+                            ),
                           ],
-                          // Container(
-                          //   height:
-                          //       84 + MediaQuery.of(context).viewPadding.bottom,
-                          // ),
                         ],
                       ),
               ),
@@ -327,172 +340,189 @@ class _PendingApprovalList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final media = MediaQuery.of(context);
-    // final horizontalPad = EdgeInsets.symmetric(
-    //   horizontal: 31 * media.size.width / 402,
-    // );
-    return Consumer<WardenActionState>(
-      builder: (context, s, _) {
-        final List<OnScreenRequest> result = stateController.getRequestByStatus(
-          status_: RequestStatus.parentApproved,
-        );
-        if (result.isEmpty) {
-          final q = s.filterController.text.trim();
-          return LayoutBuilder(
-            builder: (context, constraints) => SingleChildScrollView(
-              physics:
-                  const AlwaysScrollableScrollPhysics(), // ✅ enables pull-to-refresh even when empty
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight, // ✅ fill available height
-                ),
-                child: Center(
-                  child: Text(
-                    q.isEmpty ? 'Nothing here yet' : 'No matches for "$q"',
+    final media = MediaQuery.of(context);
+    final horizontalPad = EdgeInsets.symmetric(
+      horizontal: 31 * media.size.width / 402,
+    );
+    return Container(
+      margin: horizontalPad,
+      child: Consumer<WardenActionState>(
+        builder: (context, s, _) {
+          final List<OnScreenRequest> result = stateController
+              .getRequestByStatus(
+                status_: actor == TimelineActor.seniorWarden
+                    ? RequestStatus.parentApproved
+                    : status,
+              );
+          print(result.length);
+          if (result.isEmpty) {
+            final q = s.filterController.text.trim();
+            return LayoutBuilder(
+              builder: (context, constraints) => SingleChildScrollView(
+                physics:
+                    const AlwaysScrollableScrollPhysics(), // ✅ enables pull-to-refresh even when empty
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight, // ✅ fill available height
+                  ),
+                  child: Center(
+                    child: Text(
+                      q.isEmpty ? 'Nothing here yet' : 'No matches for "$q"',
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        }
-        return Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: state.isActioning || !state.hasSelection
-                          ? Colors.grey
-                          : Colors.red,
-                      foregroundColor: state.isActioning || !state.hasSelection
-                          ? Colors.black
-                          : Colors.white,
-                    ),
-                    onPressed: (!state.isActioning && state.hasSelection)
-                        ? () {
-                            if (actor == TimelineActor.assistentWarden) {
-                              stateController.bulkActionSelected(
-                                action: RequestAction.cancel,
-                              );
-                            } else {
-                              stateController.bulkActionSelected(
-                                action: RequestAction.reject,
-                              );
+            );
+          }
+          return Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            state.isActioning || !state.hasSelection
+                            ? Colors.grey
+                            : Colors.red,
+                        foregroundColor:
+                            state.isActioning || !state.hasSelection
+                            ? Colors.black
+                            : Colors.white,
+                      ),
+                      onPressed: (!state.isActioning && state.hasSelection)
+                          ? () {
+                              if (actor == TimelineActor.assistentWarden) {
+                                stateController.bulkActionSelected(
+                                  action: RequestAction.cancel,
+                                );
+                              } else {
+                                stateController.bulkActionSelected(
+                                  action: RequestAction.reject,
+                                );
+                              }
                             }
-                          }
-                        : null,
-                    child: actor == TimelineActor.assistentWarden
-                        ? Text(RequestAction.cancel.name)
-                        : Text(RequestAction.reject.name),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: state.isActioning || !state.hasSelection
-                          ? Colors.grey
-                          : Colors.green,
-                      foregroundColor: state.isActioning || !state.hasSelection
-                          ? Colors.black
-                          : Colors.white,
+                          : null,
+                      child: actor == TimelineActor.assistentWarden
+                          ? Text(RequestAction.cancel.name)
+                          : Text(RequestAction.reject.name),
                     ),
-                    onPressed: (!state.isActioning && state.hasSelection)
-                        ? () {
-                            if (actor == TimelineActor.assistentWarden) {
-                              stateController.bulkActionSelected(
-                                action: RequestAction.refer,
-                              );
-                            } else {
-                              stateController.bulkActionSelected(
-                                action: RequestAction.approve,
-                              );
-                            }
-                          }
-                        : null,
-                    child: actor == TimelineActor.assistentWarden
-                        ? Text(RequestAction.refer.name)
-                        : Text(RequestAction.approve.name),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            // 👇 This makes the list take the remaining space properly
-            Expanded(
-              child: ListView.separated(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-                itemCount: result.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 10),
-                itemBuilder: (context, i) {
-                  final wrap = result[i];
-                  final req = wrap.request;
-                  final stu = wrap.student;
-                  final selected = wrap.isSelected;
-                  final safeName = (stu.name).isEmpty ? 'Unknown' : stu.name;
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            state.isActioning || !state.hasSelection
+                            ? Colors.grey
+                            : Colors.green,
+                        foregroundColor:
+                            state.isActioning || !state.hasSelection
+                            ? Colors.black
+                            : Colors.white,
+                      ),
+                      onPressed: (!state.isActioning && state.hasSelection)
+                          ? () {
+                              if (actor == TimelineActor.assistentWarden) {
+                                stateController.bulkActionSelected(
+                                  action: RequestAction.refer,
+                                );
+                                stateController.fetchRequestsFromApi();
+                              } else {
+                                stateController.bulkActionSelected(
+                                  action: RequestAction.approve,
+                                );
+                                stateController.fetchRequestsFromApi();
+                              }
+                            }
+                          : null,
+                      child: actor == TimelineActor.assistentWarden
+                          ? Text(RequestAction.refer.name)
+                          : Text(RequestAction.approve.name),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              // 👇 This makes the list take the remaining space properly
+              Expanded(
+                child: ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 0,
+                    vertical: 8,
+                  ),
+                  itemCount: result.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  itemBuilder: (context, i) {
+                    final wrap = result[i];
+                    final req = wrap.request;
+                    final stu = wrap.student;
+                    final selected = wrap.isSelected;
+                    final safeName = (stu.name).isEmpty ? 'Unknown' : stu.name;
 
-                  return SimpleActionRequestCard(
-                    profileImageUrl: stu.profilePic,
-                    reason: req.reason,
-                    name: safeName,
-                    status: req.status,
-                    leaveType: req.requestType,
-                    fromDate: req.appliedFrom,
-                    toDate: req.appliedTo,
-                    selected: selected,
-                    onLongPress: (!s.isActioning && !s.hasSelection)
-                        ? () => s.toggleSelectedById(req.requestId)
-                        : null,
-                    onTap: (!s.isActioning && s.hasSelection)
-                        ? () => s.toggleSelectedById(req.requestId)
-                        : null,
-                    onRejection: (!s.hasSelection && !s.isActioning)
-                        ? () async {
-                            await stateController.actionRequestById(
-                              action: actor == TimelineActor.assistentWarden
-                                  ? RequestAction.cancel
-                                  : RequestAction.reject,
-                              requestId: req.requestId,
-                            );
-                            if (context.mounted) {
-                              context.goNamed(
-                                AppRoutes.wardenHome,
-                                queryParameters: {
-                                  'ts': DateTime.now().millisecondsSinceEpoch
-                                      .toString(),
-                                },
+                    return SimpleActionRequestCard(
+                      profileImageUrl: stu.profilePic,
+                      reason: req.reason,
+                      name: safeName,
+                      status: req.status,
+                      leaveType: req.requestType,
+                      fromDate: req.appliedFrom,
+                      toDate: req.appliedTo,
+                      selected: selected,
+                      onLongPress: (!s.isActioning && !s.hasSelection)
+                          ? () => s.toggleSelectedById(req.requestId)
+                          : null,
+                      onTap: (!s.isActioning && s.hasSelection)
+                          ? () => s.toggleSelectedById(req.requestId)
+                          : null,
+                      onRejection: (!s.hasSelection && !s.isActioning)
+                          ? () async {
+                              await stateController.actionRequestById(
+                                action: actor == TimelineActor.assistentWarden
+                                    ? RequestAction.cancel
+                                    : RequestAction.reject,
+                                requestId: req.requestId,
                               );
+                              state.clearState();
+                              if (context.mounted) {
+                                context.goNamed(
+                                  AppRoutes.wardenHome,
+                                  queryParameters: {
+                                    'ts': DateTime.now().millisecondsSinceEpoch
+                                        .toString(),
+                                  },
+                                );
+                              }
                             }
-                          }
-                        : null,
-                    onAcceptence: (!s.hasSelection && !s.isActioning)
-                        ? () async {
-                            await stateController.actionRequestById(
-                              action: actor == TimelineActor.assistentWarden
-                                  ? RequestAction.refer
-                                  : RequestAction.approve,
-                              requestId: req.requestId,
-                            );
-                            if (context.mounted) {
-                              context.goNamed(
-                                AppRoutes.wardenHome,
-                                queryParameters: {
-                                  'ts': DateTime.now().millisecondsSinceEpoch
-                                      .toString(),
-                                },
+                          : null,
+                      onAcceptence: (!s.hasSelection && !s.isActioning)
+                          ? () async {
+                              await stateController.actionRequestById(
+                                action: actor == TimelineActor.assistentWarden
+                                    ? RequestAction.refer
+                                    : RequestAction.approve,
+                                requestId: req.requestId,
                               );
+                              if (context.mounted) {
+                                context.goNamed(
+                                  AppRoutes.wardenHome,
+                                  queryParameters: {
+                                    'ts': DateTime.now().millisecondsSinceEpoch
+                                        .toString(),
+                                  },
+                                );
+                              }
                             }
-                          }
-                        : null,
-                  );
-                },
+                          : null,
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
-        );
-      },
+            ],
+          );
+        },
+      ),
     );
   }
 }

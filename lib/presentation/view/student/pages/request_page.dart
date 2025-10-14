@@ -281,6 +281,8 @@ class _RequestPageState extends State<RequestPage> {
     required RequestDetailApiResponse req,
     required TimelineActor actor,
   }) {
+    print(req.request.assistantWardenAction != null);
+    print("you bitch");
     return Container(
       decoration: BoxDecoration(
         color: Color.fromRGBO(246, 246, 246, 1),
@@ -291,33 +293,60 @@ class _RequestPageState extends State<RequestPage> {
       // padding: EdgeInsetsGeometry.symmetric(vertical: 20, horizontal: 20),
       child: RequestTimeline(
         events: [
-          if (req.request.seniorWardenAction != null)
-            TimelineEvent(
-              title: TimelineActor.seniorWarden.displayName,
-              subtitle: "",
-              time: req.request.seniorWardenAction!.actionAt,
-              status: TimelineStatus.completed,
-            ),
-          if (req.request.parentAction != null)
-            TimelineEvent(
-              title: TimelineActor.parent.displayName,
-              subtitle: "Parent accepted the request",
-              time: req.request.parentAction!.actionAt,
-              status: TimelineStatus.completed,
-            ),
-          (req.request.assistantWardenAction != null)
-              ? TimelineEvent(
-                  title: TimelineActor.assistentWarden.displayName,
-                  subtitle: "Request Referred to Parent",
-                  time: req.request.assistantWardenAction!.actionAt,
-                  status: TimelineStatus.completed,
-                )
-              : TimelineEvent(
-                  title: TimelineActor.assistentWarden.displayName,
-                  subtitle: "Request Referred to Parent",
-                  status: TimelineStatus.inProgress,
-                ),
+          // if (req.request.seniorWardenAction != null)
+          //   TimelineEvent(
+          //     title: TimelineActor.seniorWarden.displayName,
+          //     subtitle: "",
+          //     time: req.request.seniorWardenAction!.actionAt,
+          //     status: TimelineStatus.completed,
+          //   ),
+          // if (req.request.parentAction != null)
+          //   TimelineEvent(
+          //     title: TimelineActor.parent.displayName,
+          //     subtitle: "Parent accepted the request",
+          //     time: req.request.parentAction!.actionAt,
+          //     status: TimelineStatus.completed,
+          //   ),
+          // (req.request.assistantWardenAction != null)
+          //     ? TimelineEvent(
+          //         title: TimelineActor.assistentWarden.displayName,
+          //         subtitle: "Request Referred to Parent",
+          //         time: req.request.assistantWardenAction!.actionAt,
+          //         status: TimelineStatus.completed,
+          //       )
+          //     : TimelineEvent(
+          //         title: TimelineActor.assistentWarden.displayName,
+          //         subtitle: "Request Referred to Parent",
+          //         status: TimelineStatus.inProgress,
+          //       ),
+          TimelineEvent(
+            title: TimelineActor.seniorWarden.displayName,
+            subtitle: "request approved",
+            time: (req.request.seniorWardenAction != null)
+                ? req.request.seniorWardenAction!.actionAt
+                : null,
+            status: TimelineStatus.completed,
+          ),
 
+          TimelineEvent(
+            title: TimelineActor.parent.displayName,
+            subtitle: "Parent accepted the request",
+            time: (req.request.parentAction != null)
+                ? req.request.parentAction!.actionAt
+                : null,
+            status: TimelineStatus.completed,
+          ),
+
+          TimelineEvent(
+            title: TimelineActor.assistentWarden.displayName,
+            subtitle: "Request Referred to Parent",
+            time: (req.request.assistantWardenAction != null)
+                ? req.request.assistantWardenAction!.actionAt
+                : null,
+            status: (req.request.assistantWardenAction != null)
+                ? TimelineStatus.completed
+                : TimelineStatus.inProgress,
+          ),
           TimelineEvent(
             title: TimelineActor.student.displayName,
             subtitle: "Request Created",

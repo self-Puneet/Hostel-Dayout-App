@@ -170,7 +170,7 @@ class LoginController {
                 GoRouter.of(context).go(
                   role == TimelineActor.assistentWarden
                       ? AppRoutes.wardenHome
-                      : AppRoutes.seniorWardenHome,
+                      : AppRoutes.wardenHome,
                 );
                 AppSnackBar.show(
                   context,
@@ -243,7 +243,7 @@ class LoginController {
 
   /// Logout service
   static Future<void> logout(BuildContext context) async {
-    LoginSession.clearPrefs();
+    Get.find<LoginSession>().clearPrefs();
     // go navigation to login screen
     GoRouter.of(context).go(AppRoutes.login);
     AppSnackBar.show(

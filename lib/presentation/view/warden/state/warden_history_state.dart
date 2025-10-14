@@ -8,10 +8,7 @@ class OnScreenHistoryItem {
   final RequestModel request;
   final StudentProfileModel student;
 
-  OnScreenHistoryItem({
-    required this.request,
-    required this.student,
-  });
+  OnScreenHistoryItem({required this.request, required this.student});
 }
 
 class WardenHistoryState extends ChangeNotifier {
@@ -29,13 +26,15 @@ class WardenHistoryState extends ChangeNotifier {
   bool hostelsInitialized = false;
 
   // Month/Year (defaults to current month)
-  DateTime _selectedMonthYear =
-      DateTime(DateTime.now().year, DateTime.now().month);
+  DateTime _selectedMonthYear = DateTime(
+    DateTime.now().year,
+    DateTime.now().month,
+  );
   DateTime get selectedMonthYear => _selectedMonthYear;
 
   // Data
-  List<(RequestModel, StudentProfileModel)> _all = [];
-  List<(RequestModel, StudentProfileModel)> get all => _all;
+  List<RequestModel> _all = [];
+  List<RequestModel> get all => _all;
   bool get hasData => _all.isNotEmpty;
 
   List<OnScreenHistoryItem> currentOnScreen = [];
@@ -83,7 +82,7 @@ class WardenHistoryState extends ChangeNotifier {
   }
 
   // Data
-  void setRequests(List<(RequestModel, StudentProfileModel)> items) {
+  void setRequests(List<RequestModel> items) {
     _all = items;
     _applyFilters();
   }
@@ -96,18 +95,18 @@ class WardenHistoryState extends ChangeNotifier {
   void _applyFilters() {
     final q = filterController.text.trim().toLowerCase();
 
-    Iterable<(RequestModel, StudentProfileModel)> base = _all;
+    Iterable<RequestModel> base = _all;
 
     if (_typeFilter != null) {
-      base = base.where((e) => e.$1.requestType == _typeFilter);
+      base = base.where((e) => e.requestType == _typeFilter);
     }
 
-    if (q.isNotEmpty) {
-      base = base.where((e) => (e.$2.name).toLowerCase().contains(q));
-    }
+    // if (q.isNotEmpty) {
+    //   base = base.where((e) => (e.name).toLowerCase().contains(q));
+    // }
 
     currentOnScreen = base
-        .map((e) => OnScreenHistoryItem(request: e.$1, student: e.$2))
+        .map((e) => OnScreenHistoryItem(request: e, student: null!))
         .toList();
 
     notifyListeners();

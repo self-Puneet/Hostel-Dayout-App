@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_profile_state.dart';
 import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/glass_nav_bar.dart';
@@ -106,8 +107,11 @@ class WardenLayout extends StatelessWidget {
                                 horizontal: 31 * media.size.width / 402,
                               ),
                               child: LiquidGlassNavBar(
-                                onHomePressed: () =>
-                                    context.goNamed(AppRoutes.seniorWardenHome),
+                                onHomePressed: () => context.goNamed(
+                                  (actor == TimelineActor.seniorWarden)
+                                      ? AppRoutes.wardenHome
+                                      : AppRoutes.wardenHome,
+                                ),
                                 onNewPressed: () =>
                                     context.goNamed(AppRoutes.wardenActionPage),
                                 onProfilePressed: () =>

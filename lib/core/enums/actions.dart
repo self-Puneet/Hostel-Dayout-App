@@ -206,4 +206,25 @@ extension RequestActionX on RequestAction {
         }
     }
   }
+
+  static RequestAction ApiStringToAction(String action) {
+    switch (action) {
+      case "cancelled_assistent_warden":
+        return RequestAction.cancel;
+      case "referred_to_parent":
+        return RequestAction.refer;
+      case "rejected":
+        return RequestAction.reject;
+      case "accepted_by_parent":
+        return RequestAction.approve;
+      case "rejected_by_parent":
+        return RequestAction.reject;
+      case "accepted_by_warden":
+        return RequestAction.approve;
+      case "rejected_by_warden":
+        return RequestAction.reject;
+      default:
+        return RequestAction.none;
+    }
+  }
 }

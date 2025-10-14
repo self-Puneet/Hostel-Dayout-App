@@ -36,17 +36,17 @@ class SimpleRequestCard extends StatelessWidget {
       highlightColor: Colors.transparent,
       splashColor: Colors.transparent,
       onTap: () {
-        if (actor == TimelineActor.student) {
-          context.pushNamed(
-            'request-detail',
-            pathParameters: {'id': requestId},
-          );
-        } else if (actor == TimelineActor.parent) {
-          context.pushNamed(
-            'request-detail-parent',
-            pathParameters: {'id': requestId},
-          );
-        }
+        // if (actor == TimelineActor.student) {
+        //   context.pushNamed(
+        //     'request-detail',
+        //     pathParameters: {'id': requestId},
+        //   );
+        // } else if (actor == TimelineActor.parent) {
+        //   context.pushNamed(
+        //     'request-detail-parent',
+        //     pathParameters: {'id': requestId},
+        //   );
+        // }
       },
       borderRadius: BorderRadius.circular(28),
       child: Table(

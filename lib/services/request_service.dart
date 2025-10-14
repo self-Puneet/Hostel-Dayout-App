@@ -27,13 +27,15 @@ class RequestService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        print("peeche dekho peeche");
         final apiResponse = RequestApiResponse.fromJson(data);
+        print(apiResponse.requests[0].assistantWardenAction);
         return right(apiResponse);
       } else {
         return left("Error: ${response.body}");
       }
     } catch (e) {
-      print("❌ Exception: $e");
+      print("❌ Exceptions: $e");
       return left("Exception: $e");
     }
   }
@@ -161,7 +163,7 @@ class RequestService {
     }
 
     final body = jsonDecode(response.body) as Map<String, dynamic>;
-    print(body);
+    print(body['requests'][0].keys.toList());
     // Adjust parsing if your API wraps data differently.
     final list = (body['requests'] as List<dynamic>? ?? [])
         .map((e) => RequestModel.fromJson(e as Map<String, dynamic>))

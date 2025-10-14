@@ -47,7 +47,7 @@ class LoginSession {
     "hostel": hostels,
     "imageURL": imageURL,
     "primaryId": primaryId,
-    "room_no": roomNo
+    "room_no": roomNo,
   };
 
   factory LoginSession.fromJson(Map<String, dynamic> json) => LoginSession(
@@ -59,17 +59,17 @@ class LoginSession {
     phone: json["phone"],
     fcmToken: json["fcm_token"],
     role: TimelineActorX.fromString(json["role"]),
-    hostelIds: (json["hostel_id"] as List<dynamic>?)
-                ?.map((e) => e.toString())
-                .toList() ??
-            [],
-        hostels: (json["hostel"] as List<dynamic>?)
-                ?.map((e) => e.toString())
-                .toList() ??
-            [],
+    hostelIds:
+        (json["hostel_id"] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [],
+    hostels:
+        (json["hostel"] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
+        [],
     imageURL: json["imageURL"],
     primaryId: json["primaryId"],
-    roomNo: json['room_no']
+    roomNo: json['room_no'],
   );
 
   Future<void> saveToPrefs() async {
@@ -88,7 +88,8 @@ class LoginSession {
     }
   }
 
-  static Future<void> clearPrefs() async {
+  Future<void> clearPrefs() async {
+    token = "";
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove("login_session");
   }

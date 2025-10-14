@@ -110,7 +110,7 @@ class ParentHomePage extends StatelessWidget {
                             ? Column(
                                 children: [
                                   SizedBox(
-                                    height: 355,
+                                    height: 360,
                                     child: PageView.builder(
                                       controller: pageController,
                                       itemCount: activeRequests.length,

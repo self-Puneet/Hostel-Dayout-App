@@ -29,17 +29,12 @@ String? _requireAuthRedirect(BuildContext context, GoRouterState state) {
   final session = Get.find<LoginSession>();
 
   // Not logged in → go to login
+  print(session.token);
   if (session.token.isEmpty || !session.isValid) {
     return AppRoutes.login;
   }
 
   final allowedRoutes = AppRoutes.routeAllowence[session.role] ?? [];
-  // print("aaah" * 90);
-  // print(state.matchedLocation);
-  // print(
-  //   allowedRoutes.any((allowed) => state.matchedLocation.startsWith(allowed)),
-  // );
-  // Already on allowed route → no redirect
   if (allowedRoutes.any(
     (allowed) => state.matchedLocation.startsWith(allowed),
   )) {
@@ -56,7 +51,7 @@ String? _requireAuthRedirect(BuildContext context, GoRouterState state) {
     case TimelineActor.assistentWarden:
       return AppRoutes.wardenHome;
     case TimelineActor.seniorWarden:
-      return AppRoutes.seniorWardenHome;
+      return AppRoutes.wardenHome;
     case TimelineActor.parent:
       return AppRoutes.parentHome;
     default:
@@ -76,11 +71,11 @@ String? _initialRoute() {
 
   switch (role) {
     case TimelineActor.student:
-      return AppRoutes.requestForm;
+      return AppRoutes.studentHome;
     case TimelineActor.assistentWarden:
       return AppRoutes.wardenHome;
     case TimelineActor.seniorWarden:
-      return AppRoutes.wardenActionPage;
+      return AppRoutes.wardenHome;
     case TimelineActor.parent:
       return AppRoutes.parentHome;
     default:
@@ -145,8 +140,8 @@ class AppRouter {
 
             // // warden home page route
             GoRoute(
-              path: AppRoutes.seniorWardenHome,
-              name: AppRoutes.seniorWardenHome,
+              path: AppRoutes.wardenHome,
+              name: AppRoutes.wardenHome,
               pageBuilder: (context, state) {
                 // Instead of only providing state, provide both state and controller
                 return AppTransitionPage(
@@ -174,7 +169,7 @@ class AppRouter {
             // warden history page route
             GoRoute(
               path: AppRoutes.wardenHistory, // e.g., '/warden/history'
-              name: 'warden-history',
+              name: AppRoutes.wardenHistory,
               pageBuilder: (context, state) {
                 final profile = context.read<WardenProfileState>();
                 return AppTransitionPage(

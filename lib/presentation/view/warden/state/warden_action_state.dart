@@ -11,7 +11,7 @@ enum WardenTab { pendingApproval, approved, pendingParent, requested }
 
 extension WardenTabX on WardenTab {
   static WardenTab fromIndex(int i) => WardenTab.values[i];
-  String get label {
+  String label(TimelineActor actor) {
     switch (this) {
       case WardenTab.pendingApproval:
         return 'Pending Approval';
@@ -20,7 +20,9 @@ extension WardenTabX on WardenTab {
       case WardenTab.pendingParent:
         return 'Pending Parent';
       case WardenTab.requested:
-        return 'Requested';
+        return (actor == TimelineActor.seniorWarden)
+            ? 'Requested'
+            : 'Parent Approved';
     }
   }
 }
@@ -51,12 +53,11 @@ class OnScreenRequest {
     );
   }
 
-  factory OnScreenRequest.fromRequest((RequestModel, StudentProfileModel) tuple) {
+  factory OnScreenRequest.fromRequest(
+    (RequestModel, StudentProfileModel) tuple,
+  ) {
     final (request, student) = tuple;
-    return OnScreenRequest(
-      request: request,
-      student: student,
-    );
+    return OnScreenRequest(request: request, student: student);
   }
 }
 
@@ -76,7 +77,7 @@ class WardenActionState extends ChangeNotifier {
 
   // Tabs
   WardenTab _currentTab = WardenTab.pendingApproval;
-WardenTab get currentTab => _currentTab;
+  WardenTab get currentTab => _currentTab;
 
   bool get isLoading => _isLoading;
   bool get isErrored => _isErrored;
