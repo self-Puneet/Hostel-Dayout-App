@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
-
-class ExpandableStatCardData {
-  final IconData icon;
-  final Color iconColor;
-  final Color iconBgColor;
+class StatCardData {
+  final Color dotColor;
   final int value;
   final String valueLabel;
-  final String title;
-  final List<Map<String, dynamic>> breakdown;
+  final List<Map<String, dynamic>> breakdown; // e.g., [{"label": ..., "value": ...}]
   final VoidCallback? onTap;
 
-  const ExpandableStatCardData({
-    required this.icon,
-    required this.iconColor,
-    required this.iconBgColor,
+  const StatCardData({
+    required this.dotColor,
     required this.value,
     required this.valueLabel,
-    required this.title,
     this.breakdown = const [],
     this.onTap,
   });

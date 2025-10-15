@@ -14,8 +14,8 @@ class WardenActionPageController {
   // NEW: Initialize hostel list and default selection from session.
   void loadHostelsFromSession() {
     final session = Get.find<LoginSession>();
-    final ids = session.hostelIds ?? <String>[];
-    state.setHostelList(ids);
+    final hostels = session.hostels ?? [];
+    state.setHostelList(hostels);
   }
 
   Future<void> fetchRequestsFromApi({String? hostelId}) async {
@@ -26,8 +26,8 @@ class WardenActionPageController {
       final String? resolvedHostelId =
           hostelId ??
           state.selectedHostelId ??
-          ((session.hostelIds?.isNotEmpty ?? false)
-              ? session.hostelIds!.first
+          ((session.hostels?.isNotEmpty ?? false)
+              ? session.hostels!.first.hostelId
               : null);
 
       if (resolvedHostelId == null) {

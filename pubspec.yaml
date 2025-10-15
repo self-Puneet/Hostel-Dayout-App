@@ -61,6 +61,8 @@ flutter:
     - assets/hostel_image.png
     - assets/app_icon1.png
     - assets/hero1.png
+    - assets/monthly_calender.png
+    - assets/today_calender.png
 
 flutter_native_splash:
   color: "#ffffff"

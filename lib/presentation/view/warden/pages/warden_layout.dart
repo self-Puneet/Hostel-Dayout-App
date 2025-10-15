@@ -58,9 +58,12 @@ class WardenLayout extends StatelessWidget {
                               enrollmentNumber: state.loginSession.identityId,
                               phoneNumber: state.loginSession.phone,
                               actor: actor,
-                              hostelName: state.loginSession.hostelIds!.join(
-                                '\n',
-                              ),
+                              hostelName: state.loginSession.hostels!
+                                  .map((hostel) {
+                                    return hostel.hostelName;
+                                  })
+                                  .toList()
+                                  .join('\n'),
                               name: state.loginSession.username,
                               avatarUrl: state.loginSession.imageURL,
                               greeting: 'Welcome back,',

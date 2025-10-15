@@ -3,13 +3,30 @@ import 'package:dartz/dartz.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class HostelInfo {
+  String hostelId;
+  String hostelName;
+
+  HostelInfo({required this.hostelId, required this.hostelName});
+
+  // JSON serialization
+  Map<String, dynamic> toJson() => {
+        "hostel_id": hostelId,
+        "hostel_name": hostelName,
+      };
+
+  factory HostelInfo.fromJson(Map<String, dynamic> json) => HostelInfo(
+        hostelId: json["hostel_id"],
+        hostelName: json["hostel_name"],
+      );
+}
+
 class LoginSession {
   String token;
   String username;
   String? email;
   String? primaryId;
-  List<String>? hostelIds;
-  List<String>? hostels;
+  List<HostelInfo>? hostels;
   String? identityId;
   DateTime? expiry;
   String? phone;
@@ -28,8 +45,7 @@ class LoginSession {
     this.phone,
     this.fcmToken,
     required this.role,
-    this.hostelIds = const [],
-    this.hostels = const [],
+    this.hostels,
     this.imageURL,
     this.roomNo,
   });
@@ -43,7 +59,7 @@ class LoginSession {
     "phone": phone,
     "fcm_token": fcmToken,
     "role": TimelineActorX.toShortString(role),
-    "hostel_id": hostelIds,
+    "hostel_id": hostels,
     "hostel": hostels,
     "imageURL": imageURL,
     "primaryId": primaryId,
@@ -59,14 +75,10 @@ class LoginSession {
     phone: json["phone"],
     fcmToken: json["fcm_token"],
     role: TimelineActorX.fromString(json["role"]),
-    hostelIds:
-        (json["hostel_id"] as List<dynamic>?)
-            ?.map((e) => e.toString())
-            .toList() ??
-        [],
-    hostels:
-        (json["hostel"] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
-        [],
+        hostels: (json["hostels"] as List<dynamic>?)
+                ?.map((e) => HostelInfo.fromJson(e as Map<String, dynamic>))
+                .toList() ??
+            [],
     imageURL: json["imageURL"],
     primaryId: json["primaryId"],
     roomNo: json['room_no'],

@@ -1,5 +1,6 @@
 // lib/state/warden_statistics_state.dart
 import 'package:flutter/foundation.dart';
+import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/models/warden_statistics.dart';
 
 class WardenStatisticsState extends ChangeNotifier {
@@ -9,8 +10,9 @@ class WardenStatisticsState extends ChangeNotifier {
   WardenStatistics? _stats;
 
   // Hostel selection
-  List<String> _hostelIds = [];
+  List<HostelInfo> _hostels = [];
   String? _selectedHostelId;
+  String? _selectedHostelName;
   bool _hostelsInitialized = false;
 
   // Getters for UI
@@ -18,8 +20,9 @@ class WardenStatisticsState extends ChangeNotifier {
   String? get error => _error;
   WardenStatistics? get stats => _stats;
 
-  List<String> get hostelIds => _hostelIds;
+  List<HostelInfo> get hostels => _hostels;
   String? get selectedHostelId => _selectedHostelId;
+  String? get selectedHostelName => _selectedHostelName;
   bool get hostelsInitialized => _hostelsInitialized;
 
   // Setters used ONLY by controller
@@ -38,18 +41,41 @@ class WardenStatisticsState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setHostelList(List<String> ids) {
-    _hostelIds = ids;
-    if (_selectedHostelId == null && ids.isNotEmpty) {
-      _selectedHostelId = ids.first;
+  // void setHostelList(List<HostelInfo> hostels) {
+  //   if (_selectedHostelId == null && hostels.isNotEmpty) {
+  //     _selectedHostelId = hostels.first.hostelId;
+  //     _selectedHostelName = hostels.first.hostelName;
+  //   }
+  //   print(hostels.length);
+  //   hostels.add(HostelInfo(hostelId: "sdf", hostelName: "sdfsdfsdf"));
+  //   print(hostels.length);
+  //   _hostelsInitialized = true;
+  //   notifyListeners();
+  // }
+  void setHostelList(List<HostelInfo> hostels) {
+    _hostels = List<HostelInfo>.from(
+      hostels,
+    ); // Assign incoming list to private
+    if (_selectedHostelId == null && _hostels.isNotEmpty) {
+      _selectedHostelId = _hostels.first.hostelId;
+      _selectedHostelName = _hostels.first.hostelName;
     }
-    // hostelIds.add("value");
+    // optional: remove this test data now
+    // _hostels.add(HostelInfo(hostelId: "sdf", hostelName: "sdfsdfsdf"));
+    print(_hostels.length); // Now prints the correct count
     _hostelsInitialized = true;
     notifyListeners();
   }
 
   void setSelectedHostelId(String id) {
+    String name = '';
+    hostels.map((hostel) {
+      if (hostel.hostelId == id) {
+        name = hostel.hostelName;
+      }
+    });
     _selectedHostelId = id;
+    _selectedHostelName = name;
     notifyListeners();
   }
 

@@ -134,6 +134,37 @@ class ProfileService {
     }
   }
 
+  static Future<Either<String, List<HostelModel>>> getAllHostelInfo() async {
+    final session = Get.find<LoginSession>();
+    final token = session.token;
+
+    try {
+      final response = await http.get(
+        Uri.parse("$url/student/all-hostel-info"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      print("📡 getHostelInfo - Status: ${response.statusCode}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print("📡 getHostelInfo - Response: $data");
+        final hostelResponse = (data['hostels'] as List<dynamic>)
+            .map((e) => HostelModel.fromJson(e))
+            .toList();
+        return right(hostelResponse);
+      } else {
+        return left("Error: ${response.body}");
+      }
+    } catch (e) {
+      print("❌ Exception: $e");
+      return left("Exception: $e");
+    }
+  }
+
   /// Fetch parent's child (student) profile from `/parent/student`
   static Future<Either<String, List<StudentProfileModel>>>
   getParentStudentProfile({required String token}) async {

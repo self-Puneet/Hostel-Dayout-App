@@ -11,8 +11,8 @@ class WardenHistoryPageController {
 
   void loadHostelsFromSession() {
     final session = Get.find<LoginSession>();
-    final ids = session.hostelIds ?? <String>[];
-    state.setHostelList(ids);
+    final hostels = session.hostels ?? [];
+    state.setHostelList(hostels);
   }
 
   Future<void> fetchRequestsFromApi({
@@ -25,8 +25,8 @@ class WardenHistoryPageController {
       final session = Get.find<LoginSession>();
       final resolvedHostelId = hostelId ??
           state.selectedHostelId ??
-          ((session.hostelIds?.isNotEmpty ?? false)
-              ? session.hostelIds!.first
+          ((session.hostels?.isNotEmpty ?? false)
+              ? session.hostels!.first.hostelId
               : null);
 
       if (resolvedHostelId == null) {

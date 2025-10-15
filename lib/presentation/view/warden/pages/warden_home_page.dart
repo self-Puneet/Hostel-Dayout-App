@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
+import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/models/expandable_stat_card_data.dart';
 import 'package:hostel_mgmt/models/warden_statistics.dart';
@@ -17,7 +18,6 @@ class HomeDashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     final state = context.watch<WardenStatisticsState>();
     final controller = context.read<WardenStatisticsController>();
 
@@ -39,117 +39,6 @@ class HomeDashboardPage extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.all(0),
           children: [
-            // Section label (matches image)
-            if (state.hostelsInitialized && state.hostelIds.length > 1) ...[
-              Padding(
-                padding: const EdgeInsets.only(left: 4, bottom: 4),
-                child: Text(
-                  "SELECT HOSTEL",
-                  style: textTheme.h7.copyWith(letterSpacing: 1.2),
-                ),
-              ),
-            ],
-            // Dropdown
-            Visibility(
-              visible: state.hostelsInitialized && state.hostelIds.length > 1,
-              replacement: const SizedBox.shrink(),
-              child: Theme(
-                data: Theme.of(context).copyWith(
-                  // Blue overlay when an item is focused/selected in the open menu
-                  focusColor: Colors.blue.withAlpha((0.20 * 255).toInt()),
-                  // Optional: subtler blue on hover and press
-                  hoverColor: Colors.blue.withAlpha((0.08 * 255).toInt()),
-                  highlightColor: Colors.blue.withAlpha((0.12 * 255).toInt()),
-                ),
-                child: DropdownButtonFormField<String>(
-                  initialValue: state.selectedHostelId,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                        width: 1.0,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                        width: 1.0,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                        width: 1.4,
-                      ),
-                    ),
-                  ),
-                  elevation: 0,
-                  icon: const Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    color: Colors.black,
-                  ),
-                  dropdownColor: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-
-                  // Selected (displayed) item in the field -> BLUE
-                  selectedItemBuilder: (context) {
-                    return state.hostelIds.map((id) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            id,
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(
-                                  color: Colors.blue,
-                                ), // blue for selected display
-                          ),
-                        ),
-                      );
-                    }).toList();
-                  },
-
-                  // Menu items -> keep black so only the selected display is blue
-                  items: state.hostelIds.map((id) {
-                    final isSelected = id == state.selectedHostelId;
-                    return DropdownMenuItem(
-                      value: id,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? Colors.blue.shade100
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
-                        ),
-                        child: Text(
-                          id,
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(color: Colors.black),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (id) {
-                    if (id != null) controller.selectHostel(id);
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(height: 18),
             if (state.isLoading)
               const Center(
                 child: Padding(
@@ -171,19 +60,31 @@ class HomeDashboardPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   HostelSummaryCard(
-                    hostelName: state.selectedHostelId!,
+                    selectedHostelName: state.selectedHostelName ?? "Unknown",
+                    hostels: state.hostels,
+                    selectedHostelId: state.selectedHostelId!,
+                    onHostelSelected: (HostelInfo selected) {
+                      controller.selectHostel(
+                        selected.hostelId,
+                        selected.hostelName,
+                      );
+                    },
                     monthCount: state.stats!.monthCount,
                     todayCount: state.stats!.actionCount,
                   ),
 
                   const SizedBox(height: 20),
-                  // Statistics section
-                  Text(
-                    "OVERVIEW",
-                    style: textTheme.h5.copyWith(fontWeight: FontWeight.bold),
+                  const Padding(
+                    padding: EdgeInsetsGeometry.symmetric(horizontal: 11),
+                    child: Divider(color: Color.fromRGBO(117, 117, 117, 1)),
                   ),
+                  const SizedBox(height: 20),
+
+                  // Statistics section
                   DashboardGrid(stats: state.stats!),
-                  // _StatsSection(onTap: controller.onCardTap),
+                  Container(
+                    height: 84 + MediaQuery.of(context).viewPadding.bottom,
+                  ),
                 ],
               ),
           ],
@@ -194,25 +95,38 @@ class HomeDashboardPage extends StatelessWidget {
 }
 
 class HostelSummaryCard extends StatelessWidget {
-  final String hostelName;
+  final String selectedHostelName;
+  final List<HostelInfo> hostels;
+  final String selectedHostelId;
+  final void Function(HostelInfo) onHostelSelected;
   final int monthCount;
   final int todayCount;
   final IconData icon;
+
   const HostelSummaryCard({
     super.key,
-    required this.hostelName,
+    required this.selectedHostelName,
+    required this.hostels,
+    required this.selectedHostelId,
+    required this.onHostelSelected,
     required this.monthCount,
     required this.todayCount,
-    this.icon = Icons.apartment, // or another relevant icon
+    this.icon = Icons.apartment,
   });
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final multipleHostels = hostels.length > 1;
+    final selectedHostel = hostels.firstWhere(
+      (h) => h.hostelId == selectedHostelId,
+      orElse: () => hostels.first,
+    );
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        color: const Color.fromRGBO(0, 193, 255, 0.25),
+        borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -223,86 +137,185 @@ class HostelSummaryCard extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top: icon + hostel name
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  width: 44,
-                  height: 44,
-                  child: Icon(icon, color: Colors.blue, size: 28),
-                ),
-                const SizedBox(width: 14),
-                Text(
-                  hostelName,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: textTheme.h5.copyWith(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
             const SizedBox(height: 20),
-            // Stats row: This Month & Today
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                'OVERVIEW',
+                textAlign: TextAlign.start,
+                style: textTheme.h4.w500,
+              ),
+            ),
+            const SizedBox(height: 25),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (!multipleHostels)
+                    Expanded(
+                      child: Text(
+                        selectedHostelName,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.h2.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  if (multipleHostels)
+                    PopupMenuButton<HostelInfo>(
+                      tooltip: 'Select hostel',
+                      padding: EdgeInsets.zero,
+
+                      itemBuilder: (context) {
+                        return hostels.map((hostel) {
+                          final isSelected =
+                              hostel.hostelId == selectedHostelId;
+                          return PopupMenuItem<HostelInfo>(
+                            height: 35,
+                            value: hostel,
+                            padding: EdgeInsets.symmetric(horizontal: 5),
+                            child: Container(
+                              decoration: isSelected
+                                  ? BoxDecoration(
+                                      color: Colors.blue.shade100,
+                                      borderRadius: BorderRadius.circular(6),
+                                    )
+                                  : null,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 6,
+                              ),
+                              // NEW: Center row inside the container
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment
+                                    .center, // Center horizontally
+                                children: [
+                                  if (isSelected)
+                                    Icon(
+                                      Icons.check_circle,
+                                      color: Colors.blue,
+                                      size: 20,
+                                    )
+                                  else
+                                    SizedBox(width: 20),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      hostel.hostelName,
+                                      style: TextStyle(
+                                        fontWeight: isSelected
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                        color: isSelected
+                                            ? Colors.black
+                                            : Colors.grey[800],
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList();
+                      },
+                      onSelected: onHostelSelected,
+                      // constraints: const BoxConstraints(
+                      //   minWidth: 60,
+                      //   maxWidth: 220,
+                      // ),
+                      elevation: 8,
+                      color: Colors.blue[50], // Menu background (light blue)
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 0,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              selectedHostel.hostelName,
+                              style: textTheme.h2.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(width: 6),
+                            const Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: Colors.black87,
+                              size: 22,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 30),
             Row(
               children: [
-                // "This Month"
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey.withAlpha((0.08 * 225).toInt()),
-                      borderRadius: BorderRadius.circular(14),
+                      color: Colors.white,
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(32.0),
+                      ),
                     ),
                     padding: const EdgeInsets.symmetric(
-                      vertical: 18,
+                      vertical: 14,
                       horizontal: 14,
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("This Month", style: textTheme.h5),
-                        const SizedBox(height: 8),
-                        Text(
-                          '$monthCount',
-                          style: textTheme.h3.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                    child: CompressedStatTable(
+                      textTheme: textTheme,
+                      title: "This Month",
+                      value: monthCount.toString(),
+                      image: Image.asset(
+                        'assets/monthly_calender.png',
+                        height: 32,
+                        width: 32,
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
-                // "Today"
+                const SizedBox(width: 5),
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(14),
+                      color: Colors.white,
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(32.0),
+                      ),
                     ),
                     padding: const EdgeInsets.symmetric(
-                      vertical: 18,
+                      vertical: 14,
                       horizontal: 14,
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Today", style: textTheme.h5),
-                        const SizedBox(height: 8),
-                        Text(
-                          '$todayCount',
-                          style: textTheme.h3.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                    child: CompressedStatTable(
+                      textTheme: textTheme,
+                      title: "Today",
+                      value: todayCount.toString(),
+                      image: Image.asset(
+                        'assets/today_calender.png',
+                        height: 32,
+                        width: 32,
+                      ),
                     ),
                   ),
                 ),
@@ -323,17 +336,12 @@ class DashboardGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     // First row: no details
     final row0 = [
-      ExpandableStatCardData(
-        icon: Icons.assignment_outlined,
-        iconColor: const Color.fromRGBO(36, 99, 235, 1.0),
-        iconBgColor: const Color.fromRGBO(233, 239, 252, 0.8),
+      StatCardData(
+        dotColor: const Color.fromRGBO(0, 255, 13, 0.4),
         value: stats.count,
         valueLabel: "Active Requests",
-        title: "Active Requests",
         breakdown: const [],
         onTap: () {
-          // context.push(AppRoutes.wardenActionPage);
-          // Example: jump to the Approved tab
           context.goNamed(
             AppRoutes.wardenActionPage,
             queryParameters: {
@@ -342,14 +350,15 @@ class DashboardGrid extends StatelessWidget {
           );
         },
       ),
-      ExpandableStatCardData(
-        icon: Icons.assignment_turned_in_outlined,
-        iconColor: const Color.fromRGBO(249, 116, 21, 1.0),
-        iconBgColor: const Color.fromRGBO(254, 241, 231, 1.0),
-        value: stats.actionCount,
-        valueLabel: "Pending Approvals",
-        title: "Pending Approvals",
-        breakdown: const [],
+      StatCardData(
+        dotColor: const Color.fromRGBO(255, 0, 4, 0.4),
+        value: stats.lateCount,
+        valueLabel: "Late Students",
+        breakdown: [
+          {"label": "Leave", "value": stats.lateLeaveCount},
+          {"label": "Outing", "value": stats.outLeaveCount},
+          {"label": "Outing", "value": 7},
+        ],
         onTap: () {
           context.goNamed(
             AppRoutes.wardenActionPage,
@@ -363,18 +372,11 @@ class DashboardGrid extends StatelessWidget {
 
     // Second row: always show details
     final row1 = [
-      ExpandableStatCardData(
-        icon: Icons.watch_later_outlined,
-        iconColor: const Color.fromRGBO(239, 67, 67, 1.0),
-        iconBgColor: const Color.fromRGBO(253, 236, 236, 1.0),
-        value: stats.lateCount,
-        valueLabel: "Late Students",
-        title: "Late Students",
-        breakdown: [
-          {"label": "Leave", "value": stats.lateLeaveCount},
-          {"label": "Outing", "value": stats.outLeaveCount},
-          {"label": "Outing", "value": 7},
-        ],
+      StatCardData(
+        dotColor: const Color.fromRGBO(255, 251, 0, 0.5),
+        value: stats.actionCount,
+        valueLabel: "Pending Requests",
+        breakdown: const [],
         onTap: () {
           context.goNamed(
             AppRoutes.wardenActionPage,
@@ -384,13 +386,11 @@ class DashboardGrid extends StatelessWidget {
           );
         },
       ),
-      ExpandableStatCardData(
-        icon: Icons.people_outline,
-        iconColor: const Color.fromRGBO(36, 99, 235, 1.0),
-        iconBgColor: const Color.fromRGBO(233, 239, 252, 0.8),
+
+      StatCardData(
+        dotColor: const Color.fromRGBO(0, 72, 255, 0.5),
         value: stats.outCount,
         valueLabel: "Student Out",
-        title: "Student Out",
         breakdown: [
           {"label": "Leave", "value": stats.lateOutingCount},
           {"label": "Outing", "value": stats.outOutingCount},
@@ -406,22 +406,13 @@ class DashboardGrid extends StatelessWidget {
       ),
     ];
 
-    Widget buildRow(
-      List<ExpandableStatCardData> dataRow, {
-      required bool showDetails,
-    }) {
+    Widget buildRow(List<StatCardData> dataRow, {required bool showDetails}) {
       return IntrinsicHeight(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             for (final data in dataRow)
-              Expanded(
-                child: ExpandableStatCard(
-                  data: data,
-                  // If desired, allow tapping whole card to expand when breakdown exists
-                  enableExpandOnCardTap: false,
-                ),
-              ),
+              Expanded(child: ExpandableStatCard(data: data)),
           ],
         ),
       );
@@ -438,6 +429,64 @@ class DashboardGrid extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class CompressedStatTable extends StatelessWidget {
+  final TextTheme textTheme;
+  final String title;
+  final String value;
+  final Image image;
+
+  const CompressedStatTable({
+    Key? key,
+    required this.textTheme,
+    this.title = '[translate:Thid Month]',
+    this.value = '10',
+    required this.image,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IntrinsicWidth(
+      child: IntrinsicHeight(
+        child: Table(
+          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          columnWidths: const {
+            0: IntrinsicColumnWidth(),
+            1: IntrinsicColumnWidth(),
+          },
+          children: [
+            TableRow(
+              children: [
+                image,
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 5),
+                  child: Text(
+                    title,
+                    style: textTheme.h6,
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+              ],
+            ),
+            TableRow(
+              children: [
+                const SizedBox.shrink(), // empty cell for alignment
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 5),
+                  child: Text(
+                    value,
+                    style: textTheme.h1.copyWith(fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -1,6 +1,7 @@
 // lib/presentation/view/warden/state/warden_history_state.dart
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
+import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
 
@@ -21,8 +22,9 @@ class WardenHistoryState extends ChangeNotifier {
   String get errorMessage => _errorMessage;
 
   // Hostels
-  List<String> hostelIds = [];
+  List<HostelInfo> hostels = [];
   String? selectedHostelId;
+  String? selectedHostelName;
   bool hostelsInitialized = false;
 
   // Month/Year (defaults to current month)
@@ -49,19 +51,26 @@ class WardenHistoryState extends ChangeNotifier {
   }
 
   // Hostels
-  void setHostelList(List<String> ids) {
-    hostelIds = ids;
-    if (selectedHostelId == null && ids.isNotEmpty) {
-      selectedHostelId = ids.first;
+  void setHostelList(List<HostelInfo> hostels_) {
+    hostels = hostels_;
+    if (selectedHostelId == null && hostels_.isNotEmpty) {
+      selectedHostelId = hostels.first.hostelId;
+      selectedHostelName = hostels.first.hostelName;
     }
     hostelsInitialized = true;
     notifyListeners();
   }
 
   void setSelectedHostelId(String id) {
-    selectedHostelId = id;
-    notifyListeners();
-  }
+  final selected = hostels.firstWhere(
+    (hostel) => hostel.hostelId == id,
+    orElse: () => HostelInfo(hostelId: id, hostelName: 'Unknown'),
+  );
+  selectedHostelId = selected.hostelId;
+  selectedHostelName = selected.hostelName;
+  notifyListeners();
+}
+
 
   // Month/Year
   void setMonthYear(DateTime value) {
@@ -98,15 +107,19 @@ class WardenHistoryState extends ChangeNotifier {
     Iterable<OnScreenHistoryItem> onScreenRequests = currentOnScreen;
 
     if (_typeFilter != null) {
-      onScreenRequests = onScreenRequests.where((e) => e.request.requestType == _typeFilter);
+      onScreenRequests = onScreenRequests.where(
+        (e) => e.request.requestType == _typeFilter,
+      );
     }
 
     if (q.isNotEmpty) {
-      onScreenRequests = onScreenRequests.where((e) => (e.student.name).toLowerCase().contains(q));
+      onScreenRequests = onScreenRequests.where(
+        (e) => (e.student.name).toLowerCase().contains(q),
+      );
     }
 
     currentOnScreen = onScreenRequests
-      .map((e) => OnScreenHistoryItem(request: e.request, student: e.student))
+        .map((e) => OnScreenHistoryItem(request: e.request, student: e.student))
         .toList();
 
     notifyListeners();

@@ -71,8 +71,9 @@ class WardenActionState extends ChangeNotifier {
   final Set<String> _selectedIds = {};
 
   // Hostels
-  List<String> hostelIds = [];
+  List<HostelInfo> hostels = [];
   String? selectedHostelId;
+  String? selectedHostelName;
   bool hostelsInitialized = false;
 
   // Tabs
@@ -112,20 +113,20 @@ class WardenActionState extends ChangeNotifier {
   }
 
   // Initialize hostel list and default selection
-  void setHostelList(List<String> ids) {
-    hostelIds = ids;
-    if (selectedHostelId == null && ids.isNotEmpty) {
-      selectedHostelId = ids.first;
-    }
+  void setHostelList(List<HostelInfo> hostel) {
+    selectedHostelId ??= hostel.first.hostelId;
+    selectedHostelName ??= hostel.first.hostelName;
     hostelsInitialized = true;
     notifyListeners();
   }
 
   // Select hostel id (does not auto-fetch)
-  void setSelectedHostelId(String id) {
-    selectedHostelId = id;
-    notifyListeners();
-  }
+  void setSelectedHostelId(String id, String name) {
+  selectedHostelId = id;
+  selectedHostelName = name;
+  notifyListeners();
+}
+
 
   // Clear transient state but keep hostel selection/list
   void resetForHostelChange() {

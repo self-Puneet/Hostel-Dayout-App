@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
-import 'package:hostel_mgmt/presentation/view/warden/controller/warden_action_page_controller.dart';
+import 'package:hostel_mgmt/presentation/view/warden/controller/warden_history_controller.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_action_state.dart';
+import 'package:hostel_mgmt/presentation/view/warden/state/warden_history_state.dart';
 import 'package:hostel_mgmt/presentation/widgets/segmented_scrollable_tab_view.dart';
 
 // Assume WardenTab is already defined elsewhere in your project
@@ -94,90 +94,160 @@ class _WardenHistoryPageState extends State<WardenHistoryPage>
     );
   }
 
-  Widget hostelWidget(WardenActionState s) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: s.hostelIds.length <= 1 && s.selectedHostelId != null
-          ? SizedBox(
-              height: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.home, color: Colors.blueGrey, size: 18),
-                  const SizedBox(width: 5),
-                  Expanded(
-                    child: Text(
-                      s.selectedHostelId!,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 13,
-                        color: Colors.blueGrey,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : SizedBox(
-              height: 50,
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  isDense: true,
-                  isExpanded: true,
-                  itemHeight: 48.0,
-                  value:
-                      s.selectedHostelId ??
-                      (s.hostelIds.isNotEmpty ? s.hostelIds.first : null),
-                  items: s.hostelIds
-                      .map(
-                        (id) => DropdownMenuItem<String>(
-                          value: id,
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.home,
-                                color: Colors.blueGrey,
-                                size: 16,
-                              ),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: Text(
-                                  id,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (val) async {
-                    if (val == null) return;
-                    s.setSelectedHostelId(val);
-                    s.resetForHostelChange();
-                    await WardenActionPageController(
-                      s,
-                    ).fetchRequestsFromApi(hostelId: val);
-                  },
-                  icon: const Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    color: Colors.blueGrey,
-                  ),
-                  iconSize: 20,
-                  style: const TextStyle(fontSize: 13, color: Colors.black87),
-                  dropdownColor: Colors.white,
-                ),
+  // Widget hostelWidget(WardenActionState s) {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(horizontal: 10),
+  //     child: s.hostelIds.length <= 1 && s.selectedHostelId != null
+  //         ? SizedBox(
+  //             height: 50,
+  //             child: Row(
+  //               mainAxisAlignment: MainAxisAlignment.center,
+  //               children: [
+  //                 const Icon(Icons.home, color: Colors.blueGrey, size: 18),
+  //                 const SizedBox(width: 5),
+  //                 Expanded(
+  //                   child: Text(
+  //                     s.selectedHostelId!,
+  //                     maxLines: 1,
+  //                     overflow: TextOverflow.ellipsis,
+  //                     textAlign: TextAlign.center,
+  //                     style: const TextStyle(
+  //                       fontWeight: FontWeight.w500,
+  //                       fontSize: 13,
+  //                       color: Colors.blueGrey,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           )
+  //         : SizedBox(
+  //             height: 50,
+  //             child: DropdownButtonHideUnderline(
+  //               child: DropdownButton<String>(
+  //                 isDense: true,
+  //                 isExpanded: true,
+  //                 itemHeight: 48.0,
+  //                 value:
+  //                     s.selectedHostelId ??
+  //                     (s.hostelIds.isNotEmpty ? s.hostelIds.first : null),
+  //                 items: s.hostelIds
+  //                     .map(
+  //                       (id) => DropdownMenuItem<String>(
+  //                         value: id,
+  //                         child: Row(
+  //                           children: [
+  //                             const Icon(
+  //                               Icons.home,
+  //                               color: Colors.blueGrey,
+  //                               size: 16,
+  //                             ),
+  //                             const SizedBox(width: 6),
+  //                             Expanded(
+  //                               child: Text(
+  //                                 id,
+  //                                 overflow: TextOverflow.ellipsis,
+  //                                 style: const TextStyle(
+  //                                   fontSize: 13,
+  //                                   color: Colors.black87,
+  //                                 ),
+  //                               ),
+  //                             ),
+  //                           ],
+  //                         ),
+  //                       ),
+  //                     )
+  //                     .toList(),
+  //                 onChanged: (val) async {
+  //                   if (val == null) return;
+  //                   s.setSelectedHostelId(val);
+  //                   s.resetForHostelChange();
+  //                   await WardenActionPageController(
+  //                     s,
+  //                   ).fetchRequestsFromApi(hostelId: val);
+  //                 },
+  //                 icon: const Icon(
+  //                   Icons.keyboard_arrow_down_rounded,
+  //                   color: Colors.blueGrey,
+  //                 ),
+  //                 iconSize: 20,
+  //                 style: const TextStyle(fontSize: 13, color: Colors.black87),
+  //                 dropdownColor: Colors.white,
+  //               ),
+  //             ),
+  //           ),
+  //   );
+  // }
+Widget hostelWidget(WardenHistoryState s) {
+  if (s.hostels.length <= 1 && s.selectedHostelId != null) {
+    // Single hostel: just show name
+    return SizedBox(
+      height: 50,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.home, color: Colors.blueGrey, size: 18),
+          const SizedBox(width: 5),
+          Expanded(
+            child: Text(
+              s.selectedHostelName ?? '',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 13,
+                color: Colors.blueGrey,
               ),
             ),
+          ),
+        ],
+      ),
     );
   }
+  // Multiple hostels: dropdown by id, display name
+  return SizedBox(
+    height: 50,
+    child: DropdownButtonHideUnderline(
+      child: DropdownButton<String>(
+        isDense: true,
+        isExpanded: true,
+        itemHeight: 48.0,
+        value: s.selectedHostelId,
+        items: s.hostels.map((hostel) => DropdownMenuItem<String>(
+          value: hostel.hostelId,
+          child: Row(
+            children: [
+              const Icon(Icons.home, color: Colors.blueGrey, size: 16),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  hostel.hostelName,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 13, color: Colors.black87),
+                ),
+              ),
+            ],
+          ),
+        )).toList(),
+        onChanged: (val) async {
+          if (val == null) return;
+          s.setSelectedHostelId(val);
+          s.clearForHostelOrMonthChange();
+          await WardenHistoryPageController(s).fetchRequestsFromApi(hostelId: val);
+        },
+        icon: const Icon(
+          Icons.keyboard_arrow_down_rounded,
+          color: Colors.blueGrey,
+        ),
+        iconSize: 20,
+        style: const TextStyle(fontSize: 13, color: Colors.black87),
+        dropdownColor: Colors.white,
+      ),
+    ),
+  );
+}
+
 }
 
 class _EmptyHistoryTab extends StatelessWidget {

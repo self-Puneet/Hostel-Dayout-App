@@ -25,7 +25,8 @@ class WardenModel {
   final String empId;
   final String name;
   final String phoneNo;
-  final List<String> hostels;
+  final List<String> hostelId;
+  final List<String>? hostels;
   final String? profilePicUrl;
   final WardenRole wardenRole;
   final String? email;
@@ -36,11 +37,12 @@ class WardenModel {
     required this.empId,
     required this.name,
     required this.phoneNo,
-    required this.hostels,
+    required this.hostelId,
     this.profilePicUrl,
     required this.wardenRole,
     this.email,
     this.languagePreference,
+    this.hostels,
   });
 
   /// Convert string role from API → Enum
@@ -61,8 +63,6 @@ class WardenModel {
             ?.map((e) => e.toString())
             .toList() ??
         [];
-    // print(hostels_);
-    // print(hostels_.runtimeType);
     return WardenModel(
       wardenId: json['warden_id'] ?? '',
       empId: json['emp_id'] ?? '',
@@ -72,7 +72,7 @@ class WardenModel {
       wardenRole: _roleFromString(json['role']),
       email: json['email'],
       languagePreference: json['language_preference'],
-      hostels: hostels_,
+      hostelId: hostels_,
     );
   }
 
@@ -86,7 +86,37 @@ class WardenModel {
       if (profilePicUrl != null) 'profile_pic': profilePicUrl,
       if (email != null) 'email': email,
       if (languagePreference != null) 'language_preference': languagePreference,
-      'hostels': hostels,
+      'hostels': hostelId,
     };
+  }
+
+  // ---------------- copyWith ----------------
+  WardenModel copyWith({
+    String? wardenId,
+    String? empId,
+    String? name,
+    String? phoneNo,
+    List<String>? hostelId,
+    List<String>? hostels,
+    String? profilePicUrl,
+    WardenRole? wardenRole,
+    String? email,
+    String? languagePreference,
+  }) {
+    print(hostels);
+    return WardenModel(
+      wardenId: wardenId ?? this.wardenId,
+      empId: empId ?? this.empId,
+      name: name ?? this.name,
+      phoneNo: phoneNo ?? this.phoneNo,
+      hostelId: hostelId ?? List<String>.from(this.hostelId),
+      hostels:
+          hostels ??
+          (this.hostels != null ? List<String>.from(this.hostels!) : null),
+      profilePicUrl: profilePicUrl ?? this.profilePicUrl,
+      wardenRole: wardenRole ?? this.wardenRole,
+      email: email ?? this.email,
+      languagePreference: languagePreference ?? this.languagePreference,
+    );
   }
 }

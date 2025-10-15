@@ -1,14 +1,17 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
+// import 'package:hostel_mgmt/models/hostels_model.dart';
+import 'package:hostel_mgmt/models/warden_model.dart';
 import 'package:hostel_mgmt/services/parent_service.dart';
+import 'package:hostel_mgmt/services/profile_service.dart';
 import 'package:hostel_mgmt/services/warden_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 
 class AuthService {
-  static const String apiUrl = "https://hostel.vanscafe.shop/api/student/login";
+  static const String apiUrl = "http://192.168.1.5:4141/api/student/login";
 
   static Future<Either<String, LoginSession>> loginStudent({
     required String enrollmentNo,
@@ -53,7 +56,7 @@ class AuthService {
     }
   }
 
-  static const String apiBaseWarden = "https://hostel.vanscafe.shop/api/warden";
+  static const String apiBaseWarden = "http://192.168.1.5:4141/api/warden";
 
   static Future<Either<String, LoginSession>> loginWarden({
     required String empId,
@@ -74,6 +77,8 @@ class AuthService {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(payload),
       );
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
 
       if (response.statusCode != 200) {
         return left("${jsonDecode(response.body)["error"]}");
@@ -92,28 +97,64 @@ class AuthService {
       diSession.username = '';
       diSession.email = '';
       diSession.imageURL = null;
-      diSession.hostels = data['hostel_id'];
+      // diSession.hostels = data['hostel_id'];
 
       // Fetch profile to enrich session
       final profileResult = await WardenService.getWardenProfile(
         token: diSession.token,
       );
-      profileResult.fold(
-        (error) {
-          print('$error');
-        },
-        (warden) {
-          diSession.imageURL = warden.profilePicUrl;
-          diSession.identityId = warden.empId;
-          diSession.username = warden.name;
-          diSession.email = warden.email;
-          diSession.hostelIds = warden.hostels;
-        },
-      );
+
+      if (profileResult.isLeft()) {
+        final error = profileResult.fold((l) => l, (r) => null);
+        print(error);
+      } else {
+        WardenModel warden = profileResult.getOrElse(
+          () => throw Exception('Missing warden'),
+        );
+
+        warden = warden.copyWith(hostels: []);
+
+        // Fetch all hostels
+        final hostelResult = await ProfileService.getAllHostelInfo();
+
+        if (hostelResult.isRight()) {
+          final hostelList = hostelResult.getOrElse(() => []);
+          for (final hid in List.of(warden.hostelId)) {
+            // <-- copy
+            for (final h in hostelList) {
+              if (h.hostelId == hid) {
+                warden.hostels!.add(h.hostelName);
+              }
+            }
+          }
+        } else {
+          print(hostelResult.fold((l) => l, (r) => null));
+        }
+
+        List<HostelInfo> finalHostels = [];
+        for (int i = 0; i < warden.hostelId.length; i++) {
+          finalHostels.add(
+            HostelInfo.fromJson({
+              "hostel_id": warden.hostelId[i],
+              "hostel_name": warden.hostels![i],
+            }),
+          );
+        }
+
+        // Update diSession with enriched profile
+        diSession.imageURL = warden.profilePicUrl;
+        diSession.identityId = warden.empId;
+        diSession.username = warden.name;
+        diSession.email = warden.email;
+        diSession.hostels = finalHostels;
+        warden.hostels;
+      }
 
       await diSession.saveToPrefs();
+      print(diSession.hostels);
       return right(diSession);
     } catch (e) {
+      print(e);
       return left("Exception: $e");
     }
   }
@@ -129,7 +170,7 @@ class AuthService {
       };
 
       final response = await http.post(
-        Uri.parse("https://hostel.vanscafe.shop/api/parent/login"),
+        Uri.parse("http://192.168.1.5:4141/api/parent/login"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(payload),
       );
@@ -198,7 +239,7 @@ class AuthService {
       final payload = {'oldPassword': oldPassword, 'newPassword': newPassword};
 
       final response = await http.put(
-        Uri.parse("https://hostel.vanscafe.shop/api/admin/reset-password"),
+        Uri.parse("http://192.168.1.5:4141/api/admin/reset-password"),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",

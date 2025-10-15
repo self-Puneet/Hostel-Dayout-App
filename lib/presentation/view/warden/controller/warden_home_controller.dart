@@ -14,15 +14,20 @@ class WardenStatisticsController {
   // Initialize hostels from session and auto-fetch if possible
   Future<void> initFromSession() async {
     final session = Get.find<LoginSession>();
-    final ids = session.hostelIds ?? <String>[];
-    state.setHostelList(ids);
+    final hostels = session.hostels ?? [];
+    // print(hostels.length);
+    // print("aaaaaaaaaaaaaaaaaaaaaah");
+    hostels.map((hostel) {
+      print('${hostel.hostelId} ${hostel.hostelName}');
+    });
+    state.setHostelList(hostels);
     if (state.selectedHostelId != null) {
       await _fetchFor(state.selectedHostelId!, session.token);
     }
   }
 
   // Dropdown selection handler (called by UI)
-  Future<void> selectHostel(String id) async {
+  Future<void> selectHostel(String id, String name) async {
     final session = Get.find<LoginSession>();
     state.setSelectedHostelId(id);
     state.resetForHostelChange();
@@ -43,9 +48,9 @@ class WardenStatisticsController {
     state.setError(null);
     final Either<String, WardenStatistics> either =
         await WardenService.fetchStatistics(
-      hostelCode: hostelCode,
-      token: token,
-    );
+          hostelCode: hostelCode,
+          token: token,
+        );
     either.fold(
       (err) {
         state.setStats(null);

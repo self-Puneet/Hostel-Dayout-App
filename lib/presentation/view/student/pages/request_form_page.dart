@@ -84,7 +84,7 @@ class RequestFormPage extends StatelessWidget {
                   child: WelcomeHeader(
                     phoneNumber: loginSession.phone,
                     enrollmentNumber: loginSession.identityId,
-                    hostelName: loginSession.hostels!.first,
+                    hostelName: loginSession.hostels!.first.hostelName,
                     roomNumber: loginSession.roomNo,
                     actor: TimelineActor.student,
                     name: loginSession.username,

@@ -162,7 +162,7 @@ class _HomePageState extends State<HomePage> {
                   child: WelcomeHeader(
                     phoneNumber: profile.phone,
                     enrollmentNumber: profile.identityId,
-                    hostelName: profile.hostels!.first,
+                    hostelName: profile.hostels!.first.hostelName,
                     roomNumber: profile.roomNo,
                     actor: TimelineActor.student,
                     name: state.profile?.name ?? '',
