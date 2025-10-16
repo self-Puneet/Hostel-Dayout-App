@@ -21,8 +21,8 @@ class ParentModel {
       name: json['name'] ?? '',
       relation: json['relation'] ?? '',
       phoneNo: json['phone_no'] ?? '',
-      email: json['email'],
-      languagePreference: json['language_preference'],
+      email: json['email']?.toString(),
+      languagePreference: json['language_preference']?.toString(),
     );
   }
 
@@ -37,4 +37,3 @@ class ParentModel {
     };
   }
 }
-

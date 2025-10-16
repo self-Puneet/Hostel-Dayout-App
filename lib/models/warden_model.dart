@@ -58,11 +58,15 @@ class WardenModel {
   }
 
   factory WardenModel.fromJson(Map<String, dynamic> json) {
-    final hostels_ =
-        (json['hostel_id'] as List<dynamic>?)
-            ?.map((e) => e.toString())
-            .toList() ??
-        [];
+    List<String> hostels_;
+    final hostelIdFromJson = json['hostel_id'];
+    if (hostelIdFromJson is List) {
+      hostels_ = hostelIdFromJson.map((e) => e.toString()).toList();
+    } else if (hostelIdFromJson is String) {
+      hostels_ = [hostelIdFromJson];
+    } else {
+      hostels_ = [];
+    }
     return WardenModel(
       wardenId: json['warden_id'] ?? '',
       empId: json['emp_id'] ?? '',

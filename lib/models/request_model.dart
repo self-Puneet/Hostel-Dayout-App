@@ -55,7 +55,7 @@ class AssistantWardenAction {
 }
 
 class SeniorWardenAction {
-  final StudentProfileModel seniorWardenModel;
+  final WardenModel seniorWardenModel;
   final DateTime actionAt;
   final RequestAction action;
 
@@ -157,15 +157,7 @@ class RequestModel {
 
   /// Deserialize from JSON
   factory RequestModel.fromJson(Map<String, dynamic> json) {
-    // print(json.keys);
-    json.containsKey("assistent_warden_action")
-        ? print(
-            "Parsing request with status: ${json['assistent_warden_action']['action_by'].runtimeType}",
-          )
-        : print("nahi hai");
 
-    // print(json['senior_warden_action']['createdAt']);
-    print("aaaaaah");
     return RequestModel(
       id: json['_id'] ?? '',
       requestId: json['request_id'] ?? '',
@@ -198,45 +190,49 @@ class RequestModel {
       //   ),
       //   actionAt: DateTime.parse(json['student_action']['action_at']),
       // ),
-      // parentAction: json['parent_action'] != null
-      //     ? ParentAction(
-      //         parentModel: ParentModel.fromJson(
-      //           json['parent_action']['action_by'],
-      //         ),
-      //         action: RequestAction.values.firstWhere(
-      //           (e) =>
-      //               e.toString().split('.').last ==
-      //               json['parent_action']['action'],
-      //         ),
-      //         actionAt: DateTime.parse(json['parent_action']['action_at']),
-      //       )
-      //     : null,
-      // assistantWardenAction: json['assistent_warden_action'] != null
-      //     ? AssistantWardenAction(
-      //         assistantWardenModel: WardenModel.fromJson(
-      //           json['assistent_warden_action']['action_by'],
-      //         ),
-      //         action: RequestActionX.ApiStringToAction(
-      //           json['assistent_warden_action']['action'],
-      //         ),
-      //         actionAt: DateTime.parse(
-      //           json['assistent_warden_action']['createdAt'],
-      //         ),
-      //       )
-      //     : null,
-      // seniorWardenAction: json['senior_warden_action'] != null
-      //     ? SeniorWardenAction(
-      //         seniorWardenModel: StudentProfileModel.fromJson(
-      //           json['senior_warden_action']['action_by'],
-      //         ),
-      //         action: RequestActionX.ApiStringToAction(
-      //           json['senior_warden_action']['action'],
-      //         ),
-      //         actionAt: DateTime.parse(
-      //           json['senior_warden_action']['createdAt'],
-      //         ),
-      //       )
-      //     : null,
+      parentAction: json.containsKey('parent_action')
+          ? ParentAction(
+              parentModel: ParentModel.fromJson(
+                json['parent_action']['action_by'],
+              ),
+              action:
+                  ((json['parent_action'] as Map<String, dynamic>).containsKey(
+                    'action',
+                  ))
+                  ? RequestActionX.ApiStringToAction(
+                      json['parent_action']['action'],
+                    )
+                  : RequestActionX.ApiStringToAction(""),
+              actionAt: DateTime.parse(json['parent_action']['createdAt']),
+            )
+          : null,
+      assistantWardenAction: json.containsKey('assistent_warden_action')
+          ? AssistantWardenAction(
+              assistantWardenModel: WardenModel.fromJson(
+                json['assistent_warden_action']['action_by'],
+              ),
+              action: RequestActionX.ApiStringToAction(
+                json['assistent_warden_action']['action'],
+              ),
+              actionAt: DateTime.parse(
+                json['assistent_warden_action']['createdAt'],
+              ),
+            )
+          : null,
+
+      seniorWardenAction: json['senior_warden_action'] != null
+          ? SeniorWardenAction(
+              seniorWardenModel: WardenModel.fromJson(
+                json['senior_warden_action']['action_by'],
+              ),
+              action: RequestActionX.ApiStringToAction(
+                json['senior_warden_action']['action'],
+              ),
+              actionAt: DateTime.parse(
+                json['senior_warden_action']['createdAt'],
+              ),
+            )
+          : null,
       // securityGuardAction: json['security_guard_action'] != null
       //     ? SecurityGuardAction(
       //         securityGuardModel: SecurityGuardModel.fromJson(
