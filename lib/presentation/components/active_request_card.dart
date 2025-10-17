@@ -1,5 +1,6 @@
 // active_request_card.dart
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 // import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/theme/app_theme.dart';
@@ -110,17 +111,17 @@ class ActiveRequestCard extends StatelessWidget {
       highlightColor: Colors.transparent,
       splashColor: Colors.transparent,
       onTap: () {
-        // if (actor == TimelineActor.student) {
-        //   context.pushNamed(
-        //     'request-detail',
-        //     pathParameters: {'id': requestId},
-        //   );
-        // } else if (actor == TimelineActor.parent) {
-        //   context.pushNamed(
-        //     'request-detail-parent',
-        //     pathParameters: {'id': requestId},
-        //   );
-        // }
+        if (actor == TimelineActor.student) {
+          context.pushNamed(
+            'request-detail',
+            pathParameters: {'id': requestId},
+          );
+        } else if (actor == TimelineActor.parent) {
+          context.pushNamed(
+            'request-detail-parent',
+            pathParameters: {'id': requestId},
+          );
+        }
       },
       borderRadius: BorderRadius.circular(28),
       child: Container(
@@ -187,11 +188,20 @@ class ActiveRequestCard extends StatelessWidget {
                 children: [
                   Icon(Icons.calendar_month, color: Colors.grey, size: 24),
                   const SizedBox(width: 6),
-                  Text(_formatDate(fromDate), style: textTheme.h7.w500.copyWith(color: greyColor)),
+                  Text(
+                    _formatDate(fromDate),
+                    style: textTheme.h7.w500.copyWith(color: greyColor),
+                  ),
                   const Spacer(),
-                  Text('TO', style: textTheme.h7.w500.copyWith(color: greyColor)),
+                  Text(
+                    'TO',
+                    style: textTheme.h7.w500.copyWith(color: greyColor),
+                  ),
                   const Spacer(),
-                  Text(_formatDate(toDate), style: textTheme.h7.w500.copyWith(color: greyColor)),
+                  Text(
+                    _formatDate(toDate),
+                    style: textTheme.h7.w500.copyWith(color: greyColor),
+                  ),
                 ],
               ),
               // Timeline

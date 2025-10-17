@@ -80,17 +80,17 @@ extension RequestStatusX on RequestStatus {
       case RequestStatus.requested:
         return Colors.blue;
       case RequestStatus.referred:
-        return Colors.orange;
+        return Colors.blue;
       case RequestStatus.cancelled:
-        return Colors.grey;
+        return Colors.red;
       case RequestStatus.parentApproved:
-        return Colors.green;
+        return Colors.blue;
       case RequestStatus.parentDenied:
-        return Colors.redAccent;
+        return Colors.red;
       case RequestStatus.rejected:
         return Colors.red;
       case RequestStatus.approved:
-        return Colors.green.shade700;
+        return Colors.green;
       default:
         return Colors.grey;
     }

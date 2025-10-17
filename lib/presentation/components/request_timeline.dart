@@ -61,6 +61,7 @@ class RequestTimeline extends StatelessWidget {
           color: Colors.green,
         ),
       ),
+      padding: EdgeInsets.zero,
       builder: TimelineTileBuilder.connected(
         connectionDirection: ConnectionDirection.before,
         itemCount: events.length,
@@ -179,6 +180,8 @@ class RequestTimeline extends StatelessWidget {
           final e = events[index];
           if (e.status == TimelineStatus.rejected) {
             return const SolidLineConnector(color: Colors.red, thickness: 3);
+          } else if (e.status == TimelineStatus.inProgress) {
+            return const SolidLineConnector(color: Colors.grey, thickness: 3);
           }
           return const SolidLineConnector(color: Colors.green, thickness: 3);
         },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
+import 'package:hostel_mgmt/presentation/components/request_timeline.dart';
 
 class RequestActionDialogParam {
   final String title;
@@ -225,6 +226,21 @@ extension RequestActionX on RequestAction {
         return RequestAction.reject;
       default:
         return RequestAction.none;
+    }
+  }
+
+  static TimelineStatus actionToTimelineStatus(RequestAction action) {
+    switch (action) {
+      case RequestAction.refer:
+        return TimelineStatus.completed;
+      case RequestAction.cancel:
+        return TimelineStatus.rejected;
+      case RequestAction.approve:
+        return TimelineStatus.completed;
+      case RequestAction.reject:
+        return TimelineStatus.rejected;
+      case RequestAction.none:
+        return TimelineStatus.inProgress;
     }
   }
 }

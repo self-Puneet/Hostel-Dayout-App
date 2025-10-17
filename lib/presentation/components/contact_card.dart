@@ -1,56 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
+import 'package:hostel_mgmt/core/util/string_extensions.dart';
 import 'package:hostel_mgmt/presentation/widgets/call_button.dart';
 
 class ContactCard extends StatelessWidget {
   final String name;
   final String role;
   final String phoneNumber;
+  final String? imageUrl;
 
   const ContactCard({
     Key? key,
+    this.imageUrl,
     required this.name,
     required this.role,
     required this.phoneNumber,
   }) : super(key: key);
 
-  /// Get initials from name
-  String _getInitials(String fullName) {
-    final parts = fullName.trim().split(" ");
-    if (parts.length > 1) {
-      return "${parts[0][0]}${parts[1][0]}".toUpperCase();
-    }
-    return parts[0][0].toUpperCase();
-  }
-
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Container(
       margin: EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Color.fromRGBO(246, 246, 246, 1),
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Row(
         children: [
-          // Avatar with initials
           CircleAvatar(
             radius: 22,
-            backgroundColor: Colors.blue.shade50,
-            child: Text(
-              _getInitials(name),
-              style: const TextStyle(
-                color: Colors.blue,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            backgroundColor: Colors.blue.shade100,
+            backgroundImage: (imageUrl != null && imageUrl!.trim() != "")
+                ? NetworkImage(imageUrl!)
+                : null,
+            child: (imageUrl != null && imageUrl!.trim() != "")
+                ? null
+                : Text(name.initials, style: textTheme.h3.w500),
           ),
           const SizedBox(width: 12),
           // Name & Role

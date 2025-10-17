@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 // import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/theme/app_theme.dart';
@@ -34,17 +35,17 @@ class SimpleRequestCard extends StatelessWidget {
       highlightColor: Colors.transparent,
       splashColor: Colors.transparent,
       onTap: () {
-        // if (actor == TimelineActor.student) {
-        //   context.pushNamed(
-        //     'request-detail',
-        //     pathParameters: {'id': requestId},
-        //   );
-        // } else if (actor == TimelineActor.parent) {
-        //   context.pushNamed(
-        //     'request-detail-parent',
-        //     pathParameters: {'id': requestId},
-        //   );
-        // }
+        if (actor == TimelineActor.student) {
+          context.pushNamed(
+            'request-detail',
+            pathParameters: {'id': requestId},
+          );
+        } else if (actor == TimelineActor.parent) {
+          context.pushNamed(
+            'request-detail-parent',
+            pathParameters: {'id': requestId},
+          );
+        }
       },
       borderRadius: BorderRadius.circular(28),
       child: Table(

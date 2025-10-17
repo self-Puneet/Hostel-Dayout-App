@@ -9,8 +9,10 @@ import 'package:hostel_mgmt/presentation/components/contact_card.dart';
 import 'package:hostel_mgmt/presentation/components/request_timeline.dart';
 import 'package:hostel_mgmt/presentation/view/student/state/request_state.dart';
 import 'package:hostel_mgmt/presentation/view/student/controllers/request_detail_controller.dart';
+import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/liquid_back_button.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import '../../../widgets/checkered_pattern.dart';
 
 class RequestPage extends StatefulWidget {
   final TimelineActor actor;
@@ -216,58 +218,98 @@ class _RequestPageState extends State<RequestPage> {
 
           return Scaffold(
             backgroundColor: Colors.white,
-            appBar: AppBar(
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => context.go('/home'),
-              ),
-              title: Text(req.request.requestType.name),
-            ),
-            floatingActionButton: fab, // FAB or expandable FABs
+            floatingActionButton: fab,
             floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             body: AppRefreshWrapper(
               onRefresh: () async {
                 await _controller.fetchRequestDetail(widget.requestId);
               },
               child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      IntrinsicHeight(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Expanded(
-                              flex: 2,
-                              child: statusCard(status: req.request.status),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // CheckeredBackground(color: Colors.red),
+                    CheckeredContainer(
+                      color: state.request!.request.status.minimalStatusColor,
+                      height: 200,
+                      tileSize: 40,
+                      child: Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Container(
+                          height: 200,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 30,
+                              vertical: 10,
                             ),
-                            const SizedBox(width: 18),
-                            Expanded(
-                              flex: 3,
-                              child: infoCard(
-                                req.request.appliedFrom,
-                                req.request.appliedTo,
+                            child: SafeArea(
+                              bottom: false,
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  LiquidGlassBackButton(
+                                    onPressed: () => context.pop(),
+                                    radius: 30,
+                                  ),
+
+                                  Text(
+                                    req.request.requestType.displayName,
+                                    style: TextStyle(
+                                      fontSize: 32,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
+                          ),
                         ),
+                        //
                       ),
-                      const SizedBox(height: 15),
-                      reasonRemarkSection(
-                        reason: req.request.reason,
-                        parentRemark: req.request.parentRemark,
+                    ),
+                    SizedBox(height: 30),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                      child: Column(
+                        children: [
+                          IntrinsicHeight(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: statusCard(status: req.request.status),
+                                ),
+                                const SizedBox(width: 18),
+                                Expanded(
+                                  flex: 3,
+                                  child: infoCard(
+                                    req.request.appliedFrom,
+                                    req.request.appliedTo,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          reasonRemarkSection(
+                            reason: req.request.reason,
+                            parentRemark: req.request.parentRemark,
+                          ),
+                          if (widget.actor == TimelineActor.student)
+                            dynamicTimeline(req: req, actor: widget.actor),
+                          assistentWardenContactCard,
+                          seniorWardenContactCard,
+                          Container(
+                            height:
+                                384 + MediaQuery.of(context).viewPadding.bottom,
+                          ),
+                        ],
                       ),
-                      if (widget.actor == TimelineActor.student)
-                        dynamicTimeline(req: req, actor: widget.actor),
-                      assistentWardenContactCard,
-                      seniorWardenContactCard,
-                      Container(
-                        height: 84 + MediaQuery.of(context).viewPadding.bottom,
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -281,8 +323,6 @@ class _RequestPageState extends State<RequestPage> {
     required RequestDetailApiResponse req,
     required TimelineActor actor,
   }) {
-    print(req.request.assistantWardenAction != null);
-    print("you bitch");
     return Container(
       decoration: BoxDecoration(
         color: Color.fromRGBO(246, 246, 246, 1),
@@ -293,50 +333,31 @@ class _RequestPageState extends State<RequestPage> {
       // padding: EdgeInsetsGeometry.symmetric(vertical: 20, horizontal: 20),
       child: RequestTimeline(
         events: [
-          // if (req.request.seniorWardenAction != null)
-          //   TimelineEvent(
-          //     title: TimelineActor.seniorWarden.displayName,
-          //     subtitle: "",
-          //     time: req.request.seniorWardenAction!.actionAt,
-          //     status: TimelineStatus.completed,
-          //   ),
-          // if (req.request.parentAction != null)
-          //   TimelineEvent(
-          //     title: TimelineActor.parent.displayName,
-          //     subtitle: "Parent accepted the request",
-          //     time: req.request.parentAction!.actionAt,
-          //     status: TimelineStatus.completed,
-          //   ),
-          // (req.request.assistantWardenAction != null)
-          //     ? TimelineEvent(
-          //         title: TimelineActor.assistentWarden.displayName,
-          //         subtitle: "Request Referred to Parent",
-          //         time: req.request.assistantWardenAction!.actionAt,
-          //         status: TimelineStatus.completed,
-          //       )
-          //     : TimelineEvent(
-          //         title: TimelineActor.assistentWarden.displayName,
-          //         subtitle: "Request Referred to Parent",
-          //         status: TimelineStatus.inProgress,
-          //       ),
           TimelineEvent(
             title: TimelineActor.seniorWarden.displayName,
             subtitle: "request approved",
             time: (req.request.seniorWardenAction != null)
                 ? req.request.seniorWardenAction!.actionAt
                 : null,
-            status: TimelineStatus.completed,
+            status: (req.request.seniorWardenAction != null)
+                ? RequestActionX.actionToTimelineStatus(
+                    req.request.seniorWardenAction!.action,
+                  )
+                : TimelineStatus.inProgress,
           ),
 
           TimelineEvent(
             title: TimelineActor.parent.displayName,
             subtitle: "Parent accepted the request",
+            status: (req.request.parentAction != null)
+                ? RequestActionX.actionToTimelineStatus(
+                    req.request.parentAction!.action,
+                  )
+                : TimelineStatus.inProgress,
             time: (req.request.parentAction != null)
                 ? req.request.parentAction!.actionAt
                 : null,
-            status: TimelineStatus.completed,
           ),
-
           TimelineEvent(
             title: TimelineActor.assistentWarden.displayName,
             subtitle: "Request Referred to Parent",
@@ -344,7 +365,9 @@ class _RequestPageState extends State<RequestPage> {
                 ? req.request.assistantWardenAction!.actionAt
                 : null,
             status: (req.request.assistantWardenAction != null)
-                ? TimelineStatus.completed
+                ? RequestActionX.actionToTimelineStatus(
+                    req.request.assistantWardenAction!.action,
+                  )
                 : TimelineStatus.inProgress,
           ),
           TimelineEvent(
@@ -392,7 +415,9 @@ class _RequestPageState extends State<RequestPage> {
             ),
           ),
           if (parentRemark != null && parentRemark != "") ...[
-            Divider(color: Colors.black),
+            SizedBox(height: 10),
+            Divider(height: 0.5, color: Color.fromRGBO(117, 117, 117, 1)),
+            SizedBox(height: 10),
             Padding(
               padding: EdgeInsetsGeometry.symmetric(horizontal: 6),
               child: Text(
@@ -424,7 +449,7 @@ class _RequestPageState extends State<RequestPage> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: Colors.blue.withAlpha(90),
+        color: status.minimalStatusColor.withAlpha(90),
       ),
       child: Container(
         padding: EdgeInsets.all(20),
