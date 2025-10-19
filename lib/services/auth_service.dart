@@ -39,17 +39,42 @@ class AuthService {
       if ((data['token'] ?? '').toString().isEmpty) {
         return left(data['message']?.toString() ?? "Login failed");
       }
+      final profile = await ProfileService.getStudentProfile();
+      profile.fold(
+        (error) {
+          return error;
+        },
+        (profileResponse) {
+          profileResponse.student.hostelName;
+          final session = LoginSession(
+            token: data['token'],
+            username: profileResponse.student.name,
+            email: profileResponse.student.email,
+            identityId: profileResponse.student.enrollmentNo,
+            hostels: [
+              HostelInfo(
+                hostelId: profileResponse.student.hostelName,
+                hostelName: profileResponse.student.hostelName,
+              ),
+            ],
+            role: TimelineActor.student,
+            imageURL: data['imageURL'],
+          );
 
+          session.saveToPrefs();
+          return right(session);
+        },
+      );
       final session = LoginSession(
         token: data['token'],
         username: data['name'],
         email: data['email'],
         identityId: data['enrollment_no'],
+        // hostels: data['hostel'],
         role: TimelineActor.student,
         imageURL: data['imageURL'],
       );
-
-      await session.saveToPrefs();
+      session.saveToPrefs();
       return right(session);
     } catch (e) {
       print("❌ Exception: $e");

@@ -27,6 +27,7 @@ class ProfileService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final apiResponse = StudentApiResponse.fromJson(data);
+
         return right(apiResponse);
       } else {
         return left("Error: ${response.body}");

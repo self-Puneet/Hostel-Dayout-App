@@ -32,6 +32,7 @@ class LiquidGlassChip extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: borderRadius,
                 border: Border.all(color: const Color(0xFFC1C1C1), width: 1),
+
                 // boxShadow: BoxBorder.all()
               ),
               child: LiquidGlass(
@@ -51,14 +52,14 @@ class LiquidGlassChip extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: borderRadius,
-                    // gradient: LinearGradient(
-                    //   begin: Alignment.bottomCenter,
-                    //   end: Alignment.topCenter,
-                    //   colors: [
-                    //     Colors.transparent,
-                    //     Colors.black.withAlpha((0.1 * 225).toInt()),
-                    //   ],
-                    // ),
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withAlpha((0.1 * 225).toInt()),
+                      ],
+                    ),
                   ),
                 ),
               ),

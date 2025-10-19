@@ -9,6 +9,8 @@ import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/presentation/components/active_request_card.dart';
 import 'package:hostel_mgmt/presentation/components/simple_request_card.dart';
+import 'package:hostel_mgmt/presentation/components/skeleton_loaders/active_request_card_skeleton.dart';
+import 'package:hostel_mgmt/presentation/components/skeleton_loaders/simple_request_card_skeleton.dart';
 import 'package:hostel_mgmt/presentation/view/student/controllers/home_controller.dart';
 import 'package:hostel_mgmt/presentation/view/student/state/home_state.dart';
 import 'package:hostel_mgmt/presentation/widgets/clickable_text.dart';
@@ -77,7 +79,28 @@ class _HomePageState extends State<HomePage> {
               },
             );
 
+            final List<String> hostelInfo = [];
+            String hostelName = "";
+
+            profile.hostels!.forEach((hos) {
+              hostelInfo.add(hos.hostelName);
+            });
+
+            if (hostelInfo.length == 1) {
+              hostelName = hostelInfo[0]; // use index 0
+            } else {
+              hostelName = hostelInfo.join(" | "); // assign joined string
+            }
+
             Widget activeRequestView() {
+              if (state.isLoading) {
+                // <- Add this loading flag to your state class
+                return Container(
+                  margin: padding,
+                  height: 315,
+                  child: activeRequestCardSkeleton(),
+                );
+              }
               if (hasMultiple) {
                 return SizedBox(
                   height: 315,
@@ -162,7 +185,7 @@ class _HomePageState extends State<HomePage> {
                   child: WelcomeHeader(
                     phoneNumber: profile.phone,
                     enrollmentNumber: profile.identityId,
-                    hostelName: "profile.hostels!.first.hostelName",
+                    hostelName: hostelName,
                     roomNumber: profile.roomNo,
                     actor: TimelineActor.student,
                     name: state.profile?.name ?? '',
@@ -187,10 +210,10 @@ class _HomePageState extends State<HomePage> {
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: EdgeInsets.zero,
                       children: [
-                        SizedBox(height: 60),
+                        SizedBox(height: 20),
                         yourRequestsTitle(),
-                        activeRequestView(),
 
+                        activeRequestView(),
                         if (hasMultiple) ...[
                           Center(
                             child: SmoothPageIndicator(
@@ -206,7 +229,6 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ],
-
                         const SizedBox(height: 18),
 
                         Padding(
@@ -259,7 +281,9 @@ class _HomePageState extends State<HomePage> {
                               ),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: state.filteredRequests == null
+                            child: state.isLoadingHistory || state.isLoading
+                                ? simpleRequestCardSkeleton()
+                                : state.filteredRequests == null
                                 ? const Center(child: Text('No requests found'))
                                 : SimpleRequestCard(
                                     requestType:

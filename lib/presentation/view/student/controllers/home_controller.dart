@@ -1,3 +1,7 @@
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/utils.dart';
+import 'package:hostel_mgmt/core/enums/enum.dart';
+import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/services/profile_service.dart';
 import 'package:hostel_mgmt/services/request_service.dart';
 import '../state/home_state.dart';
@@ -20,8 +24,25 @@ class HomeController {
       (error) {
         print('Profile error: $error');
       },
-      (apiResponse) {
-        state.setProfile(apiResponse.student);
+      (profileResponse) {
+        final session = LoginSession(
+          token: Get.find<LoginSession>().token,
+          username: profileResponse.student.name,
+          email: profileResponse.student.email,
+          identityId: profileResponse.student.enrollmentNo,
+          hostels: [
+            HostelInfo(
+              hostelId: profileResponse.student.hostelName,
+              hostelName: profileResponse.student.hostelName,
+            ),
+          ],
+          role: TimelineActor.student,
+          imageURL: Get.find<LoginSession>().imageURL,
+        );
+
+        session.saveToPrefs();
+
+        state.setProfile(profileResponse.student);
       },
     );
 
@@ -46,13 +67,13 @@ class HomeController {
   // If the UI filters locally, this ensures we always have the full set for accurate filtering.
   Future<void> fetchHistoryRequests({String filter = 'All'}) async {
     try {
-      state.setLoading(true);
+      state.isLoadingHistory = true;
       final requests = await RequestService.getRequestsByStatusKey(filter);
       state.setHistoryRequests(requests);
     } catch (e) {
       print('History fetch error ($filter): $e');
     } finally {
-      state.setLoading(false);
+      state.isLoadingHistory = false;
     }
   }
 }

@@ -22,7 +22,7 @@ class MonthGroupCard extends StatefulWidget {
 }
 
 class _MonthGroupCardState extends State<MonthGroupCard> {
-  bool _expanded = false; // local expansion state
+  bool _expanded = true; // local expansion state
   int _resetTick = 0; // bump to force ExpansionTile rebuild
   TabController? _tabController;
   int _lastIndex = 0;

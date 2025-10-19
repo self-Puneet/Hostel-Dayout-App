@@ -8,12 +8,14 @@ class HomeState extends ChangeNotifier {
   bool isLoading;
   List<RequestModel> activeRequests;
   StudentProfileModel? profile;
+  bool isLoadingHistory;
 
   HomeState({
     this.isLoading = false,
     this.activeRequests = const [],
     this.profile,
     this.requests = const [],
+    this.isLoadingHistory = false,
   });
 
   void setLoading(bool loading) {
@@ -30,6 +32,8 @@ class HomeState extends ChangeNotifier {
     profile = profileModel;
     notifyListeners();
   }
+
+  
 
   // dropdown related states
   String selectedStatus = 'All';
@@ -65,7 +69,6 @@ class HomeState extends ChangeNotifier {
 
   // set history requests
   void setHistoryRequests(List<RequestModel> historyRequests) {
-    print("Setting history requests: ${historyRequests.length} items");
     requests = historyRequests;
     notifyListeners();
   }
