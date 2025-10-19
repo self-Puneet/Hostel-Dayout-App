@@ -172,7 +172,7 @@ class WardenService {
     }
   }
 
-  static Future<Either<String, List<RequestModel>>>
+  static Future<Either<String, List<(RequestModel, StudentProfileModel)>>>
   getRequestsForMonth({
     required String hostelId,
     required String yearMonth, // "yyyy-MM"
@@ -183,7 +183,7 @@ class WardenService {
 
     try {
       final base = url; // assumes same global base as other services
-      final path = "$base/warden/requests/$hostelId/2025-09";
+      final path = "$base/warden/requests/$hostelId/$yearMonth";
       final response = await http.get(
         Uri.parse(path),
         headers: {
@@ -192,36 +192,27 @@ class WardenService {
         },
       );
 
-      print(jsonDecode(response.body));
+      print(yearMonth);
+      print(jsonDecode(response.body)['requests'][0]["request_status"]);
       if (response.statusCode != 200) {
         return left("Error: ${response.body}");
       }
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       final list = (data['requests'] as List?) ?? const [];
-      final List<RequestModel> results;
+      final List<(RequestModel, StudentProfileModel)> results;
       results = [];
       for (final raw in list) {
         final item = raw as Map<String, dynamic>;
         final req = RequestModel.fromJson(item);
-        print("hehe");
-        // fix it
-
-        print(data['requests'][0]["created_by"]);
-
-        // final studentJson = item['student_Info'] as Map<String, dynamic>;
-        // final student = StudentProfileModel.fromJson(studentJson);
-        // print("hehe");
-        // final parentJson = item['parent_Info'] as List<dynamic>? ?? [];
-        // final parentList = parentJson
-        //     .map((p) => ParentModel.fromJson(p as Map<String, dynamic>))
-        //     .toList();
-        // print("hehe");
-        // final updatedStudent = student.copyWith(parents: parentList);
-        results.add(req);
+        final studentJson = item['student_info'] as Map<String, dynamic>;
+        final student = StudentProfileModel.fromJson(studentJson);
+        results.add((req, student));
       }
+      print("hiiiii");
 
       return right(results);
     } catch (e) {
+      print(e);
       return left("Exception: $e");
     }
   }

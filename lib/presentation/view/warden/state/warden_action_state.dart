@@ -6,6 +6,12 @@ import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
 
+// =======================================enums for warden action page tabs===============================================
+/*
+the warden history page will have the following tabs -> cancelled, denied, approved.
+and the tabs will name same or will be the same for both assitent warden and senior warden so no case or switching.
+*/
+
 // Tab identifiers for the UI/state
 enum WardenTab { pendingApproval, approved, pendingParent, requested }
 
@@ -27,6 +33,14 @@ extension WardenTabX on WardenTab {
   }
 }
 
+// ==============================================================================================================
+
+
+// ===================================== request model which would be shown to the warden =================================================
+
+/* 
+there is no selecting thing or the actioning thing at all on the history page so remove those fields from them and all the state management related to that too from the file
+ */
 class OnScreenRequest {
   final RequestModel request;
   final StudentProfileModel student;
@@ -62,15 +76,20 @@ class OnScreenRequest {
 }
 
 class WardenActionState extends ChangeNotifier {
+
+
+  
   bool _isLoading = false;
   bool _isErrored = false;
-  bool _isActioning = false;
+  bool _isActioning = false; // this removal
   String _errorMessage = '';
 
   // Selection
-  final Set<String> _selectedIds = {};
+  final Set<String> _selectedIds = {};// this removal
 
   // Hostels
+
+  // this should not be removed since hostel selection is still there on this history page removal
   List<HostelInfo> hostels = [];
   String? selectedHostelId;
   String? selectedHostelName;
@@ -130,7 +149,7 @@ class WardenActionState extends ChangeNotifier {
 
   // Clear transient state but keep hostel selection/list
   void resetForHostelChange() {
-    _isErrored = false;
+    _isErrored = false; 
     _errorMessage = '';
     _allRequests = [];
     currentOnScreenRequests = [];

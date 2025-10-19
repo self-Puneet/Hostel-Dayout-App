@@ -11,7 +11,8 @@ import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 
 class AuthService {
-  static const String apiUrl = "http://192.168.1.5:4141/api/student/login";
+  static const String apiUrl =
+      "https://hostel-leave-3.onrender.com/api/student/login";
 
   static Future<Either<String, LoginSession>> loginStudent({
     required String enrollmentNo,
@@ -56,7 +57,8 @@ class AuthService {
     }
   }
 
-  static const String apiBaseWarden = "http://192.168.1.5:4141/api/warden";
+  static const String apiBaseWarden =
+      "https://hostel-leave-3.onrender.com/api/warden";
 
   static Future<Either<String, LoginSession>> loginWarden({
     required String empId,
@@ -170,7 +172,7 @@ class AuthService {
       };
 
       final response = await http.post(
-        Uri.parse("http://192.168.1.5:4141/api/parent/login"),
+        Uri.parse("https://hostel-leave-3.onrender.com/api/parent/login"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(payload),
       );
@@ -239,7 +241,9 @@ class AuthService {
       final payload = {'oldPassword': oldPassword, 'newPassword': newPassword};
 
       final response = await http.put(
-        Uri.parse("http://192.168.1.5:4141/api/admin/reset-password"),
+        Uri.parse(
+          "https://hostel-leave-3.onrender.com/api/admin/reset-password",
+        ),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",

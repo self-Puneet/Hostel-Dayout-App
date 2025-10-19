@@ -294,6 +294,11 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.0"
+  flutter_localizations:
+    dependency: "direct main"
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   flutter_native_splash:
     dependency: "direct main"
     description:
@@ -568,6 +573,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  month_year_picker:
+    dependency: "direct main"
+    description:
+      name: month_year_picker
+      sha256: "0990a698061ce4f421ba4f2163895dae5ea88a2f2ff09294f0d77d7c9e6c0491"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.0+1"
   nested:
     dependency: transitive
     description:
@@ -805,6 +818,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
+  syncfusion_flutter_core:
+    dependency: transitive
+    description:
+      name: syncfusion_flutter_core
+      sha256: adcd41bc5c4de1e7aa831fe3f2ca2d22465de29f166a9de685133b70d21e4541
+      url: "https://pub.dev"
+    source: hosted
+    version: "31.2.2"
+  syncfusion_flutter_datepicker:
+    dependency: "direct main"
+    description:
+      name: syncfusion_flutter_datepicker
+      sha256: "0dbebfcf820e4f6355deaa757926a04ba958dd47203b88de8afd7bed3d63682d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "31.2.2"
   term_glyph:
     dependency: transitive
     description:
@@ -933,6 +962,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+  wheel_picker:
+    dependency: "direct main"
+    description:
+      name: wheel_picker
+      sha256: bb1d913e5a7ab45158fd2154ca7309bc6e5666233dd5bdbdc583ee208b4257fa
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.2"
   xdg_directories:
     dependency: transitive
     description:
@@ -959,4 +996,4 @@ packages:
     version: "3.1.3"
 sdks:
   dart: ">=3.9.0 <4.0.0"
-  flutter: ">=3.35.0"
+  flutter: ">=3.35.1"

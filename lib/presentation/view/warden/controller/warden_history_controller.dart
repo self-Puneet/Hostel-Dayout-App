@@ -1,5 +1,3 @@
-// lib/presentation/view/warden/controller/warden_history_controller.dart
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_history_state.dart';
@@ -9,21 +7,26 @@ class WardenHistoryPageController {
   final WardenHistoryState state;
   WardenHistoryPageController(this.state);
 
+  // Load available hostels from the current session
   void loadHostelsFromSession() {
     final session = Get.find<LoginSession>();
     final hostels = session.hostels ?? [];
     state.setHostelList(hostels);
   }
 
+  // Fetch requests from API based on hostel and month-year
   Future<void> fetchRequestsFromApi({
     String? hostelId,
     DateTime? monthYear,
   }) async {
+    print(hostelId);
+    print(monthYear);
     state.setIsLoading(true);
     state.setError(false, '');
     try {
       final session = Get.find<LoginSession>();
-      final resolvedHostelId = hostelId ??
+      final resolvedHostelId =
+          hostelId ??
           state.selectedHostelId ??
           ((session.hostels?.isNotEmpty ?? false)
               ? session.hostels!.first.hostelId
@@ -34,9 +37,9 @@ class WardenHistoryPageController {
         return;
       }
 
-      final date = monthYear ?? state.selectedMonthYear;
-      final yearMonth =
-          '${date.year}-${date.month.toString().padLeft(2, '0')}';
+      final date =
+          monthYear ?? DateTime(state.selectedYear, state.selectedMonth);
+      final yearMonth = '${date.year}-${date.month.toString().padLeft(2, '0')}';
 
       final result = await WardenService.getRequestsForMonth(
         hostelId: resolvedHostelId,
@@ -45,36 +48,12 @@ class WardenHistoryPageController {
 
       result.fold(
         (err) => state.setError(true, err),
-        (list) => state.setRequests(list),
+        (list) => state.setRequests(list.map((r) => (r.$1, r.$2)).toList()),
       );
     } catch (e) {
       state.setError(true, 'Failed to load history: $e');
     } finally {
       state.setIsLoading(false);
-    }
-  }
-
-  Future<void> pickMonthYear(BuildContext context) async {
-    // Built-in Material date picker; user picks any day, only month/year are used downstream.
-    final now = DateTime.now();
-    final initial = state.selectedMonthYear;
-    final first = DateTime(now.year - 5, 1);
-    final last = DateTime(now.year + 5, 12);
-
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: initial,
-      firstDate: first,
-      lastDate: last,
-      initialEntryMode: DatePickerEntryMode.calendar,
-      helpText: 'Select month and year',
-    );
-
-    if (picked != null) {
-      final normalized = DateTime(picked.year, picked.month);
-      state.setMonthYear(normalized);
-      state.clearForHostelOrMonthChange();
-      await fetchRequestsFromApi(monthYear: normalized);
     }
   }
 }
