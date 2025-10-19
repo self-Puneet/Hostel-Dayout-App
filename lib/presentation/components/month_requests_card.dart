@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:hostel_mgmt/presentation/components/simple_request_card.dart';
 
@@ -62,6 +63,7 @@ class _MonthGroupCardState extends State<MonthGroupCard> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       decoration: BoxDecoration(
@@ -104,21 +106,11 @@ class _MonthGroupCardState extends State<MonthGroupCard> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Month',
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 12,
-                    color: Colors.black87,
-                  ),
-                ),
+                Text('Month', style: textTheme.h6.w500),
+                SizedBox(height: 8),
                 Text(
                   widget.monthTitle,
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 18,
-                    color: Colors.black,
-                  ),
+                  style: textTheme.h4.copyWith(fontWeight: FontWeight.w700),
                 ),
               ],
             ),

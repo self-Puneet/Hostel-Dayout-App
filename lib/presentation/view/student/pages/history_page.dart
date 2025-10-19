@@ -2,10 +2,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/instance_manager.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/presentation/components/month_requests_card.dart';
+import 'package:hostel_mgmt/presentation/components/skeleton_loaders/month_card_skeleton.dart';
 import 'package:provider/provider.dart';
 
 import 'package:hostel_mgmt/presentation/view/student/state/history_state.dart';
@@ -48,6 +49,7 @@ class _HistoryPageViewState extends State<_HistoryPageView> {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final padding = 31 * mediaQuery.size.width / 402;
+    final textTheme = Theme.of(context).textTheme;
 
     return Provider<HistoryController>.value(
       value: _controller,
@@ -75,11 +77,7 @@ class _HistoryPageViewState extends State<_HistoryPageView> {
                     Text(
                       'History',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.w500,
-                        fontStyle: FontStyle.normal,
-                        fontSize: 28,
-                      ),
+                      style: textTheme.h1.w500,
                     ),
                   ],
                 ),
@@ -136,8 +134,8 @@ class HistoryListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final padding = 31 * mediaQuery.size.width / 402;
-
     final profile = Get.find<LoginSession>();
+
     return Consumer<HistoryState>(
       builder: (context, state, _) {
         if (state.isErrored) {
@@ -155,8 +153,22 @@ class HistoryListView extends StatelessWidget {
           );
         }
 
+        // === SHOW SKELETON LOADER WHEN LOADING ===
         if (state.isLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return AppRefreshWrapper(
+            onRefresh: () async => context.read<HistoryController>().refresh(),
+            child: ListView.builder(
+              // physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+              itemCount: 2, // show two skeleton groups for variety
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: padding),
+                  child: monthGroupCardSkeleton(),
+                );
+              },
+            ),
+          );
         }
 
         final grouped = state.groupedForFilter(filter);
@@ -187,7 +199,7 @@ class HistoryListView extends StatelessWidget {
               final key = monthKeys[index];
               final items = grouped[key]!;
               return Padding(
-                padding: EdgeInsetsGeometry.symmetric(horizontal: padding),
+                padding: EdgeInsets.symmetric(horizontal: padding),
                 child: MonthGroupCard(
                   monthTitle: key,
                   requests: items,

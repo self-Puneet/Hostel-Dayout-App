@@ -33,6 +33,14 @@ class LiquidGlassBackButton extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: const Color(0xFFC1C1C1), width: 1),
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withAlpha((0.1 * 225).toInt()),
+                  ],
+                ),
               ),
               child: ClipOval(
                 child: enableGlass

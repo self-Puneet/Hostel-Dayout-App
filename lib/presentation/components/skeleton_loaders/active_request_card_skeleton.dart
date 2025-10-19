@@ -47,18 +47,28 @@ Widget activeRequestCardSkeleton() {
         ),
         SizedBox(height: 28),
         // Progress dots and labels
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: List.generate(
-            4,
-            (index) => Column(
-              children: [
-                shimmerCircle(size: 32),
-                SizedBox(height: 8),
-                shimmerBox(width: 48, height: 10),
-              ],
+        Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(right: 20, left: 20, top: 15),
+              child: shimmerBox(width: double.infinity, height: 4),
             ),
-          ),
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(
+                  4,
+                  (index) => Column(
+                    children: [
+                      shimmerCircle(size: 32),
+                      SizedBox(height: 8),
+                      shimmerBox(width: 48, height: 10),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     ),

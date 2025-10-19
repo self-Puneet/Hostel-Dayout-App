@@ -188,7 +188,7 @@ class _HomePageState extends State<HomePage> {
                     hostelName: hostelName,
                     roomNumber: profile.roomNo,
                     actor: TimelineActor.student,
-                    name: state.profile?.name ?? '',
+                    name: state.profile?.name ?? "",
                     avatarUrl: state.profile?.profilePic,
                     greeting: 'Welcome,',
                   ),
