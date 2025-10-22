@@ -60,7 +60,8 @@ class RequestService {
       print(jsonDecode(response.body));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print(data.keys);
+        print(data['request'].keys);
+        print("herehereherehereherehereherehere");
         final request = RequestDetailApiResponse.fromJson(data);
         return right(request);
       } else {

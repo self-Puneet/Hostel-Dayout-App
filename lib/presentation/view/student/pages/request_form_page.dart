@@ -72,7 +72,6 @@ class RequestFormPage extends StatelessWidget {
       // Use builder so that the child context has access to providers
       builder: (context, child) {
         final loginSession = Get.find<LoginSession>();
-        print(loginSession.imageURL);
         // Use Consumer here to get the provider instance safely
         return Consumer<RequestFormState>(
           builder: (context, provider, _) => Column(
@@ -125,62 +124,47 @@ class _RequestFormView extends StatelessWidget {
         // Unfocus any focused input before showing dialog and clearing
         FocusScope.of(context).unfocus();
 
-        final confirmed =
-            await showDialog<bool>(
-              context: context,
-              barrierDismissible: true, // allow tap outside to close dialog
-              builder: (ctx) => AlertDialog(
-                title: const Text('Clear form?'),
-                content: const Text(
-                  'Are you sure you want to remove the entered data? This cannot be undone.',
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(ctx).pop(false),
-                    child: const Text('Cancel'),
-                  ),
-                  FilledButton(
-                    onPressed: () => Navigator.of(ctx).pop(true),
-                    child: const Text('Clear & refresh'),
-                  ),
-                ],
-              ),
-            ) ??
-            false;
+        bool isFormTouched =
+            provider.touchedDayoutDate ||
+            provider.touchedDayoutFromTime ||
+            provider.touchedDayoutToTime ||
+            provider.touchedLeaveFromDate ||
+            provider.touchedLeaveToDate ||
+            provider.touchedLeaveFromTime ||
+            provider.touchedLeaveToTime ||
+            provider.touchedReason ||
+            provider.reason.trim().isNotEmpty;
 
-        if (!confirmed) return;
+        if (isFormTouched) {
+          final confirmed =
+              await showDialog<bool>(
+                context: context,
+                barrierDismissible: true, // allow tap outside to close dialog
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Clear form?'),
+                  content: const Text(
+                    'Are you sure you want to remove the entered data? This cannot be undone.',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(ctx).pop(false),
+                      child: const Text('Cancel'),
+                    ),
+                    FilledButton(
+                      onPressed: () => Navigator.of(ctx).pop(true),
+                      child: const Text('Clear & refresh'),
+                    ),
+                  ],
+                ),
+              ) ??
+              false;
+
+          if (!confirmed) return;
+        }
         provider.clearState();
         await Future.wait([controller.loadRestriction()]);
         // reload rules on refresh
       },
-      // onRefresh: () async {
-      //   final confirmed =
-      //       await showDialog<bool>(
-      //         context: context,
-      //         barrierDismissible: false,
-      //         builder: (ctx) => AlertDialog(
-      //           title: const Text('Clear form?'),
-      //           content: const Text(
-      //             'Are you sure you want to remove the entered data? This cannot be undone.',
-      //           ),
-      //           actions: [
-      //             TextButton(
-      //               onPressed: () => Navigator.of(ctx).pop(false),
-      //               child: const Text('Cancel'),
-      //             ),
-      //             FilledButton(
-      //               onPressed: () => Navigator.of(ctx).pop(true),
-      //               child: const Text('Clear & refresh'),
-      //             ),
-      //           ],
-      //         ),
-      //       ) ??
-      //       false;
-
-      //   if (!confirmed) return;
-      //   provider.clearState();
-      //   await controller.loadRestriction(); // reload rules on refresh
-      // },
       child: SingleChildScrollView(
         child: Container(
           margin: padding2,

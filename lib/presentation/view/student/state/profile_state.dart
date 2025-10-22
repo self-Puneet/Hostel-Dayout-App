@@ -43,4 +43,14 @@ class ProfileState extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  void clear() {
+  profile = null;
+  isLoading = false;
+  isErrored = false;
+  errorMessage = null;
+  isUploadingPic = false;
+  notifyListeners();
+}
+
 }

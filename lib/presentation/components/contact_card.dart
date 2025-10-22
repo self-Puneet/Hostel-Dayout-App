@@ -30,14 +30,14 @@ class ContactCard extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            radius: 22,
+            radius: 18,
             backgroundColor: Colors.blue.shade100,
             backgroundImage: (imageUrl != null && imageUrl!.trim() != "")
                 ? NetworkImage(imageUrl!)
                 : null,
             child: (imageUrl != null && imageUrl!.trim() != "")
                 ? null
-                : Text(name.initials, style: textTheme.h3.w500),
+                : Text(name.initials, style: textTheme.h4.w500),
           ),
           const SizedBox(width: 12),
           // Name & Role
@@ -47,15 +47,10 @@ class ContactCard extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
+                  style: textTheme.h5.copyWith(fontWeight: FontWeight.bold),
                 ),
-                Text(
-                  role,
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                ),
+                SizedBox(height: 5),
+                Text(role, style: textTheme.h6.w300),
               ],
             ),
           ),

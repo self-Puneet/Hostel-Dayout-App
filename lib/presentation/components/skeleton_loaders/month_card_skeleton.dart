@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/presentation/components/skeleton_loaders/simple_request_card_skeleton.dart';
+import 'package:hostel_mgmt/presentation/widgets/shimmer_box.dart';
 
 // Assume simpleRequestCardSkeleton() is already defined (from previous code)
 

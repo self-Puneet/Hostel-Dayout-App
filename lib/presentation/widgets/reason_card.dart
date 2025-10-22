@@ -68,7 +68,7 @@ class _ReasonCardState extends State<ReasonCard> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 3.0, bottom: 4),
-          child: Text(label, style: textTheme.h6.w500),
+          child: Text(label, style: textTheme.h5.w500),
         ),
         Container(
           decoration: BoxDecoration(
@@ -93,6 +93,7 @@ class _ReasonCardState extends State<ReasonCard> {
             controller: _controller,
             maxLines: 4,
             maxLength: maxLength,
+            style: textTheme.h4.copyWith(fontSize: 13),
             decoration: InputDecoration(
               isDense: true,
               border: InputBorder.none,

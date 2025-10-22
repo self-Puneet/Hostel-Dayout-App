@@ -83,25 +83,6 @@ class RequestFormState extends ChangeNotifier {
   bool _cachedTouchedLeaveFromTime = false;
   bool _cachedTouchedLeaveToTime = false;
 
-  // bool isProfileLoading = true;
-  // StudentProfileModel? profile;
-
-  // void setProfileLoading(bool v) {
-  //   isProfileLoading = v;
-  //   notifyListeners();
-  // }
-
-  // void setProfile(StudentProfileModel p) {
-  //   profile = p;
-  //   notifyListeners();
-  // }
-
-  // void setProfileError() {
-  //   // optional: if tracking profile load errors
-  //   isProfileLoading = false;
-  //   notifyListeners();
-  // }
-
   DateTime? _cachedDayoutDate;
   TimeOfDay? _cachedDayoutFromTime;
   TimeOfDay? _cachedDayoutToTime;

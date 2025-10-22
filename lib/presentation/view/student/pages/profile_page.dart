@@ -2,12 +2,16 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
+import 'package:hostel_mgmt/models/parent_model.dart';
+import 'package:hostel_mgmt/models/student_profile.dart';
 import 'package:hostel_mgmt/presentation/widgets/collapsing_header.dart';
+import 'package:hostel_mgmt/presentation/widgets/shimmer_box.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../state/profile_state.dart';
 import '../controllers/profile_controller.dart';
 import 'package:hostel_mgmt/services/profile_service.dart';
+import '../../../components/skeleton_loaders/profile_page_skeleton.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -77,10 +81,27 @@ class _ProfilePageState extends State<ProfilePage>
       value: state,
       child: Consumer<ProfileState>(
         builder: (context, state, _) {
-          if (state.isLoading || state.profile == null) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final p = state.profile!;
+          final p =
+              state.profile ??
+              StudentProfileModel(
+                studentId: '',
+                enrollmentNo: "",
+                name: "",
+                email: "",
+                phoneNo: "",
+                hostelName: "",
+                roomNo: "",
+                semester: 0,
+                branch: "",
+                parents: [
+                  ParentModel(
+                    parentId: "",
+                    name: "",
+                    relation: "",
+                    phoneNo: "",
+                  ),
+                ],
+              );
           final scheme = Theme.of(context).colorScheme;
           final mediaQuery = MediaQuery.of(context).size;
           final padding2 = EdgeInsets.symmetric(
@@ -92,7 +113,8 @@ class _ProfilePageState extends State<ProfilePage>
             backgroundColor: const Color(0xFFE9E9E9),
             body: AppRefreshWrapper(
               onRefresh: () async {
-                await Future.delayed(const Duration(seconds: 1)); // await!
+                Future.delayed(Durations.long4 * 20);
+                controller.initialize();
                 FocusScope.of(context).unfocus();
               },
               child: CustomScrollView(
@@ -131,146 +153,176 @@ class _ProfilePageState extends State<ProfilePage>
                     child: SingleChildScrollView(
                       child: Container(
                         margin: padding2,
-                        child: Column(
-                          children: [
-                            // Replace the original Stack with this widget.
-                            Stack(
-                              clipBehavior: Clip.none,
-                              alignment: Alignment.center,
-                              children: [
-                                // White ring + subtle shadow around the avatar
-                                Container(
-                                  padding: const EdgeInsets.all(
-                                    3,
-                                  ), // ring thickness
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.06),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 3),
+                        child: (state.isLoading)
+                            ? Column(
+                                children: [
+                                  profileTopSkeleton(),
+                                  const Divider(),
+                                  shimmerBox(
+                                    width: double.infinity,
+                                    height: 272,
+                                    borderRadius: 20,
+                                  ),
+
+                                  const SizedBox(height: 16),
+                                  const Divider(),
+                                  const SizedBox(height: 8),
+
+                                  shimmerBox(
+                                    width: double.infinity,
+                                    height: 200,
+                                    borderRadius: 20,
+                                  ),
+                                  // parentInfoSkeleton(),
+                                ],
+                              )
+                            : Column(
+                                children: [
+                                  // Replace the original Stack with this widget.
+                                  Stack(
+                                    clipBehavior: Clip.none,
+                                    alignment: Alignment.center,
+                                    children: [
+                                      // White ring + subtle shadow around the avatar
+                                      Container(
+                                        padding: const EdgeInsets.all(
+                                          3,
+                                        ), // ring thickness
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.06,
+                                              ),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: CircleAvatar(
+                                          radius: 48,
+                                          backgroundImage:
+                                              (p.profilePic != null &&
+                                                  p.profilePic!.isNotEmpty)
+                                              ? NetworkImage(p.profilePic!)
+                                              : null,
+                                          backgroundColor: Colors.blue.shade100,
+                                          child:
+                                              (p.profilePic == null ||
+                                                  p.profilePic!.isEmpty)
+                                              ? Text(
+                                                  _initials(p.name),
+                                                  style: const TextStyle(
+                                                    fontSize: 22,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.blue,
+                                                  ),
+                                                )
+                                              : null,
+                                        ),
+                                      ),
+
+                                      // Small blue camera FAB pinned to the bottom-right
+                                      Positioned(
+                                        bottom: -2,
+                                        right: -2,
+                                        child: FloatingActionButton.small(
+                                          heroTag: 'edit-avatar',
+                                          backgroundColor: Colors.blue,
+                                          foregroundColor: Colors.white,
+                                          elevation: 1,
+                                          onPressed: state.isUploadingPic
+                                              ? null
+                                              : _showPickSheet,
+                                          child: state.isUploadingPic
+                                              ? const SizedBox(
+                                                  width: 16,
+                                                  height: 16,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                      ),
+                                                )
+                                              : const Icon(
+                                                  Icons.camera_alt_outlined,
+                                                  size: 18,
+                                                ),
+                                        ),
                                       ),
                                     ],
                                   ),
-                                  child: CircleAvatar(
-                                    radius: 48,
-                                    backgroundImage:
-                                        (p.profilePic != null &&
-                                            p.profilePic!.isNotEmpty)
-                                        ? NetworkImage(p.profilePic!)
-                                        : null,
-                                    backgroundColor: Colors.blue.shade100,
-                                    child:
-                                        (p.profilePic == null ||
-                                            p.profilePic!.isEmpty)
-                                        ? Text(
-                                            _initials(p.name),
-                                            style: const TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.blue,
-                                            ),
-                                          )
-                                        : null,
+
+                                  // const SizedBox(height: 16),
+
+                                  // Name emphasized
+                                  Text(
+                                    p.name,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                ),
-
-                                // Small blue camera FAB pinned to the bottom-right
-                                Positioned(
-                                  bottom: -2,
-                                  right: -2,
-                                  child: FloatingActionButton.small(
-                                    heroTag: 'edit-avatar',
-                                    backgroundColor: Colors.blue,
-                                    foregroundColor: Colors.white,
-                                    elevation: 1,
-                                    onPressed: state.isUploadingPic
-                                        ? null
-                                        : _showPickSheet,
-                                    child: state.isUploadingPic
-                                        ? const SizedBox(
-                                            width: 16,
-                                            height: 16,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                            ),
-                                          )
-                                        : const Icon(
-                                            Icons.camera_alt_outlined,
-                                            size: 18,
-                                          ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    p.email,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade700,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                ),
-                              ],
-                            ),
 
-                            // const SizedBox(height: 16),
+                                  const SizedBox(height: 16),
+                                  const Divider(),
+                                  const SizedBox(height: 8),
 
-                            // Name emphasized
-                            Text(
-                              p.name,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
+                                  _section('Student Info', [
+                                    _infoRow('Enrollment No', p.enrollmentNo),
+                                    _infoRow('Phone No', p.phoneNo),
+                                    _infoRow('Hostel', p.hostelName),
+                                    _infoRow('Room No', p.roomNo),
+                                    _infoRow('Branch', p.branch),
+                                    _infoRow('Semester', p.semester.toString()),
+                                  ]),
+
+                                  const SizedBox(height: 16),
+                                  const Divider(),
+                                  const SizedBox(height: 8),
+
+                                  _section('Parent Info', [
+                                    _infoRow(
+                                      'Name',
+                                      p.parents.isNotEmpty
+                                          ? p.parents[0].name
+                                          : '',
+                                    ),
+                                    _infoRow(
+                                      'Relation',
+                                      p.parents.isNotEmpty
+                                          ? p.parents[0].relation
+                                          : '',
+                                    ),
+                                    _infoRow(
+                                      'Phone No',
+                                      p.parents.isNotEmpty
+                                          ? p.parents[0].phoneNo
+                                          : '',
+                                    ),
+                                  ]),
+
+                                  const SizedBox(height: 24),
+                                  Container(
+                                    height:
+                                        84 +
+                                        MediaQuery.of(
+                                          context,
+                                        ).viewPadding.bottom,
+                                  ),
+                                ],
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              p.email,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey.shade700,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-
-                            const SizedBox(height: 16),
-                            const Divider(),
-                            const SizedBox(height: 8),
-
-                            _section('Student Info', [
-                              _infoRow('Enrollment No', p.enrollmentNo),
-                              _infoRow('Phone No', p.phoneNo),
-                              _infoRow('Hostel', p.hostelName),
-                              _infoRow('Room No', p.roomNo),
-                              _infoRow('Branch', p.branch),
-                              _infoRow('Semester', p.semester.toString()),
-                            ]),
-
-                            const SizedBox(height: 16),
-                            const Divider(),
-                            const SizedBox(height: 8),
-
-                            _section('Parent Info', [
-                              _infoRow(
-                                'Name',
-                                p.parents.isNotEmpty ? p.parents[0].name : '',
-                              ),
-                              _infoRow(
-                                'Relation',
-                                p.parents.isNotEmpty
-                                    ? p.parents[0].relation
-                                    : '',
-                              ),
-                              _infoRow(
-                                'Phone No',
-                                p.parents.isNotEmpty
-                                    ? p.parents[0].phoneNo
-                                    : '',
-                              ),
-                            ]),
-
-                            const SizedBox(height: 24),
-                            Container(
-                              height:
-                                  84 +
-                                  MediaQuery.of(context).viewPadding.bottom,
-                            ),
-                          ],
-                        ),
                       ),
                     ),
                   ),

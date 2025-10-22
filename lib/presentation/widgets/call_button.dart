@@ -25,7 +25,7 @@ class CallButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.blue.shade50,
+          color: Colors.blue.shade100,
           borderRadius: BorderRadius.circular(12),
         ),
         child: const Icon(Icons.call, color: Colors.blue, size: 20),

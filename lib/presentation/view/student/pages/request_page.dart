@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/core/util/input_convertor.dart';
 import 'package:hostel_mgmt/models/warden_model.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:hostel_mgmt/presentation/components/contact_card.dart';
 import 'package:hostel_mgmt/presentation/components/request_timeline.dart';
+import 'package:hostel_mgmt/presentation/components/skeleton_loaders/request_detail_skeleton.dart';
+import 'package:hostel_mgmt/presentation/components/skeleton_loaders/timeline_skeleton.dart';
 import 'package:hostel_mgmt/presentation/view/student/state/request_state.dart';
 import 'package:hostel_mgmt/presentation/view/student/controllers/request_detail_controller.dart';
 import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/liquid_back_button.dart';
+import 'package:hostel_mgmt/presentation/widgets/shimmer_box.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../widgets/checkered_pattern.dart';
@@ -66,18 +70,28 @@ class _RequestPageState extends State<RequestPage> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+
+    final padding = EdgeInsets.symmetric(
+      horizontal: 31 * mediaQuery.size.width / 402,
+    );
+
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
     return ChangeNotifierProvider<RequestState>.value(
       value: _controller.state,
       child: Consumer<RequestState>(
         builder: (context, state, _) {
           // Loading/error scaffolds
           if (state.isLoading) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
+            return Scaffold(
+              backgroundColor: const Color(0xFFE9E9E9),
+              body: skeletonLoader(),
             );
           }
           if (state.isErrored) {
             return Scaffold(
+              backgroundColor: const Color(0xFFE9E9E9),
               appBar: AppBar(
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back),
@@ -113,7 +127,8 @@ class _RequestPageState extends State<RequestPage> {
             role: req.seniorWarden.wardenRole.displayName,
             phoneNumber: req.seniorWarden.phoneNo,
           );
-
+          final studentContactCard = seniorWardenContactCard;
+          final parentContactCard = assistentWardenContactCard;
           // Compute actions based on actor + current status
           final statusNow = req.request.status;
           final actions = RequestActionX.actionPossibleonStatus(
@@ -140,10 +155,7 @@ class _RequestPageState extends State<RequestPage> {
                               );
                             },
                       icon: a.icon,
-                      label: Text(
-                        a.name,
-                        style: TextStyle(color: Colors.white),
-                      ),
+                      label: Text(a.name, style: textTheme.h5.w500),
                       backgroundColor: a.actionColor,
                     );
                   })()
@@ -217,7 +229,7 @@ class _RequestPageState extends State<RequestPage> {
           }
 
           return Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: const Color(0xFFE9E9E9),
             floatingActionButton: fab,
             floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             body: AppRefreshWrapper(
@@ -228,50 +240,17 @@ class _RequestPageState extends State<RequestPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // CheckeredBackground(color: Colors.red),
-                    CheckeredContainer(
-                      color: state.request!.request.status.minimalStatusColor,
-                      height: 200,
-                      tileSize: 40,
-                      child: Align(
-                        alignment: Alignment.bottomLeft,
-                        child: Container(
-                          height: 200,
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 30,
-                              vertical: 10,
-                            ),
-                            child: SafeArea(
-                              bottom: false,
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  LiquidGlassBackButton(
-                                    onPressed: () => context.pop(),
-                                    radius: 30,
-                                  ),
-
-                                  Text(
-                                    req.request.requestType.displayName,
-                                    style: TextStyle(
-                                      fontSize: 32,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        //
+                    checkeredDesign(
+                      child: Text(
+                        req.request.requestType.displayName,
+                        style: textTheme.h1.w500,
                       ),
+                      color: state.request!.request.status.minimalStatusColor,
                     ),
+                    // CheckeredBackground(color: Colors.red),
                     SizedBox(height: 30),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                      padding: padding,
                       child: Column(
                         children: [
                           IntrinsicHeight(
@@ -282,7 +261,7 @@ class _RequestPageState extends State<RequestPage> {
                                   flex: 2,
                                   child: statusCard(status: req.request.status),
                                 ),
-                                const SizedBox(width: 18),
+                                const SizedBox(width: 12),
                                 Expanded(
                                   flex: 3,
                                   child: infoCard(
@@ -300,11 +279,21 @@ class _RequestPageState extends State<RequestPage> {
                           ),
                           if (widget.actor == TimelineActor.student)
                             dynamicTimeline(req: req, actor: widget.actor),
-                          assistentWardenContactCard,
-                          seniorWardenContactCard,
+                          if (widget.actor == TimelineActor.student ||
+                              widget.actor == TimelineActor.parent) ...[
+                            assistentWardenContactCard,
+                            seniorWardenContactCard,
+                          ],
+                          if (widget.actor == TimelineActor.seniorWarden ||
+                              widget.actor ==
+                                  TimelineActor.assistentWarden) ...[
+                            parentContactCard,
+                            studentContactCard,
+                          ],
+
                           Container(
                             height:
-                                384 + MediaQuery.of(context).viewPadding.bottom,
+                                84 + MediaQuery.of(context).viewPadding.bottom,
                           ),
                         ],
                       ),
@@ -382,6 +371,8 @@ class _RequestPageState extends State<RequestPage> {
   }
 
   Widget reasonRemarkSection({required String reason, String? parentRemark}) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
     return Container(
       decoration: BoxDecoration(
         color: Color.fromRGBO(246, 246, 246, 1),
@@ -395,10 +386,7 @@ class _RequestPageState extends State<RequestPage> {
         children: [
           Padding(
             padding: EdgeInsetsGeometry.symmetric(horizontal: 6),
-            child: Text(
-              "Reason",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-            ),
+            child: Text("Reason", style: textTheme.h3.w500),
           ),
           SizedBox(height: 8),
           Container(
@@ -409,10 +397,7 @@ class _RequestPageState extends State<RequestPage> {
             constraints: BoxConstraints(minWidth: double.maxFinite),
             // margin: EdgeInsets.symmetric(vertical: 40),
             padding: EdgeInsets.symmetric(horizontal: 9, vertical: 12),
-            child: Text(
-              reason,
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
-            ),
+            child: Text(reason, style: textTheme.h6),
           ),
           if (parentRemark != null && parentRemark != "") ...[
             SizedBox(height: 10),
@@ -420,10 +405,7 @@ class _RequestPageState extends State<RequestPage> {
             SizedBox(height: 10),
             Padding(
               padding: EdgeInsetsGeometry.symmetric(horizontal: 6),
-              child: Text(
-                "Parent Remark",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-              ),
+              child: Text("Parent Remark", style: textTheme.h3.w500),
             ),
             SizedBox(height: 8),
             Container(
@@ -434,10 +416,7 @@ class _RequestPageState extends State<RequestPage> {
               constraints: BoxConstraints(minWidth: double.maxFinite),
               // margin: EdgeInsets.symmetric(vertical: 40),
               padding: EdgeInsets.symmetric(horizontal: 9, vertical: 12),
-              child: Text(
-                parentRemark,
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
-              ),
+              child: Text(parentRemark, style: textTheme.h6),
             ),
           ],
         ],
@@ -446,6 +425,8 @@ class _RequestPageState extends State<RequestPage> {
   }
 
   Widget statusCard({required RequestStatus status}) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -468,13 +449,7 @@ class _RequestPageState extends State<RequestPage> {
             Icon(status.minimalStatusIcon, color: status.statusColor, size: 40),
             const SizedBox(height: 8),
             Spacer(),
-            Text(
-              status.displayName,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
+            Text(status.displayName, style: textTheme.h5.w500),
           ],
         ),
       ),
@@ -497,6 +472,79 @@ class _RequestPageState extends State<RequestPage> {
             time: InputConverter.formatTime(inDateTime),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget skeletonLoader() {
+    final mediaQuery = MediaQuery.of(context);
+
+    final padding = EdgeInsets.symmetric(
+      horizontal: 31 * mediaQuery.size.width / 402,
+    );
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          checkeredDesign(
+            child: shimmerBox(width: 140, height: 50),
+            color: Colors.grey,
+          ),
+          SizedBox(height: 30),
+          Padding(
+            padding: padding,
+            child: Column(
+              children: [
+                requestDetailSkeletonLoader(),
+                const SizedBox(height: 15),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(246, 246, 246, 1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 25),
+                  child: timelineSkeletonLoader(),
+                ),
+                Container(
+                  height: 84 + MediaQuery.of(context).viewPadding.bottom,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget checkeredDesign({required Widget child, required Color color}) {
+    return CheckeredContainer(
+      color: color,
+      height: 200,
+      tileSize: 40,
+      child: Align(
+        alignment: Alignment.bottomLeft,
+        child: Container(
+          height: 200,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+            child: SafeArea(
+              bottom: false,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  LiquidGlassBackButton(
+                    onPressed: () => context.pop(),
+                    radius: 30,
+                  ),
+                  child,
+                ],
+              ),
+            ),
+          ),
+        ),
+        //
       ),
     );
   }

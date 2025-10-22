@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:hostel_mgmt/presentation/widgets/shimmer_box.dart';
+import 'package:hostel_mgmt/presentation/widgets/skeleton_circle.dart';
 
 Widget activeRequestCardSkeleton() {
   return Container(
@@ -24,11 +25,18 @@ Widget activeRequestCardSkeleton() {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            shimmerBox(width: 120, height: 18),
-            shimmerBox(width: 70, height: 32),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                shimmerBox(width: 120, height: 15),
+                SizedBox(height: 5),
+                shimmerBox(width: 120, height: 15),
+              ],
+            ),
+            shimmerBox(width: 80, height: 32, borderRadius: 20),
           ],
         ),
-        SizedBox(height: 16),
+        SizedBox(height: 12),
         Divider(color: Colors.grey.shade300, thickness: 1),
         SizedBox(height: 12),
         shimmerBox(width: 140, height: 18), // Reason text
@@ -71,42 +79,6 @@ Widget activeRequestCardSkeleton() {
           ],
         ),
       ],
-    ),
-  );
-}
-
-// Helper widget to wrap individual box in shimmer
-Widget shimmerBox({
-  required double width,
-  required double height,
-  double borderRadius = 8,
-}) {
-  return Shimmer.fromColors(
-    baseColor: Colors.grey.shade300,
-    highlightColor: Colors.grey.shade100,
-    child: Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: Colors.grey[400],
-        borderRadius: BorderRadius.circular(borderRadius),
-      ),
-    ),
-  );
-}
-
-// Helper widget to wrap individual circle in shimmer
-Widget shimmerCircle({required double size}) {
-  return Shimmer.fromColors(
-    baseColor: Colors.grey.shade300,
-    highlightColor: Colors.grey.shade100,
-    child: Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: Colors.grey[400],
-        shape: BoxShape.circle,
-      ),
     ),
   );
 }

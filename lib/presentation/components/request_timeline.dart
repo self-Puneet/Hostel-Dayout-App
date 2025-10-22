@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:timelines_plus/timelines_plus.dart';
 
 enum TimelineStatus { inProgress, completed, rejected }
@@ -49,6 +50,8 @@ class RequestTimeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
     const double padding = 25;
     return Timeline.tileBuilder(
       shrinkWrap: true,
@@ -74,30 +77,15 @@ class RequestTimeline extends StatelessWidget {
             child: Align(
               alignment: Alignment.centerLeft, // center with indicator
               child: (e.subtitle == null || e.subtitle == "")
-                  ? Text(
-                      e.title,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    )
+                  ? Text(e.title, style: textTheme.h6)
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          e.title,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
+                        Text(e.title, style: textTheme.h6),
                         Text(
                           e.subtitle!,
-                          style: TextStyle(
+                          style: textTheme.h7.copyWith(
                             color: Color.fromRGBO(0, 0, 0, 0.6),
-
-                            fontWeight: FontWeight.w400,
-                            fontSize: 10,
                           ),
                         ),
                       ],
@@ -116,19 +104,12 @@ class RequestTimeline extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   if (e.time != null)
-                    Text(
-                      _formatDate(e.time!),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
+                    Text(_formatDate(e.time!), style: textTheme.h6),
                   if (e.time != null)
                     Text(
                       _formatTime(e.time!),
-                      style: TextStyle(
+                      style: textTheme.h7.copyWith(
                         color: Color.fromRGBO(0, 0, 0, 0.6),
-                        fontSize: 10,
                       ),
                     ),
                 ],

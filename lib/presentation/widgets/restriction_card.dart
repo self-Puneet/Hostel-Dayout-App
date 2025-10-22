@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/models/restriction_window.dart';
+import 'package:hostel_mgmt/presentation/widgets/shimmer_box.dart';
+import 'package:hostel_mgmt/presentation/widgets/skeleton_circle.dart';
 
 class RestrictionCard extends StatelessWidget {
   final RestrictionWindow? restriction;
@@ -47,15 +49,23 @@ class RestrictionCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     if (isLoading) {
-      return SizedBox(
-        height: 72,
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        height: 66,
         child: Center(
-          child: Text(
-            "Loading restriction…",
-            style: textTheme.bodySmall!.w300.copyWith(
-              color: colorScheme.onSurface.withOpacity(0.6),
-              fontStyle: FontStyle.italic,
-            ),
+          child: Row(
+            children: [
+              shimmerCircle(size: 35),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  shimmerBox(width: 60, height: 18, borderRadius: 10),
+                  const SizedBox(height: 4),
+                  shimmerBox(width: 180, height: 18, borderRadius: 10),
+                ],
+              ),
+            ],
           ),
         ),
       );
