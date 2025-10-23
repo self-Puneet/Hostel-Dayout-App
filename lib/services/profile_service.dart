@@ -14,6 +14,7 @@ class ProfileService {
   static Future<Either<String, StudentApiResponse>> getStudentProfile() async {
     final session = Get.find<LoginSession>();
     final token = session.token;
+    print(session.token);
 
     try {
       final response = await http.get(

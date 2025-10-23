@@ -19,29 +19,30 @@ class HomeController {
     state.setLoading(true);
 
     // Profile
+    final session = Get.find<LoginSession>();
+    session.loadFromPrefs(); // or any other method
+
     final profileResult = await ProfileService.getStudentProfile();
-    profileResult.fold(
-      (error) {
+    await profileResult.fold(
+      (error) async {
         print('Profile error: $error');
       },
-      (profileResponse) {
-        final session = LoginSession(
-          token: Get.find<LoginSession>().token,
-          username: profileResponse.student.name,
-          email: profileResponse.student.email,
-          identityId: profileResponse.student.enrollmentNo,
-          hostels: [
+      (profileResponse) async {
+        session
+          ..username = profileResponse.student.name
+          ..email = profileResponse.student.email
+          ..identityId = profileResponse.student.enrollmentNo
+          ..hostels = [
             HostelInfo(
               hostelId: profileResponse.student.hostelName,
               hostelName: profileResponse.student.hostelName,
             ),
-          ],
-          role: TimelineActor.student,
-          imageURL: Get.find<LoginSession>().imageURL,
-        );
+          ]
+          ..phone = profileResponse.student.phoneNo
+          ..roomNo = profileResponse.student.roomNo
+          ..role = TimelineActor.student;
 
-        session.saveToPrefs();
-
+        await session.saveToPrefs();
         state.setProfile(profileResponse.student);
       },
     );

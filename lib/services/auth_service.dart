@@ -39,42 +39,54 @@ class AuthService {
       if ((data['token'] ?? '').toString().isEmpty) {
         return left(data['message']?.toString() ?? "Login failed");
       }
+      final session = Get.find<LoginSession>();
+
+      session
+        ..token = data['token']
+        ..username = data['name']
+        ..email = data['email']
+        ..identityId = data['enrollment_no']
+        // ..hostels = (data['hostel'] as List?)
+        //     ?.map((h) => HostelInfo.fromJson(h))
+        //     .toList()x
+        ..role = TimelineActor.student
+        ..imageURL = data['imageURL'];
+
+      await session.saveToPrefs();
+
       final profile = await ProfileService.getStudentProfile();
       profile.fold(
         (error) {
+          print("--------------------->error");
+          print(error);
           return error;
         },
-        (profileResponse) {
+        (profileResponse) async {
           profileResponse.student.hostelName;
-          final session = LoginSession(
-            token: data['token'],
-            username: profileResponse.student.name,
-            email: profileResponse.student.email,
-            identityId: profileResponse.student.enrollmentNo,
-            hostels: [
+          final session = Get.find<LoginSession>();
+
+          session
+            ..token = data['token']
+            ..phone = profileResponse.student.phoneNo
+            ..username = profileResponse.student.name
+            ..email = profileResponse.student.email
+            ..identityId = profileResponse.student.enrollmentNo
+            ..hostels = [
               HostelInfo(
                 hostelId: profileResponse.student.hostelName,
                 hostelName: profileResponse.student.hostelName,
               ),
-            ],
-            role: TimelineActor.student,
-            imageURL: data['imageURL'],
-          );
+            ]
+            ..role = TimelineActor.student
+            ..imageURL = data['imageURL'];
 
-          session.saveToPrefs();
+          print("hiiiiiiiiiiiiiiiiiiiii");
+          print(session.phone);
+
+          await session.saveToPrefs();
           return right(session);
         },
       );
-      final session = LoginSession(
-        token: data['token'],
-        username: data['name'],
-        email: data['email'],
-        identityId: data['enrollment_no'],
-        // hostels: data['hostel'],
-        role: TimelineActor.student,
-        imageURL: data['imageURL'],
-      );
-      session.saveToPrefs();
       return right(session);
     } catch (e) {
       print("❌ Exception: $e");
@@ -245,7 +257,8 @@ class AuthService {
   }
 
   static Future<LoginSession?> getSavedStudentSession() async {
-    final session = await LoginSession.loadFromPrefs();
+    final session = Get.find<LoginSession>();
+    session.loadFromPrefs();
     if (session != null && Get.isRegistered<LoginSession>()) {
       final diSession = Get.find<LoginSession>();
       diSession.token = session.token;

@@ -11,14 +11,12 @@ class HostelInfo {
 
   // JSON serialization
   Map<String, dynamic> toJson() => {
-        "hostel_id": hostelId,
-        "hostel_name": hostelName,
-      };
+    "hostel_id": hostelId,
+    "hostel_name": hostelName,
+  };
 
-  factory HostelInfo.fromJson(Map<String, dynamic> json) => HostelInfo(
-        hostelId: json["hostel_id"],
-        hostelName: json["hostel_name"],
-      );
+  factory HostelInfo.fromJson(Map<String, dynamic> json) =>
+      HostelInfo(hostelId: json["hostel_id"], hostelName: json["hostel_name"]);
 }
 
 class LoginSession {
@@ -50,6 +48,7 @@ class LoginSession {
     this.roomNo,
   });
 
+  // ✅ Proper JSON serialization
   Map<String, dynamic> toJson() => {
     "token": token,
     "username": username,
@@ -59,29 +58,30 @@ class LoginSession {
     "phone": phone,
     "fcm_token": fcmToken,
     "role": TimelineActorX.toShortString(role),
-    "hostel_id": hostels,
-    "hostel": hostels,
+    "hostels": hostels?.map((h) => h.toJson()).toList(),
     "imageURL": imageURL,
     "primaryId": primaryId,
     "room_no": roomNo,
   };
 
+  // ✅ Proper JSON deserialization
   factory LoginSession.fromJson(Map<String, dynamic> json) => LoginSession(
-    token: json["token"],
-    username: json["username"],
+    token: json["token"] ?? '',
+    username: json["username"] ?? '',
     email: json["email"],
     identityId: json["identityId"],
     expiry: json["expiry"] != null ? DateTime.tryParse(json["expiry"]) : null,
     phone: json["phone"],
     fcmToken: json["fcm_token"],
     role: TimelineActorX.fromString(json["role"]),
-        hostels: (json["hostels"] as List<dynamic>?)
-                ?.map((e) => HostelInfo.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            [],
+    hostels:
+        (json["hostels"] as List?)
+            ?.map((e) => HostelInfo.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [],
     imageURL: json["imageURL"],
     primaryId: json["primaryId"],
-    roomNo: json['room_no'],
+    roomNo: json["room_no"],
   );
 
   Future<void> saveToPrefs() async {
@@ -89,7 +89,7 @@ class LoginSession {
     await prefs.setString("login_session", jsonEncode(toJson()));
   }
 
-  static Future<LoginSession?> loadFromPrefs() async {
+  Future<LoginSession?> loadFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     final data = prefs.getString("login_session");
     if (data == null) return null;
@@ -111,9 +111,9 @@ class LoginSession {
     return DateTime.now().isBefore(expiry!);
   }
 
-  static Future<Either<String, String>> getValidToken() async {
+  Future<Either<String, String>> getValidToken() async {
     try {
-      final session = await LoginSession.loadFromPrefs();
+      final session = await loadFromPrefs();
 
       if (session == null) {
         return left('Session not found. Please login again.');
