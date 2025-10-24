@@ -110,7 +110,7 @@ class SimpleActionRequestCard extends StatelessWidget {
     final BorderRadius radius = BorderRadius.circular(16);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8), // vertical margin
+      padding: const EdgeInsets.symmetric(vertical: 0), // vertical margin
       // Use Material + Ink + InkWell so ink splash is clipped to rounded shape
       child: Material(
         type: MaterialType.transparency,
@@ -127,18 +127,21 @@ class SimpleActionRequestCard extends StatelessWidget {
         child: Ink(
           decoration: ShapeDecoration(
             // Keep existing selected blue tint; otherwise use pale background.
-            color: selected
-                ? selectedColor.withAlpha((1 * 255).toInt())
-                // : (borderColor == null)
+            color: isLate
+                ? borderColor!.withAlpha((0.1 * 255).toInt())
+                : selected
+                ? selectedColor.withAlpha((0.1 * 255).toInt())
                 : Colors.white,
             // : borderColor!.withAlpha((0.08 * 255).toInt()),
             shape: RoundedRectangleBorder(
               borderRadius: radius,
               side: BorderSide(
-                color: selected
+                color: isLate
+                    ? borderColor!.withAlpha((0.1 * 255).toInt())
+                    : selected
                     ? selectedColor
                     : (borderColor != null)
-                    ? borderColor!.withAlpha((1 * 255).toInt())
+                    ? borderColor!.withAlpha((0 * 255).toInt())
                     : Colors.transparent,
                 width: selected ? 2 : 0.8,
               ),
@@ -148,8 +151,12 @@ class SimpleActionRequestCard extends StatelessWidget {
             onTap: onTap,
             onLongPress: onLongPress,
             customBorder: RoundedRectangleBorder(borderRadius: radius),
-            splashColor: selectedColor.withAlpha((0.12 * 255).toInt()),
-            highlightColor: selectedColor.withAlpha((0.06 * 255).toInt()),
+            splashColor: isLate
+                ? borderColor!.withAlpha((0.1 * 255).toInt())
+                : selectedColor.withAlpha((0.12 * 255).toInt()),
+            highlightColor: isLate
+                ? borderColor!.withAlpha((0.1 * 255).toInt())
+                : selectedColor.withAlpha((0.12 * 255).toInt()),
             child: Stack(
               children: [
                 // Main content

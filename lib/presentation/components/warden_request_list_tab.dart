@@ -42,7 +42,6 @@ class StatusList extends StatelessWidget {
         builder: (context, s, _) {
           final List<OnScreenRequest> reqeusts = stateController
               .getRequestByStatus(status_: status);
-          print(reqeusts.length);
           if (reqeusts.isEmpty) {
             final q = s.filterController.text.trim();
             return LayoutBuilder(
@@ -119,6 +118,7 @@ class StatusList extends StatelessWidget {
                         _openDialer(stu.phoneNo);
                       }
                     : null,
+                // rejectionColor: Colors.red,
               );
             },
           );

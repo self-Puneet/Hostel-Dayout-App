@@ -42,7 +42,6 @@ class WardenActionPageController {
       //   resolvedHostelId,
       // );
       result.fold((error) => state.setError(true, error), (response) {
-        print(response.length);
         state.setRequests(response);
       });
     } catch (e) {
@@ -122,16 +121,14 @@ class WardenActionPageController {
   }
 
   List<OnScreenRequest> getRequestByStatus({required RequestStatus status_}) {
-    final requests = state.allRequests;
-    final List<OnScreenRequest> onScreenRequest = [];
-    for (int i = 0; i < requests.length; i++) {
-      if (requests[i].$1.status == status_) {
-        onScreenRequest.add(OnScreenRequest.fromRequest(requests[i]));
-      }
-    }
-    if (status_ == RequestStatus.referred) {
-      print(onScreenRequest.length);
-    }
-    return onScreenRequest.toList();
+    // final requests = state.allRequests;
+    // final List<OnScreenRequest> onScreenRequest = [];
+    // for (int i = 0; i < requests.length; i++) {
+    //   if (requests[i].$1.status == status_) {
+    //     onScreenRequest.add(OnScreenRequest.fromRequest(requests[i]));
+    //   }
+    // }
+    final result = state.currentOnScreenRequests;
+    return result;
   }
 }

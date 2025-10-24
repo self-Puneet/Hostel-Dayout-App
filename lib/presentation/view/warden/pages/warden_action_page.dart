@@ -6,6 +6,7 @@ import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/presentation/components/simple_action_request_card.dart';
 import 'package:hostel_mgmt/presentation/components/warden_request_list_tab.dart';
 import 'package:hostel_mgmt/presentation/widgets/segmented_scrollable_tab_view.dart';
+import 'package:hostel_mgmt/presentation/widgets/shimmer_box.dart';
 import 'package:provider/provider.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_action_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/controller/warden_action_page_controller.dart';
@@ -43,6 +44,15 @@ class _WardenHomePageState extends State<WardenHomePage>
         context.read<WardenActionState>().setCurrentTab(tab);
       }
     });
+    // _tabs.addListener(() {
+    //   if (!_tabs.indexIsChanging) {
+    //     final tab = WardenTabX.fromIndex(_tabs.index);
+    //     final s = context.read<WardenActionState>();
+    //     s.setIsLoading(true);
+    //     s.setCurrentTab(tab);
+    //   }
+    // });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         context.read<WardenActionState>().setCurrentTab(initTab);
@@ -155,10 +165,18 @@ class _WardenHomePageState extends State<WardenHomePage>
                 child: Divider(thickness: 2, color: Colors.grey.shade300),
               ),
               // Tab contents
-              Expanded(
-                child: (s.isLoading && !s.hasData)
-                    ? const Center(child: CircularProgressIndicator())
-                    : TabBarView(
+              (s.isLoading && !s.hasData)
+                  ? Padding(
+                      padding:
+                          horizontalPad +
+                          const EdgeInsets.symmetric(
+                            horizontal: 0,
+                            vertical: 8,
+                          ),
+                      child: shimmerBox(width: double.infinity, height: 100),
+                    )
+                  : Expanded(
+                      child: TabBarView(
                         controller: _tabs,
                         physics: const NeverScrollableScrollPhysics(),
                         children: [
@@ -193,7 +211,7 @@ class _WardenHomePageState extends State<WardenHomePage>
                           ],
                         ],
                       ),
-              ),
+                    ),
             ],
           );
         },
@@ -201,92 +219,95 @@ class _WardenHomePageState extends State<WardenHomePage>
     );
   }
 
-Widget hostelWidget(WardenActionState s) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 10),
-    child: s.hostels.length <= 1 && s.selectedHostelId != null
-        ? SizedBox(
-            height: 50,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.home, color: Colors.blueGrey, size: 18),
-                const SizedBox(width: 5),
-                Expanded(
-                  child: Text(
-                    s.selectedHostelName!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 13,
-                      color: Colors.blueGrey,
+  Widget hostelWidget(WardenActionState s) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: s.hostels.length <= 1 && s.selectedHostelId != null
+          ? SizedBox(
+              height: 50,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.home, color: Colors.blueGrey, size: 18),
+                  const SizedBox(width: 5),
+                  Expanded(
+                    child: Text(
+                      s.selectedHostelName!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                        color: Colors.blueGrey,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          )
-        : SizedBox(
-            height: 50,
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                isDense: true,
-                isExpanded: true,
-                itemHeight: 48.0,
-                value: s.selectedHostelId,
-                items: s.hostels.map((hostel) {
-                  return DropdownMenuItem<String>(
-                    value: hostel.hostelId, // select by ID
-                    child: Row(
-                      children: [
-                        const Icon(Icons.home,
-                            color: Colors.blueGrey, size: 16),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            hostel.hostelName, // show name
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: Colors.black87,
+                ],
+              ),
+            )
+          : SizedBox(
+              height: 50,
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  isDense: true,
+                  isExpanded: true,
+                  itemHeight: 48.0,
+                  value: s.selectedHostelId,
+                  items: s.hostels.map((hostel) {
+                    return DropdownMenuItem<String>(
+                      value: hostel.hostelId, // select by ID
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.home,
+                            color: Colors.blueGrey,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              hostel.hostelName, // show name
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.black87,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-                onChanged: (val) async {
-                  if (val == null) return;
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (val) async {
+                    if (val == null) return;
 
-                  // find matching hostel name by ID
-                  final hostel = s.hostels.firstWhere(
-                    (h) => h.hostelId == val,
-                    orElse: () => s.hostels.first,
-                  );
+                    // find matching hostel name by ID
+                    final hostel = s.hostels.firstWhere(
+                      (h) => h.hostelId == val,
+                      orElse: () => s.hostels.first,
+                    );
 
-                  // FIX → Provide both id & name as required by setSelectedHostelId()
-                  s.setSelectedHostelId(hostel.hostelId, hostel.hostelName);
-                  s.resetForHostelChange();
+                    // FIX → Provide both id & name as required by setSelectedHostelId()
+                    s.setSelectedHostelId(hostel.hostelId, hostel.hostelName);
+                    s.resetForHostelChange();
 
-                  await WardenActionPageController(s)
-                      .fetchRequestsFromApi(hostelId: hostel.hostelId);
-                },
-                icon: const Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  color: Colors.blueGrey,
+                    await WardenActionPageController(
+                      s,
+                    ).fetchRequestsFromApi(hostelId: hostel.hostelId);
+                  },
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: Colors.blueGrey,
+                  ),
+                  iconSize: 20,
+                  style: const TextStyle(fontSize: 13, color: Colors.black87),
+                  dropdownColor: Colors.white,
                 ),
-                iconSize: 20,
-                style:
-                    const TextStyle(fontSize: 13, color: Colors.black87),
-                dropdownColor: Colors.white,
               ),
             ),
-          ),
-  );
-}
+    );
+  }
 
   Widget requestedTab(WardenActionPageController controller) {
     return StatusList(
@@ -350,13 +371,15 @@ class _PendingApprovalList extends StatelessWidget {
       margin: horizontalPad,
       child: Consumer<WardenActionState>(
         builder: (context, s, _) {
+          // state.currentOnScreenRequests = [];
           final List<OnScreenRequest> result = stateController
               .getRequestByStatus(
                 status_: actor == TimelineActor.seniorWarden
                     ? RequestStatus.parentApproved
                     : status,
               );
-          print(result.length);
+          // final List<OnScreenRequest> result = state.currentOnScreenRequests;
+
           if (result.isEmpty) {
             final q = s.filterController.text.trim();
             return LayoutBuilder(
@@ -378,73 +401,79 @@ class _PendingApprovalList extends StatelessWidget {
           }
           return Column(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            state.isActioning || !state.hasSelection
-                            ? Colors.grey
-                            : Colors.red,
-                        foregroundColor:
-                            state.isActioning || !state.hasSelection
-                            ? Colors.black
-                            : Colors.white,
-                      ),
-                      onPressed: (!state.isActioning && state.hasSelection)
-                          ? () {
-                              if (actor == TimelineActor.assistentWarden) {
-                                stateController.bulkActionSelected(
-                                  action: RequestAction.cancel,
-                                );
-                              } else {
-                                stateController.bulkActionSelected(
-                                  action: RequestAction.reject,
-                                );
-                              }
-                            }
-                          : null,
-                      child: actor == TimelineActor.assistentWarden
-                          ? Text(RequestAction.cancel.name)
-                          : Text(RequestAction.reject.name),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            state.isActioning || !state.hasSelection
-                            ? Colors.grey
-                            : Colors.green,
-                        foregroundColor:
-                            state.isActioning || !state.hasSelection
-                            ? Colors.black
-                            : Colors.white,
-                      ),
-                      onPressed: (!state.isActioning && state.hasSelection)
-                          ? () {
-                              if (actor == TimelineActor.assistentWarden) {
-                                stateController.bulkActionSelected(
-                                  action: RequestAction.refer,
-                                );
-                                stateController.fetchRequestsFromApi();
-                              } else {
-                                stateController.bulkActionSelected(
-                                  action: RequestAction.approve,
-                                );
-                                stateController.fetchRequestsFromApi();
-                              }
-                            }
-                          : null,
-                      child: actor == TimelineActor.assistentWarden
-                          ? Text(RequestAction.refer.name)
-                          : Text(RequestAction.approve.name),
-                    ),
-                  ),
-                ],
-              ),
+              // false
+              //     ? Row(
+              //         children: [
+              //           Expanded(
+              //             child: ElevatedButton(
+              //               style: ElevatedButton.styleFrom(
+              //                 backgroundColor:
+              //                     state.isActioning || !state.hasSelection
+              //                     ? Colors.grey
+              //                     : Colors.red,
+              //                 foregroundColor:
+              //                     state.isActioning || !state.hasSelection
+              //                     ? Colors.black
+              //                     : Colors.white,
+              //               ),
+              //               onPressed:
+              //                   (!state.isActioning && state.hasSelection)
+              //                   ? () {
+              //                       if (actor ==
+              //                           TimelineActor.assistentWarden) {
+              //                         stateController.bulkActionSelected(
+              //                           action: RequestAction.cancel,
+              //                         );
+              //                       } else {
+              //                         stateController.bulkActionSelected(
+              //                           action: RequestAction.reject,
+              //                         );
+              //                       }
+              //                     }
+              //                   : null,
+              //               child: actor == TimelineActor.assistentWarden
+              //                   ? Text(RequestAction.cancel.name)
+              //                   : Text(RequestAction.reject.name),
+              //             ),
+              //           ),
+              //           const SizedBox(width: 12),
+              //           Expanded(
+              //             child: ElevatedButton(
+              //               style: ElevatedButton.styleFrom(
+              //                 backgroundColor:
+              //                     state.isActioning || !state.hasSelection
+              //                     ? Colors.grey
+              //                     : Colors.green,
+              //                 foregroundColor:
+              //                     state.isActioning || !state.hasSelection
+              //                     ? Colors.black
+              //                     : Colors.white,
+              //               ),
+              //               onPressed:
+              //                   (!state.isActioning && state.hasSelection)
+              //                   ? () {
+              //                       if (actor ==
+              //                           TimelineActor.assistentWarden) {
+              //                         stateController.bulkActionSelected(
+              //                           action: RequestAction.refer,
+              //                         );
+              //                         stateController.fetchRequestsFromApi();
+              //                       } else {
+              //                         stateController.bulkActionSelected(
+              //                           action: RequestAction.approve,
+              //                         );
+              //                         stateController.fetchRequestsFromApi();
+              //                       }
+              //                     }
+              //                   : null,
+              //               child: actor == TimelineActor.assistentWarden
+              //                   ? Text(RequestAction.refer.name)
+              //                   : Text(RequestAction.approve.name),
+              //             ),
+              //           ),
+              //         ],
+              //       )
+              //     : Container(),
               const SizedBox(height: 8),
               // 👇 This makes the list take the remaining space properly
               Expanded(
@@ -456,12 +485,16 @@ class _PendingApprovalList extends StatelessWidget {
                   ),
                   itemCount: result.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 10),
+
                   itemBuilder: (context, i) {
                     final wrap = result[i];
                     final req = wrap.request;
                     final stu = wrap.student;
                     final selected = wrap.isSelected;
                     final safeName = (stu.name).isEmpty ? 'Unknown' : stu.name;
+                    // print(
+                    //   "request on screen ------> ${req.reason} ------> ${result[i].isSelected}",
+                    // );
 
                     return SimpleActionRequestCard(
                       profileImageUrl: stu.profilePic,
@@ -498,6 +531,7 @@ class _PendingApprovalList extends StatelessWidget {
                               }
                             }
                           : null,
+
                       onAcceptence: (!s.hasSelection && !s.isActioning)
                           ? () async {
                               await stateController.actionRequestById(

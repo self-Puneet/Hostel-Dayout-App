@@ -35,7 +35,6 @@ extension WardenTabX on WardenTab {
 
 // ==============================================================================================================
 
-
 // ===================================== request model which would be shown to the warden =================================================
 
 /* 
@@ -76,16 +75,13 @@ class OnScreenRequest {
 }
 
 class WardenActionState extends ChangeNotifier {
-
-
-  
   bool _isLoading = false;
   bool _isErrored = false;
   bool _isActioning = false; // this removal
   String _errorMessage = '';
 
   // Selection
-  final Set<String> _selectedIds = {};// this removal
+  final Set<String> _selectedIds = {}; // this removal
 
   // Hostels
 
@@ -141,15 +137,14 @@ class WardenActionState extends ChangeNotifier {
 
   // Select hostel id (does not auto-fetch)
   void setSelectedHostelId(String id, String name) {
-  selectedHostelId = id;
-  selectedHostelName = name;
-  notifyListeners();
-}
-
+    selectedHostelId = id;
+    selectedHostelName = name;
+    notifyListeners();
+  }
 
   // Clear transient state but keep hostel selection/list
   void resetForHostelChange() {
-    _isErrored = false; 
+    _isErrored = false;
     _errorMessage = '';
     _allRequests = [];
     currentOnScreenRequests = [];
@@ -187,22 +182,33 @@ class WardenActionState extends ChangeNotifier {
     if (_selectedIds.contains(id)) {
       _selectedIds.remove(id);
     } else {
+      // print("yooooo we are on right track !!!!!!!");
       _selectedIds.add(id);
     }
     for (var i = 0; i < currentOnScreenRequests.length; i++) {
       final req = currentOnScreenRequests[i];
       final requestId = req.request.requestId;
       if (requestId == id) {
+        // print("yooooo we are on right track !!!!!!!");
         currentOnScreenRequests[i] = req.copyWith(
           isSelected: _selectedIds.contains(id),
         );
+        // print(_selectedIds.contains(id));
+        // print(currentOnScreenRequests[i].isSelected);
         break;
       }
     }
+    // currentOnScreenRequests.forEach((onScreenRequest) {
+    //   print(
+    //     "request in state -----> ${onScreenRequest.request.reason} ---> ${onScreenRequest.isSelected}",
+    //   );
+    // });
+
     selectedRequests = currentOnScreenRequests
         .where((w) => _selectedIds.contains(w.request.requestId))
         .map((w) => w.request)
         .toList();
+
     notifyListeners();
   }
 
