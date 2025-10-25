@@ -259,7 +259,7 @@ class AuthService {
   static Future<LoginSession?> getSavedStudentSession() async {
     final session = Get.find<LoginSession>();
     session.loadFromPrefs();
-    if (session != null && Get.isRegistered<LoginSession>()) {
+    if (Get.isRegistered<LoginSession>()) {
       final diSession = Get.find<LoginSession>();
       diSession.token = session.token;
       diSession.username = session.username;
