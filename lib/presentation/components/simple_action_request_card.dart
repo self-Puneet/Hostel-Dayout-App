@@ -28,8 +28,8 @@ class SimpleActionRequestCard extends StatelessWidget {
   final Color? borderColor; // base color for card, rendered pale
 
   // New icon customization fields
-  final IconData acceptenceIcon; // default: Icons.check
-  final IconData declineIcon; // default: Icons.close
+  final Widget acceptenceIcon; // default: Icon(Icons.check)
+  final Widget declineIcon; // default: Icon(Icons.close)
 
   final bool isLate;
 
@@ -57,8 +57,8 @@ class SimpleActionRequestCard extends StatelessWidget {
     this.borderColor,
 
     // New defaults as requested
-    this.acceptenceIcon = Icons.check,
-    this.declineIcon = Icons.close,
+    this.acceptenceIcon = const Icon(Icons.check, size: 20),
+    this.declineIcon = const Icon(Icons.close, size: 20),
   });
 
   @override
@@ -68,6 +68,7 @@ class SimpleActionRequestCard extends StatelessWidget {
 
     // Button styles (WidgetStateProperty on recent Flutter)
     final ButtonStyle dangerStyle = ButtonStyle(
+      elevation: const WidgetStatePropertyAll(0),
       backgroundColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.disabled)) {
           return theme.colorScheme.surfaceContainerHighest;
@@ -88,6 +89,7 @@ class SimpleActionRequestCard extends StatelessWidget {
     );
 
     final ButtonStyle successStyle = ButtonStyle(
+      elevation: const WidgetStatePropertyAll(0),
       backgroundColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.disabled)) {
           return theme.colorScheme.surfaceContainerHighest;
@@ -265,7 +267,7 @@ class SimpleActionRequestCard extends StatelessWidget {
                                 ElevatedButton(
                                   onPressed: onRejection, // null => disabled
                                   style: dangerStyle,
-                                  child: Icon(declineIcon, size: 20),
+                                  child: declineIcon,
                                 ),
                               if (isRejection && isAcceptence)
                                 const SizedBox(width: 8),
@@ -273,7 +275,7 @@ class SimpleActionRequestCard extends StatelessWidget {
                                 ElevatedButton(
                                   onPressed: onAcceptence, // null => disabled
                                   style: successStyle,
-                                  child: Icon(acceptenceIcon, size: 20),
+                                  child: acceptenceIcon,
                                 ),
                             ],
                           ),

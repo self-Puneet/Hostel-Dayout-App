@@ -22,6 +22,7 @@ import 'package:hostel_mgmt/presentation/view/warden/state/warden_history_state.
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_home_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_layout_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_profile_state.dart';
+import 'package:hostel_mgmt/presentation/widgets/back_selection.dart';
 import 'package:provider/provider.dart';
 import '../../presentation/view/student/pages/pages.dart';
 
@@ -133,9 +134,11 @@ class AppRouter {
                 );
                 return AppTransitionPage(
                   key: state.pageKey,
-                  child: WardenHomePage(
-                    actor: layoutState.loginSession.role,
-                    initialTab: initialTab,
+                  child: WardenActionSelectionGuard(
+                    child: WardenHomePage(
+                      actor: layoutState.loginSession.role,
+                      initialTab: initialTab,
+                    ),
                   ),
                 );
               },

@@ -2,6 +2,8 @@
 
 // Other tabs: read-only cards
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/presentation/widgets/custom_icons.dart';
+import 'package:hostel_mgmt/presentation/widgets/no_request_card.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -23,12 +25,14 @@ class StatusList extends StatelessWidget {
   final TimelineActor actor;
   final WardenActionPageController stateController;
   final RequestStatus status;
+  final bool showParent;
 
   const StatusList({
     super.key,
     required this.actor,
     required this.stateController,
     required this.status,
+    required this.showParent,
   });
 
   @override
@@ -37,6 +41,8 @@ class StatusList extends StatelessWidget {
     final horizontalPad = EdgeInsets.symmetric(
       horizontal: 31 * media.size.width / 402,
     );
+
+    final double height = 84 + MediaQuery.of(context).viewPadding.bottom;
 
     return Container(
       margin: horizontalPad,
@@ -52,8 +58,15 @@ class StatusList extends StatelessWidget {
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Center(
-                    child: Text(
-                      q.isEmpty ? 'Nothing here yet' : 'No matches for "$q"',
+                    child: EmptyQueueCard(
+                      title: q.isEmpty
+                          ? 'Your queue is empty.'
+                          : 'No matches found.',
+                      subtitle: q.isEmpty
+                          ? 'All clear! No requests for now.'
+                          : 'Try refining your search.',
+                      minHeight: 280,
+                      bottomPadding: height, // already added via padding
                     ),
                   ),
                 ),
@@ -63,7 +76,7 @@ class StatusList extends StatelessWidget {
 
           return ListView.separated(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+            padding: EdgeInsets.fromLTRB(0, 0, 0, height),
             itemCount: items.length,
             separatorBuilder: (_, __) => const SizedBox(height: 10),
             itemBuilder: (context, i) {
@@ -84,15 +97,21 @@ class StatusList extends StatelessWidget {
                 fromDate: req.appliedFrom,
                 toDate: req.appliedTo,
                 selected: false,
-                isRejection: false,
                 isLate: isLate,
                 borderColor: isLate ? Colors.red : null,
-                acceptenceIcon: Icons.phone,
-                accrptenceCOlor: Colors.blue,
                 onLongPress: null,
                 onTap: null,
-                onRejection: null,
+
+                accrptenceCOlor: Colors.transparent,
+                acceptenceIcon: CallStudentIcon(),
                 onAcceptence: () async {
+                  await _openDialer(stu.parents[0].phoneNo);
+                },
+
+                rejectionColor: Colors.transparent,
+                isRejection: showParent,
+                declineIcon: CallGuardianIcon(),
+                onRejection: () async {
                   await _openDialer(stu.phoneNo);
                 },
               );

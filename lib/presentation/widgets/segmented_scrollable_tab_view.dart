@@ -33,7 +33,7 @@ class SegmentedTabs extends StatelessWidget {
       animation: controller, // listen to controller index changes
       builder: (context, _) {
         return Container(
-          padding: const EdgeInsets.only(top: 4, right: 0, bottom: 4, left: 0),
+          padding: const EdgeInsets.only(top: 4, right: 0, bottom: 0, left: 0),
           child: TabBar(
             splashFactory: NoSplash.splashFactory,
 
@@ -46,7 +46,7 @@ class SegmentedTabs extends StatelessWidget {
             indicator: const BoxDecoration(),
             dividerColor: Colors.transparent,
             labelPadding: labelPadding,
-            padding: EdgeInsets.only(bottom: 4),
+            padding: EdgeInsets.only(bottom: 0),
             splashBorderRadius: BorderRadius.circular(radius),
             tabs: labels.map((t) {
               final isSelected = controller.index == labels.indexOf(t);

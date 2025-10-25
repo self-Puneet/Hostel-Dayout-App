@@ -7,7 +7,7 @@ import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/presentation/components/simple_action_request_card.dart';
 import 'package:hostel_mgmt/presentation/components/warden_request_list_tab.dart';
-import 'package:hostel_mgmt/presentation/widgets/clear_selection.dart';
+import 'package:hostel_mgmt/presentation/widgets/no_request_card.dart';
 import 'package:hostel_mgmt/presentation/widgets/segmented_scrollable_tab_view.dart';
 import 'package:hostel_mgmt/presentation/widgets/shimmer_box.dart';
 import 'package:provider/provider.dart';
@@ -116,125 +116,140 @@ class _WardenHomePageState extends State<WardenHomePage>
             });
           }
 
-          return ClearSelectionOnTap(
-            child: Column(
-              children: [
-                // Search + hostel picker
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 0, vertical: 8) +
-                      horizontalPad,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: s.filterController,
-                          decoration: InputDecoration(
-                            hintText: 'Search by Name ...',
-                            prefixIcon: const Icon(Icons.search),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            isDense: true,
+          return Column(
+            children: [
+              // Search + hostel picker
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 0, vertical: 8) +
+                    horizontalPad,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: s.filterController,
+                        decoration: InputDecoration(
+                          hintText: 'Search by Name ...',
+                          prefixIcon: const Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
+                          isDense: true,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      SizedBox(
-                        width: 130,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.blueGrey,
-                              width: 1.1,
-                            ),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black12,
-                                blurRadius: 6,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      width: 130,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.blueGrey,
+                            width: 1.1,
                           ),
-                          child: hostelWidget(s),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Segmented, scrollable tabs
-                Padding(
-                  padding: horizontalPad,
-                  child: SegmentedTabs(controller: _tabs, labels: labels),
-                ),
-                const SizedBox(height: 6),
-                Padding(
-                  padding: horizontalPad,
-                  child: Divider(thickness: 2, color: Colors.grey.shade300),
-                ),
-
-                // Tab contents
-                (s.isLoading && !s.hasData)
-                    ? Padding(
-                        padding:
-                            horizontalPad +
-                            const EdgeInsets.symmetric(
-                              horizontal: 0,
-                              vertical: 8,
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 6,
+                              offset: Offset(0, 2),
                             ),
-                        child: shimmerBox(width: double.infinity, height: 100),
-                      )
-                    : Expanded(
-                        child: TabBarView(
-                          controller: _tabs,
-                          physics: const NeverScrollableScrollPhysics(),
-                          children: [
-                            if (widget.actor == TimelineActor.seniorWarden) ...[
-                              // Pending (senior: referred + parentApproved)
-                              finalApprovalTab(_controller, state),
-                              // Approved
-                              approvedTab(_controller),
-                              // Pending Parent (show referred or parentApproved per your UX);
-                              parentPendingTab(_controller),
-                              // Requested
-                              requestedTab(_controller),
-                            ] else if (widget.actor ==
-                                TimelineActor.assistentWarden) ...[
-                              // Pending (assistant: requested + cancelledStudent)
-                              _PendingApprovalList(
-                                actor: widget.actor,
-                                stateController: _controller,
-                                state: state,
-                                // status param kept for compatibility; ignored internally.
-                                status: RequestStatus.requested,
-                              ),
-                              // Approved
-                              StatusList(
-                                actor: widget.actor,
-                                stateController: _controller,
-                                status: RequestStatus.approved,
-                              ),
-                              // Referred
-                              StatusList(
-                                actor: widget.actor,
-                                stateController: _controller,
-                                status: RequestStatus.referred,
-                              ),
-                              // Parent Approved
-                              StatusList(
-                                actor: widget.actor,
-                                stateController: _controller,
-                                status: RequestStatus.parentApproved,
-                              ),
-                            ],
                           ],
                         ),
+                        child: hostelWidget(s),
                       ),
-              ],
-            ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Segmented, scrollable tabs
+              Padding(
+                padding: horizontalPad,
+                child: SegmentedTabs(controller: _tabs, labels: labels),
+              ),
+              const SizedBox(height: 6),
+              Padding(
+                padding: horizontalPad,
+                child: Divider(thickness: 2, color: Colors.grey.shade300),
+              ),
+
+              // Tab contents
+              (s.isLoading && !s.hasData)
+                  ? Padding(
+                      padding:
+                          horizontalPad +
+                          const EdgeInsets.symmetric(
+                            horizontal: 0,
+                            vertical: 8,
+                          ),
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Column(
+                          children: List.generate(2, (index) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: shimmerBox(
+                                width: double.infinity,
+                                height: 170,
+                                borderRadius: 16,
+                              ),
+                            );
+                          }),
+                        ),
+                      ),
+                    )
+                  : Expanded(
+                      child: TabBarView(
+                        controller: _tabs,
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: [
+                          if (widget.actor == TimelineActor.seniorWarden) ...[
+                            // Pending (senior: referred + parentApproved)
+                            finalApprovalTab(_controller, state),
+                            // Approved
+                            approvedTab(_controller),
+                            // Pending Parent (show referred or parentApproved per your UX);
+                            parentPendingTab(_controller),
+                            // Requested
+                            requestedTab(_controller),
+                          ] else if (widget.actor ==
+                              TimelineActor.assistentWarden) ...[
+                            // Pending (assistant: requested + cancelledStudent)
+                            _PendingApprovalList(
+                              actor: widget.actor,
+                              stateController: _controller,
+                              state: state,
+                              // status param kept for compatibility; ignored internally.
+                              status: RequestStatus.requested,
+                            ),
+                            // Approved
+                            StatusList(
+                              actor: widget.actor,
+                              stateController: _controller,
+                              status: RequestStatus.approved,
+                              showParent: true,
+                            ),
+                            // Referred
+                            StatusList(
+                              actor: widget.actor,
+                              stateController: _controller,
+                              status: RequestStatus.referred,
+                              showParent: true,
+                            ),
+                            // Parent Approved
+                            StatusList(
+                              actor: widget.actor,
+                              stateController: _controller,
+                              status: RequestStatus.parentApproved,
+                              showParent: true,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+            ],
           );
         },
       ),
@@ -334,6 +349,7 @@ class _WardenHomePageState extends State<WardenHomePage>
       actor: widget.actor,
       stateController: controller,
       status: RequestStatus.requested,
+      showParent: true,
     );
   }
 
@@ -342,6 +358,7 @@ class _WardenHomePageState extends State<WardenHomePage>
       actor: widget.actor,
       stateController: controller,
       status: RequestStatus.referred,
+      showParent: true,
     );
   }
 
@@ -350,6 +367,7 @@ class _WardenHomePageState extends State<WardenHomePage>
       actor: widget.actor,
       stateController: controller,
       status: RequestStatus.approved,
+      showParent: true,
     );
   }
 
@@ -406,8 +424,15 @@ class _PendingApprovalList extends StatelessWidget {
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Center(
-                    child: Text(
-                      q.isEmpty ? 'Nothing here yet' : 'No matches for "$q"',
+                    child: EmptyQueueCard(
+                      title: q.isEmpty
+                          ? 'Your queue is empty.'
+                          : 'No matches found.',
+                      subtitle: q.isEmpty
+                          ? 'All clear! No requests for now.'
+                          : 'Try refining your search.',
+                      minHeight: 280,
+                      bottomPadding: height, // already added via padding
                     ),
                   ),
                 ),
