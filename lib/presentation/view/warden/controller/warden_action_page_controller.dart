@@ -1,3 +1,5 @@
+// lib/presentation/view/warden/controller/warden_action_page_controller.dart
+
 import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/enums/request_status.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
@@ -11,7 +13,7 @@ class WardenActionPageController {
   final WardenActionState state;
   WardenActionPageController(this.state);
 
-  // NEW: Initialize hostel list and default selection from session.
+  // Initialize hostel list and default selection from session.
   void loadHostelsFromSession() {
     final session = Get.find<LoginSession>();
     final hostels = session.hostels ?? [];
@@ -34,16 +36,16 @@ class WardenActionPageController {
         state.setError(true, 'No hostel selected for fetching requests.');
         return;
       }
+
+      // Active requests endpoint keeps the lists focused for the actioning flows.
       final result = await WardenService.getAllActiveRequestsForWarden(
         resolvedHostelId,
       );
 
-      // final result = await WardenService.getAllRequestsForWarden(
-      //   resolvedHostelId,
-      // );
-      result.fold((error) => state.setError(true, error), (response) {
-        state.setRequests(response);
-      });
+      result.fold(
+        (error) => state.setError(true, error),
+        (response) => state.setRequests(response),
+      );
     } catch (e) {
       state.setError(true, 'Failed to load requests: $e');
     } finally {
@@ -70,34 +72,15 @@ class WardenActionPageController {
         status: statusApi,
         remark: 'ok done',
       );
-      // print(jsonDecode(result))
 
       await result.fold(
         (error) async {
           state.setError(true, error);
         },
         (updatedRequestModel) async {
-          final keep = WardenActionState.belongsToActorQueue(
-            updatedRequestModel.status,
-            actor,
-          );
-
-          if (!keep) {
-            state.currentOnScreenRequests.removeWhere(
-              (w) => w.request.requestId == requestId,
-            );
-            state.notifyListenerMethod();
-          } else {
-            state.currentOnScreenRequests = state.currentOnScreenRequests.map((
-              w,
-            ) {
-              if (w.request.requestId == requestId) {
-                return w.copyWith(request: updatedRequestModel);
-              }
-              return w;
-            }).toList();
-            state.notifyListenerMethod();
-          }
+          // Write back into the master list; all tabs re-filter on next build.
+          state.updateRequestInAll(updatedRequestModel);
+          state.notifyListenerMethod();
         },
       );
     } catch (e) {
@@ -108,27 +91,38 @@ class WardenActionPageController {
   }
 
   Future<void> bulkActionSelected({required RequestAction action}) async {
-    if (!state.hasSelection) return;
+    // Collect selected requests from the Pending view (selection only valid there).
+    final pending = getRequestsForPending(Get.find<LoginSession>().role);
+    final ids = pending
+        .where((w) => w.isSelected)
+        .map((w) => w.request.requestId)
+        .toList();
+    print("here we goo !!");
+    if (ids.isEmpty) return;
+
     state.setIsActioning(true);
     try {
-      final ids = state.selectedRequests.map((r) => r.requestId).toList();
       for (final id in ids) {
         await actionRequestById(requestId: id, action: action);
       }
+      // Clear selection after bulk completion; lists auto-refresh from master.
+      state.clearSelection();
     } finally {
       state.setIsActioning(false);
     }
   }
 
-  List<OnScreenRequest> getRequestByStatus({required RequestStatus status_}) {
-    // final requests = state.allRequests;
-    // final List<OnScreenRequest> onScreenRequest = [];
-    // for (int i = 0; i < requests.length; i++) {
-    //   if (requests[i].$1.status == status_) {
-    //     onScreenRequest.add(OnScreenRequest.fromRequest(requests[i]));
-    //   }
-    // }
-    final result = state.currentOnScreenRequests;
-    return result;
+  // Build lists through state's on-demand filterers to avoid shared mutable lists.
+  List<OnScreenRequest> getRequestsForPending(TimelineActor actor) {
+    final statuses = state.allowedForTab(actor, WardenTab.pendingApproval);
+    return state.buildListForStatuses(statuses);
+  }
+
+  List<OnScreenRequest> getRequestsForStatus(RequestStatus status) {
+    return state.buildListForStatus(status);
+  }
+
+  List<OnScreenRequest> getRequestsForStatuses(Set<RequestStatus> statuses) {
+    return state.buildListForStatuses(statuses);
   }
 }

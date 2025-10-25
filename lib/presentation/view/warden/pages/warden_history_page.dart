@@ -255,6 +255,8 @@ class _WardenHistoryPageState extends State<WardenHistoryPage>
       horizontal: 31 * media.size.width / 402,
     );
     final tabLabels = WardenHistoryTab.values.map((t) => t.label).toList();
+    final height = 84 + MediaQuery.of(context).viewPadding.bottom;
+
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -395,7 +397,7 @@ class _WardenHistoryPageState extends State<WardenHistoryPage>
 
                         return ListView.separated(
                           physics: const AlwaysScrollableScrollPhysics(),
-                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          padding: EdgeInsets.fromLTRB(0, 8, 0, height),
                           itemCount: filteredRequests.length,
                           separatorBuilder: (_, __) =>
                               const SizedBox(height: 10),

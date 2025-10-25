@@ -1,14 +1,14 @@
+// lib/presentation/components/warden_request_list_tab.dart
+
 // Other tabs: read-only cards
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hostel_mgmt/core/enums/actions.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import 'package:hostel_mgmt/core/enums/enum.dart';
-import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/presentation/components/simple_action_request_card.dart';
 import 'package:hostel_mgmt/presentation/view/warden/controller/warden_action_page_controller.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_action_state.dart';
-import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 Future<void> _openDialer(String number) async {
   final Uri phoneUri = Uri(scheme: 'tel', path: number);
@@ -25,6 +25,7 @@ class StatusList extends StatelessWidget {
   final RequestStatus status;
 
   const StatusList({
+    super.key,
     required this.actor,
     required this.stateController,
     required this.status,
@@ -36,22 +37,20 @@ class StatusList extends StatelessWidget {
     final horizontalPad = EdgeInsets.symmetric(
       horizontal: 31 * media.size.width / 402,
     );
+
     return Container(
       margin: horizontalPad,
       child: Consumer<WardenActionState>(
         builder: (context, s, _) {
-          final List<OnScreenRequest> reqeusts = stateController
-              .getRequestByStatus(status_: status);
-          if (reqeusts.isEmpty) {
+          // Per-tab data is derived on demand from the master list to avoid stale carryover.
+          final items = stateController.getRequestsForStatus(status);
+          if (items.isEmpty) {
             final q = s.filterController.text.trim();
             return LayoutBuilder(
               builder: (context, constraints) => SingleChildScrollView(
-                physics:
-                    const AlwaysScrollableScrollPhysics(), // ✅ enables pull-to-refresh even when empty
+                physics: const AlwaysScrollableScrollPhysics(),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight, // ✅ fill available height
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Center(
                     child: Text(
                       q.isEmpty ? 'Nothing here yet' : 'No matches for "$q"',
@@ -61,17 +60,21 @@ class StatusList extends StatelessWidget {
               ),
             );
           }
+
           return ListView.separated(
+            physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-            itemCount: reqeusts.length,
+            itemCount: items.length,
             separatorBuilder: (_, __) => const SizedBox(height: 10),
             itemBuilder: (context, i) {
-              final wrap = reqeusts[i];
+              final wrap = items[i];
               final req = wrap.request;
               final stu = wrap.student;
-              final selected = wrap.isSelected;
               final safeName = (stu.name).isEmpty ? 'Unknown' : stu.name;
 
+              final bool isLate = req.appliedTo.isBefore(DateTime.now());
+
+              // Read-only cards: selection/actions are disabled; acceptance dials the student.
               return SimpleActionRequestCard(
                 profileImageUrl: stu.profilePic,
                 reason: req.reason,
@@ -80,45 +83,18 @@ class StatusList extends StatelessWidget {
                 leaveType: req.requestType,
                 fromDate: req.appliedFrom,
                 toDate: req.appliedTo,
-                selected: selected,
+                selected: false,
                 isRejection: false,
-                isLate: req.appliedTo.isBefore(DateTime.now()),
-                borderColor: req.appliedTo.isBefore(DateTime.now())
-                    ? Colors.red
-                    : null,
+                isLate: isLate,
+                borderColor: isLate ? Colors.red : null,
                 acceptenceIcon: Icons.phone,
                 accrptenceCOlor: Colors.blue,
-                onLongPress: (!s.isActioning && !s.hasSelection)
-                    ? () => s.toggleSelectedById(req.requestId)
-                    : null,
-                onTap: (!s.isActioning && s.hasSelection)
-                    ? () => s.toggleSelectedById(req.requestId)
-                    : null,
-                onRejection: (!s.hasSelection && !s.isActioning)
-                    ? () async {
-                        await stateController.actionRequestById(
-                          action: actor == TimelineActor.assistentWarden
-                              ? RequestAction.cancel
-                              : RequestAction.reject,
-                          requestId: req.requestId,
-                        );
-                        if (context.mounted) {
-                          context.goNamed(
-                            AppRoutes.wardenHome,
-                            queryParameters: {
-                              'ts': DateTime.now().millisecondsSinceEpoch
-                                  .toString(),
-                            },
-                          );
-                        }
-                      }
-                    : null,
-                onAcceptence: (!s.hasSelection && !s.isActioning)
-                    ? () async {
-                        _openDialer(stu.phoneNo);
-                      }
-                    : null,
-                // rejectionColor: Colors.red,
+                onLongPress: null,
+                onTap: null,
+                onRejection: null,
+                onAcceptence: () async {
+                  await _openDialer(stu.phoneNo);
+                },
               );
             },
           );

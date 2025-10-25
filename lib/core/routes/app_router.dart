@@ -20,6 +20,7 @@ import 'package:hostel_mgmt/presentation/view/warden/pages/warden_layout.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_action_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_history_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_home_state.dart';
+import 'package:hostel_mgmt/presentation/view/warden/state/warden_layout_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_profile_state.dart';
 import 'package:provider/provider.dart';
 import '../../presentation/view/student/pages/pages.dart';
@@ -75,7 +76,7 @@ String? _initialRoute() {
     case TimelineActor.assistentWarden:
       return AppRoutes.wardenActionPage;
     case TimelineActor.seniorWarden:
-      return AppRoutes.wardenHistory;
+      return AppRoutes.wardenActionPage;
     case TimelineActor.parent:
       return AppRoutes.parentHome;
     default:
@@ -103,36 +104,38 @@ class AppRouter {
         ),
 
         ShellRoute(
-          builder: (context, state, child) => ChangeNotifierProvider(
-            create: (_) => WardenProfileState(),
-            child: WardenLayout(child: child),
-          ),
+          builder: (context, state, child) {
+            final layoutState = WardenLayoutState();
+            final profileState = WardenProfileState();
+
+            return MultiProvider(
+              providers: [
+                ChangeNotifierProvider.value(value: layoutState),
+                ChangeNotifierProvider.value(value: profileState),
+                ChangeNotifierProvider(
+                  create: (_) => WardenActionState(layoutState),
+                ),
+              ],
+              child: WardenLayout(child: child),
+            );
+          },
           routes: [
             // warden action page route
             GoRoute(
               path: AppRoutes.wardenActionPage,
               name: AppRoutes.wardenActionPage,
               pageBuilder: (context, state) {
-                final profile = context.read<WardenProfileState>();
-
-                // Read ?tab=<enumName> from the URL, e.g., ?tab=approved
+                final layoutState = context.read<WardenLayoutState>();
                 final tabParam = state.uri.queryParameters['tab'];
-
-                // Map name → enum safely
                 final initialTab = WardenTab.values.firstWhere(
                   (t) => t.name == tabParam,
                   orElse: () => WardenTab.pendingApproval,
                 );
-
                 return AppTransitionPage(
                   key: state.pageKey,
-                  child: ChangeNotifierProvider(
-                    create: (_) => WardenActionState(),
-                    child: WardenHomePage(
-                      actor: profile.loginSession.role,
-                      initialTab:
-                          initialTab, // requires WardenHomePage(initialTab)
-                    ),
+                  child: WardenHomePage(
+                    actor: layoutState.loginSession.role,
+                    initialTab: initialTab,
                   ),
                 );
               },

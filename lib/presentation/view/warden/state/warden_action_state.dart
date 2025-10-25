@@ -1,16 +1,12 @@
 // lib/presentation/view/warden/state/warden_action_state.dart
+
 import 'package:flutter/material.dart';
-import 'package:get/instance_manager.dart';
+import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
-
-// =======================================enums for warden action page tabs===============================================
-/*
-the warden history page will have the following tabs -> cancelled, denied, approved.
-and the tabs will name same or will be the same for both assitent warden and senior warden so no case or switching.
-*/
+import 'package:hostel_mgmt/presentation/view/warden/state/warden_layout_state.dart';
 
 // Tab identifiers for the UI/state
 enum WardenTab { pendingApproval, approved, pendingParent, requested }
@@ -33,13 +29,7 @@ extension WardenTabX on WardenTab {
   }
 }
 
-// ==============================================================================================================
-
-// ===================================== request model which would be shown to the warden =================================================
-
-/* 
-there is no selecting thing or the actioning thing at all on the history page so remove those fields from them and all the state management related to that too from the file
- */
+// Request model shown to the warden
 class OnScreenRequest {
   final RequestModel request;
   final StudentProfileModel student;
@@ -77,15 +67,13 @@ class OnScreenRequest {
 class WardenActionState extends ChangeNotifier {
   bool _isLoading = false;
   bool _isErrored = false;
-  bool _isActioning = false; // this removal
+  bool _isActioning = false;
   String _errorMessage = '';
 
   // Selection
-  final Set<String> _selectedIds = {}; // this removal
+  final Set<String> _selectedIds = {};
 
   // Hostels
-
-  // this should not be removed since hostel selection is still there on this history page removal
   List<HostelInfo> hostels = [];
   String? selectedHostelId;
   String? selectedHostelName;
@@ -108,22 +96,65 @@ class WardenActionState extends ChangeNotifier {
   List<(RequestModel, StudentProfileModel)> get allRequests => _allRequests;
   bool get hasData => _allRequests.isNotEmpty;
 
-  List<OnScreenRequest> currentOnScreenRequests = [];
-  List<RequestModel> selectedRequests = [];
-
+  // Search + type filters
   final TextEditingController filterController = TextEditingController();
 
-  // FIX: constructor name corrected so the filter listener attaches
-  WardenActionState() {
-    filterController.addListener(_filterRequests);
+  RequestType? _typeFilter;
+  RequestType? get typeFilter => _typeFilter;
+
+  // NEW: Selection transition callbacks
+  VoidCallback? _onFirstSelected;
+  VoidCallback? _onNoneSelected;
+
+  final WardenLayoutState layoutState;
+
+  // Constructor: attach search listener
+  WardenActionState(this.layoutState) {
+    filterController.addListener(_notifyForFilter);
   }
+
+  void _notifyForFilter() {
+    // Rebuild lists on search change
+    notifyListeners();
+  }
+
+  // NEW: Register callbacks for selection transitions
+  void setSelectionCallbacks({
+    VoidCallback? onFirstSelected,
+    VoidCallback? onNoneSelected,
+  }) {
+    _onFirstSelected = onFirstSelected;
+    _onNoneSelected = onNoneSelected;
+  }
+
+  // ===========================================================================================
+
+  // NEW: Bulk action callback
+  Future<void> Function({required RequestAction action})? _onBulkAction;
+
+  // NEW: Register bulk action callback
+  void setBulkActionCallback(
+    Future<void> Function({required RequestAction action})? callback,
+  ) {
+    _onBulkAction = callback;
+  }
+
+  // NEW: Trigger bulk action from anywhere (called from layout)
+  Future<void> triggerBulkAction({required RequestAction action}) async {
+    if (_onBulkAction != null) {
+      print("ok right path !");
+      await _onBulkAction!(action: action);
+      layoutState.hideActionsOverlay();
+    }
+  }
+
+  // ===========================================================================================
 
   void setCurrentTab(WardenTab tab) {
     _currentTab = tab;
     if (tab != WardenTab.pendingApproval) {
       clearSelection();
     }
-    _filterRequests();
     notifyListeners();
   }
 
@@ -147,9 +178,8 @@ class WardenActionState extends ChangeNotifier {
     _isErrored = false;
     _errorMessage = '';
     _allRequests = [];
-    currentOnScreenRequests = [];
     _selectedIds.clear();
-    selectedRequests.clear();
+    _typeFilter = null;
     filterController.clear();
     notifyListeners();
   }
@@ -172,131 +202,123 @@ class WardenActionState extends ChangeNotifier {
 
   void setRequests(List<(RequestModel, StudentProfileModel)> response) {
     _allRequests = response;
-    _filterRequests();
+    notifyListeners();
+  }
+
+  // Replace updated request inside _allRequests and notify
+  void updateRequestInAll(RequestModel updated) {
+    final idx = _allRequests.indexWhere(
+      (t) => t.$1.requestId == updated.requestId,
+    );
+    if (idx != -1) {
+      final (_, stu) = _allRequests[idx];
+      _allRequests[idx] = (updated, stu);
+      notifyListeners();
+    }
   }
 
   bool isSelectedById(String id) => _selectedIds.contains(id);
 
   void toggleSelectedById(String id) {
     if (_currentTab != WardenTab.pendingApproval) return;
+
+    final hadSelection = _selectedIds.isNotEmpty;
+
     if (_selectedIds.contains(id)) {
       _selectedIds.remove(id);
     } else {
-      // print("yooooo we are on right track !!!!!!!");
       _selectedIds.add(id);
     }
-    for (var i = 0; i < currentOnScreenRequests.length; i++) {
-      final req = currentOnScreenRequests[i];
-      final requestId = req.request.requestId;
-      if (requestId == id) {
-        // print("yooooo we are on right track !!!!!!!");
-        currentOnScreenRequests[i] = req.copyWith(
-          isSelected: _selectedIds.contains(id),
-        );
-        // print(_selectedIds.contains(id));
-        // print(currentOnScreenRequests[i].isSelected);
-        break;
-      }
-    }
-    // currentOnScreenRequests.forEach((onScreenRequest) {
-    //   print(
-    //     "request in state -----> ${onScreenRequest.request.reason} ---> ${onScreenRequest.isSelected}",
-    //   );
-    // });
 
-    selectedRequests = currentOnScreenRequests
-        .where((w) => _selectedIds.contains(w.request.requestId))
-        .map((w) => w.request)
-        .toList();
+    final hasSelectionNow = _selectedIds.isNotEmpty;
+
+    // Trigger callbacks on transitions
+    if (!hadSelection && hasSelectionNow) {
+      // 0 → 1 transition (first selected)
+      _onFirstSelected?.call();
+    } else if (hadSelection && !hasSelectionNow) {
+      // 1 → 0 transition (none selected)
+      _onNoneSelected?.call();
+    }
 
     notifyListeners();
   }
 
   void restrictSelectionToIds(Set<String> ids) {
     if (_currentTab != WardenTab.pendingApproval) return;
+
+    final hadSelection = _selectedIds.isNotEmpty;
     _selectedIds.removeWhere((id) => !ids.contains(id));
-    for (var i = 0; i < currentOnScreenRequests.length; i++) {
-      final req = currentOnScreenRequests[i];
-      final id = req.request.requestId;
-      currentOnScreenRequests[i] = req.copyWith(
-        isSelected: _selectedIds.contains(id),
-      );
+    final hasSelectionNow = _selectedIds.isNotEmpty;
+
+    // Check transition after restriction
+    if (hadSelection && !hasSelectionNow) {
+      _onNoneSelected?.call();
     }
-    selectedRequests = currentOnScreenRequests
-        .where((w) => _selectedIds.contains(w.request.requestId))
-        .map((w) => w.request)
-        .toList();
+
     notifyListeners();
   }
 
   void clearSelection() {
+    final hadSelection = _selectedIds.isNotEmpty;
     _selectedIds.clear();
-    selectedRequests.clear();
-    for (var i = 0; i < currentOnScreenRequests.length; i++) {
-      currentOnScreenRequests[i] = currentOnScreenRequests[i].copyWith(
-        isSelected: false,
-      );
+
+    if (hadSelection) {
+      _onNoneSelected?.call();
     }
+
+    layoutState.hideActionsOverlay();
+
     notifyListeners();
   }
 
   void setIsActioningbyId(String id, bool value) {
-    final index = currentOnScreenRequests.indexWhere(
-      (req) => req.request.requestId == id,
-    );
-    if (index != -1) {
-      currentOnScreenRequests[index] = currentOnScreenRequests[index].copyWith(
-        isActioning: value,
-      );
-      notifyListeners();
-    }
+    // Kept for interface compatibility; item-level spinners can be derived by mapping if needed.
+    _isActioning = value;
+    notifyListeners();
   }
 
-  void _filterRequests() {
+  // Build filtered lists on demand (single source of truth: _allRequests)
+  List<OnScreenRequest> buildListForStatuses(Set<RequestStatus> statuses) {
     final query = filterController.text.trim().toLowerCase();
-
-    if (_allRequests.isEmpty) {
-      currentOnScreenRequests = [];
-      notifyListeners();
-      return;
-    }
-
-    final actor = Get.find<LoginSession>().role;
-
-    // Statuses allowed for the active tab and actor
-    final allowed = _allowedStatusesForTab(actor, _currentTab);
+    if (_allRequests.isEmpty) return [];
 
     Iterable<(RequestModel, StudentProfileModel)> base = _allRequests.where(
-      (r) => allowed.contains(r.$1.status),
+      (r) => statuses.contains(r.$1.status),
     );
+
+    if (_typeFilter != null) {
+      base = base.where((r) => r.$1.requestType == _typeFilter);
+    }
 
     if (query.isNotEmpty) {
       base = base.where((r) => (r.$2.name).toLowerCase().contains(query));
     }
 
-    currentOnScreenRequests = base.map((pair) {
+    return base.map((pair) {
       final req = pair.$1;
       final stu = pair.$2;
+      final selected = _selectedIds.contains(req.requestId);
+      // Selection only matters on Pending; harmless elsewhere.
       return OnScreenRequest(
         request: req,
         student: stu,
-        isSelected: _selectedIds.contains(req.requestId),
+        isSelected: selected && _currentTab == WardenTab.pendingApproval,
       );
     }).toList();
-
-    notifyListeners();
   }
 
-  // Map tabs to statuses; adjust per your RequestStatus enum
-  Set<RequestStatus> _allowedStatusesForTab(
-    TimelineActor actor,
-    WardenTab tab,
-  ) {
+  List<OnScreenRequest> buildListForStatus(RequestStatus status) {
+    return buildListForStatuses({status});
+  }
+
+  // Map tabs to statuses
+  Set<RequestStatus> allowedForTab(TimelineActor actor, WardenTab tab) {
     switch (tab) {
       case WardenTab.pendingApproval:
         return actor == TimelineActor.assistentWarden
-            ? {RequestStatus.requested, RequestStatus.cancelledStudent}
-            : {RequestStatus.referred, RequestStatus.parentApproved};
+            ? {RequestStatus.requested}
+            : {RequestStatus.parentApproved};
       case WardenTab.approved:
         return {RequestStatus.approved};
       case WardenTab.pendingParent:
@@ -329,25 +351,28 @@ class WardenActionState extends ChangeNotifier {
     notifyListeners();
   }
 
-  RequestType? _typeFilter;
-  RequestType? get typeFilter => _typeFilter;
   void setTypeFilter(RequestType? value) {
     _typeFilter = value;
-    _filterRequests();
+    notifyListeners();
   }
 
   // Full clear
   void clearState() {
+    final hadSelection = _selectedIds.isNotEmpty;
+
     _isLoading = false;
     _isErrored = false;
     _isActioning = false;
     _errorMessage = '';
     _allRequests = [];
-    currentOnScreenRequests = [];
     _selectedIds.clear();
-    selectedRequests.clear();
     _typeFilter = null;
     filterController.clear();
+
+    if (hadSelection) {
+      _onNoneSelected?.call();
+    }
+
     notifyListeners();
   }
 }

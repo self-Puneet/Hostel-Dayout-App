@@ -111,7 +111,7 @@ class SimpleActionRequestCard extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 0), // vertical margin
-      // Use Material + Ink + InkWell so ink splash is clipped to rounded shape
+      // Use Material + Ink + InkWell so ink splash isn  clipped to rounded shape
       child: Material(
         type: MaterialType.transparency,
         shape: RoundedRectangleBorder(
