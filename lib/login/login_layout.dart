@@ -49,7 +49,7 @@ class LoginLayout extends StatelessWidget {
                       ),
                     ),
 
-                  const SizedBox(height: 200),
+                  // const SizedBox(height: 200),
 
                   // Replace SegmentedTabControl + TabBarView with your GlassSegmentedTabs
                   // if (!state.isKeyboardOpen)
