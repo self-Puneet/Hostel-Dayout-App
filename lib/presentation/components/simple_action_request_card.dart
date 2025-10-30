@@ -32,6 +32,7 @@ class SimpleActionRequestCard extends StatelessWidget {
   final Widget declineIcon; // default: Icon(Icons.close)
 
   final bool isLate;
+  final bool overflowStatusTag;
 
   const SimpleActionRequestCard({
     this.isLate = false,
@@ -48,6 +49,7 @@ class SimpleActionRequestCard extends StatelessWidget {
     this.onLongPress,
     this.onTap,
     required this.profileImageUrl,
+    this.overflowStatusTag = false,
 
     // Defaults
     this.isRejection = true,
@@ -193,6 +195,7 @@ class SimpleActionRequestCard extends StatelessWidget {
                           StatusTag(
                             status: status.displayName,
                             color: status.minimalStatusColor,
+                            overflow: overflowStatusTag,
                           ),
                         ],
                       ),

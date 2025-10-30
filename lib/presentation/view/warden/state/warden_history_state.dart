@@ -7,7 +7,7 @@ import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
 
-// ================= Enums for Warden History Tabs =================
+// ================= Enums for Warden History Tabs =================a
 
 enum WardenHistoryTab { all, cancelled, denied, approved }
 
@@ -217,4 +217,22 @@ class WardenHistoryState extends ChangeNotifier {
   void notifyListenerMethod() {
     notifyListeners();
   }
+
+  List<OnScreenRequest> buildListForTab(TimelineActor actor, WardenHistoryTab tab) {
+  final query = filterController.text.trim().toLowerCase();
+
+  if (_allRequests.isEmpty) return [];
+
+  final allowed = allowedStatusesForTab(actor, tab);
+  Iterable<(RequestModel, StudentProfileModel)> base = _allRequests.where(
+    (r) => allowed.contains(r.$1.status),
+  );
+
+  if (query.isNotEmpty) {
+    base = base.where((r) => (r.$2.name).toLowerCase().contains(query));
+  }
+
+  return base.map((pair) => OnScreenRequest(request: pair.$1, student: pair.$2)).toList();
+}
+
 }

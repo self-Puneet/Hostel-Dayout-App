@@ -162,6 +162,7 @@ class WardenActionState extends ChangeNotifier {
   void setHostelList(List<HostelInfo> hostel) {
     selectedHostelId ??= hostel.first.hostelId;
     selectedHostelName ??= hostel.first.hostelName;
+    // hostel.add(HostelInfo(hostelId: "sdfsdf", hostelName: "sdfsdf"));
     hostelsInitialized = true;
     notifyListeners();
   }

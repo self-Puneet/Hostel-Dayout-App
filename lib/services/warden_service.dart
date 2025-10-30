@@ -179,7 +179,7 @@ class WardenService {
   }) async {
     final session = Get.find<LoginSession>();
     final token = session.token;
-    print(yearMonth);
+    // print(yearMonth);
 
     try {
       final base = url; // assumes same global base as other services
@@ -192,10 +192,10 @@ class WardenService {
         },
       );
 
-      print(yearMonth);
-      print(jsonDecode(response.body)['requests'][0]["request_status"]);
+      // print(yearMonth);
+      // print(jsonDecode(response.body)['requests'][0]["request_status"]);
       if (response.statusCode != 200) {
-        return left("Error: ${response.body}");
+        return left(jsonDecode(response.body)['error']);
       }
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       final list = (data['requests'] as List?) ?? const [];

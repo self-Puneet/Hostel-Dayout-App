@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_history_state.dart';
 import 'package:hostel_mgmt/services/warden_service.dart';
@@ -55,5 +56,14 @@ class WardenHistoryPageController {
     } finally {
       state.setIsLoading(false);
     }
+  }
+
+  // Add to WardenHistoryPageController:
+
+  List<OnScreenRequest> getRequestsForTab(
+    TimelineActor actor,
+    WardenHistoryTab tab,
+  ) {
+    return state.buildListForTab(actor, tab);
   }
 }

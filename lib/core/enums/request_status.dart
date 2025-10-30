@@ -29,7 +29,7 @@ extension RequestStatusX on RequestStatus {
       case RequestStatus.approved:
         return 'Approved';
       case RequestStatus.cancelledStudent:
-        return 'Cancelled by Student';
+        return 'Student Cancelled';
     }
   }
 

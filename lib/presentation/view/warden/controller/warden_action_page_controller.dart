@@ -17,6 +17,7 @@ class WardenActionPageController {
   void loadHostelsFromSession() {
     final session = Get.find<LoginSession>();
     final hostels = session.hostels ?? [];
+    hostels.add(HostelInfo(hostelId: "sdfsdf", hostelName: "sdfsdf"));
     state.setHostelList(hostels);
   }
 

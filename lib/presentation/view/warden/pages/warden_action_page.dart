@@ -6,10 +6,10 @@ import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/presentation/components/simple_action_request_card.dart';
+import 'package:hostel_mgmt/presentation/components/skeleton_loaders/simple_action_request_card_skeleton.dart';
 import 'package:hostel_mgmt/presentation/components/warden_request_list_tab.dart';
 import 'package:hostel_mgmt/presentation/widgets/no_request_card.dart';
 import 'package:hostel_mgmt/presentation/widgets/segmented_scrollable_tab_view.dart';
-import 'package:hostel_mgmt/presentation/widgets/shimmer_box.dart';
 import 'package:provider/provider.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_action_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/controller/warden_action_page_controller.dart';
@@ -120,16 +120,14 @@ class _WardenHomePageState extends State<WardenHomePage>
             children: [
               // Search + hostel picker
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 0, vertical: 8) +
-                    horizontalPad,
+                padding: horizontalPad,
                 child: Row(
                   children: [
                     Expanded(
                       child: TextField(
                         controller: s.filterController,
                         decoration: InputDecoration(
-                          hintText: 'Search by Name ...',
+                          hintText: 'Search by Name',
                           prefixIcon: const Icon(Icons.search),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -169,10 +167,14 @@ class _WardenHomePageState extends State<WardenHomePage>
                 padding: horizontalPad,
                 child: SegmentedTabs(controller: _tabs, labels: labels),
               ),
-              const SizedBox(height: 6),
+              // const SizedBox(height: 6),
               Padding(
                 padding: horizontalPad,
-                child: Divider(thickness: 2, color: Colors.grey.shade300),
+                child: Divider(
+                  thickness: 2,
+                  height: 0,
+                  color: Colors.grey.shade300,
+                ),
               ),
 
               // Tab contents
@@ -190,11 +192,7 @@ class _WardenHomePageState extends State<WardenHomePage>
                           children: List.generate(2, (index) {
                             return Padding(
                               padding: const EdgeInsets.symmetric(vertical: 8),
-                              child: shimmerBox(
-                                width: double.infinity,
-                                height: 170,
-                                borderRadius: 16,
-                              ),
+                              child: simpleActionRequestCardSkeleton(),
                             );
                           }),
                         ),
@@ -442,14 +440,13 @@ class _PendingApprovalList extends StatelessWidget {
 
           return Column(
             children: [
-              const SizedBox(height: 8),
               Expanded(
                 child: ListView.separated(
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.only(
                     left: 0,
                     right: 0,
-                    top: 8,
+                    top: 16,
                     bottom: height,
                   ),
                   itemCount: result.length,

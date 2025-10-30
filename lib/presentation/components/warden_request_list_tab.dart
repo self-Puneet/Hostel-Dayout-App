@@ -74,48 +74,54 @@ class StatusList extends StatelessWidget {
             );
           }
 
-          return ListView.separated(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: EdgeInsets.fromLTRB(0, 0, 0, height),
-            itemCount: items.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
-            itemBuilder: (context, i) {
-              final wrap = items[i];
-              final req = wrap.request;
-              final stu = wrap.student;
-              final safeName = (stu.name).isEmpty ? 'Unknown' : stu.name;
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.fromLTRB(0, 16, 0, height),
+                  itemCount: items.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  itemBuilder: (context, i) {
+                    final wrap = items[i];
+                    final req = wrap.request;
+                    final stu = wrap.student;
+                    final safeName = (stu.name).isEmpty ? 'Unknown' : stu.name;
 
-              final bool isLate = req.appliedTo.isBefore(DateTime.now());
+                    final bool isLate = req.appliedTo.isBefore(DateTime.now());
 
-              // Read-only cards: selection/actions are disabled; acceptance dials the student.
-              return SimpleActionRequestCard(
-                profileImageUrl: stu.profilePic,
-                reason: req.reason,
-                name: safeName,
-                status: req.status,
-                leaveType: req.requestType,
-                fromDate: req.appliedFrom,
-                toDate: req.appliedTo,
-                selected: false,
-                isLate: isLate,
-                borderColor: isLate ? Colors.red : null,
-                onLongPress: null,
-                onTap: null,
+                    // Read-only cards: selection/actions are disabled; acceptance dials the student.
+                    return SimpleActionRequestCard(
+                      profileImageUrl: stu.profilePic,
+                      reason: req.reason,
+                      name: safeName,
+                      status: req.status,
+                      leaveType: req.requestType,
+                      fromDate: req.appliedFrom,
+                      toDate: req.appliedTo,
+                      selected: false,
+                      isLate: isLate,
+                      borderColor: isLate ? Colors.red : null,
+                      onLongPress: null,
+                      onTap: null,
 
-                accrptenceCOlor: Colors.transparent,
-                acceptenceIcon: CallStudentIcon(),
-                onAcceptence: () async {
-                  await _openDialer(stu.parents[0].phoneNo);
-                },
+                      accrptenceCOlor: Colors.transparent,
+                      acceptenceIcon: CallStudentIcon(),
+                      onAcceptence: () async {
+                        await _openDialer(stu.parents[0].phoneNo);
+                      },
 
-                rejectionColor: Colors.transparent,
-                isRejection: showParent,
-                declineIcon: CallGuardianIcon(),
-                onRejection: () async {
-                  await _openDialer(stu.phoneNo);
-                },
-              );
-            },
+                      rejectionColor: Colors.transparent,
+                      isRejection: showParent,
+                      declineIcon: CallGuardianIcon(),
+                      onRejection: () async {
+                        await _openDialer(stu.phoneNo);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
           );
         },
       ),

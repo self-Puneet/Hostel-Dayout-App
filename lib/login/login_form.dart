@@ -190,54 +190,56 @@ class LoginPage extends StatelessWidget {
           child: KeyboardDismissOnTap(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0),
-              child: LiquidGlass(
-                // Same shape as GlassSegmentedTabs
-                shape: LiquidRoundedSuperellipse(
-                  borderRadius: BorderRadius.circular(40).topLeft,
-                ),
-                // Same settings as GlassSegmentedTabs
-                settings: const LiquidGlassSettings(
-                  thickness: 10,
-                  blur: 20, // increased from 8 for stronger frost
-                  chromaticAberration: 0.01,
-                  lightAngle: pi * 5 / 18,
-                  lightIntensity: 0.5,
-                  refractiveIndex: 1.4,
-                  saturation: 1,
-                  lightness: 1,
-                ),
-                // Glass body + your content
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(40),
-                    // ~5% white tint over the glass to match your tabs component
-                    color: Colors.white.withAlpha((0.05 * 225).toInt()),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        formTitle,
-                        const SizedBox(height: 16),
-                        wardenTypeSelector,
-                        const SizedBox(height: 16),
-                        identityField,
-                        const SizedBox(height: 16),
-                        varificationField,
-                        const SizedBox(height: 24),
-                        loginButton,
-                        // const SizedBox(height: 16),
-                        // otherFunctionalities,
-                      ],
+              child:
+                  // LiquidGlass(
+                  //   // Same shape as GlassSegmentedTabs
+                  //   shape: LiquidRoundedSuperellipse(
+                  //     borderRadius: BorderRadius.circular(40).topLeft,
+                  //   ),
+                  //   // Same settings as GlassSegmentedTabs
+                  //   settings: const LiquidGlassSettings(
+                  //     thickness: 10,
+                  //     blur: 20, // increased from 8 for stronger frost
+                  //     chromaticAberration: 0.01,
+                  //     lightAngle: pi * 5 / 18,
+                  //     lightIntensity: 0.5,
+                  //     refractiveIndex: 1.4,
+                  //     saturation: 1,
+                  //     lightness: 1,
+                  //   ),
+                  //   // Glass body + your content
+                  //   child:
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(40),
+                      // ~5% white tint over the glass to match your tabs component
+                      color: Colors.white.withAlpha((0.05 * 225).toInt()),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          formTitle,
+                          const SizedBox(height: 16),
+                          wardenTypeSelector,
+                          const SizedBox(height: 16),
+                          identityField,
+                          const SizedBox(height: 16),
+                          varificationField,
+                          const SizedBox(height: 24),
+                          loginButton,
+                          // const SizedBox(height: 16),
+                          // otherFunctionalities,
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ),
             ),
           ),
         ),
       ),
+      // ),
     );
   }
 }

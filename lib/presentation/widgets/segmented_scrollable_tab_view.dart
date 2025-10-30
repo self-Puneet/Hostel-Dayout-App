@@ -5,7 +5,7 @@ import 'package:hostel_mgmt/core/theme/app_theme.dart';
 class SegmentedTabs extends StatelessWidget {
   final TabController controller;
   final List<String> labels;
-
+  final bool scrollable;
   final double radius;
   final EdgeInsetsGeometry labelPadding;
   final Color barBackground;
@@ -15,6 +15,7 @@ class SegmentedTabs extends StatelessWidget {
 
   const SegmentedTabs({
     super.key,
+    this.scrollable = true,
     required this.controller,
     required this.labels,
     this.radius = 3,
@@ -41,8 +42,8 @@ class SegmentedTabs extends StatelessWidget {
             overlayColor: WidgetStateProperty.all(Colors.transparent),
 
             controller: controller,
-            isScrollable: true,
-            tabAlignment: TabAlignment.start,
+            isScrollable: scrollable,
+            tabAlignment: scrollable ? TabAlignment.start : TabAlignment.center,
             indicator: const BoxDecoration(),
             dividerColor: Colors.transparent,
             labelPadding: labelPadding,

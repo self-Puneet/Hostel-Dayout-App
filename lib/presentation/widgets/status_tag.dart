@@ -28,7 +28,7 @@ class StatusTag extends StatelessWidget {
       child: Center(
         child: Text(
           textAlign: TextAlign.center,
-          overflow ? status.split(' ').join('\n') : status,
+          overflow ? status.split(' ').take(2).join('\n') : status,
           style: textTheme.h6.w500,
         ),
       ),
