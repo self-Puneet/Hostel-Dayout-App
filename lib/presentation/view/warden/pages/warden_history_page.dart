@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
@@ -6,6 +8,7 @@ import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_history_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/controller/warden_history_controller.dart';
 import 'package:hostel_mgmt/presentation/widgets/segmented_scrollable_tab_view.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'package:provider/provider.dart';
 import 'package:wheel_picker/wheel_picker.dart';
 
@@ -69,150 +72,173 @@ class _WardenHistoryPageState extends State<WardenHistoryPage>
 
     return showDialog<(int, int)>(
       context: context,
-      builder: (ctx) => Dialog(
-        backgroundColor: Colors.black.withOpacity(0.85),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Container(
-          height: 340,
-          width: 320,
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              const Text(
-                'Select Month & Year',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Expanded(
-                child: Row(
-                  children: [
-                    // Month Picker
-                    Expanded(
-                      child: StatefulBuilder(
-                        builder: (context, setState) {
-                          return WheelPicker(
-                            controller: monthController,
-                            looping: false,
-                            enableTap: true,
-                            selectedIndexColor: Colors.transparent,
-                            style: const WheelPickerStyle(
-                              squeeze: 1.1,
-                              diameterRatio: 1.2,
-                              magnification: 1.05,
-                            ),
-                            builder: (context, index) {
-                              final isSelected = index == currentMonth - 1;
-                              final month = months[index];
-                              return Center(
-                                child: AnimatedDefaultTextStyle(
-                                  duration: const Duration(milliseconds: 150),
-                                  style: TextStyle(
-                                    fontSize: isSelected ? 20 : 14,
-                                    color: isSelected
-                                        ? Colors.white
-                                        : Colors.white.withOpacity(0.45),
-                                    fontWeight: isSelected
-                                        ? FontWeight.w600
-                                        : FontWeight.normal,
-                                  ),
-                                  child: Text(month),
-                                ),
-                              );
-                            },
-                            onIndexChanged: (index, reason) {
-                              setState(() {
-                                currentMonth = index + 1;
-                              });
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: VerticalDivider(
-                        color: Colors.white38,
-                        thickness: 1,
-                      ),
-                    ),
-                    // Year Picker
-                    Expanded(
-                      child: StatefulBuilder(
-                        builder: (context, setState) {
-                          return WheelPicker(
-                            controller: yearController,
-                            looping: false,
-                            enableTap: true,
-                            selectedIndexColor: Colors.transparent,
-                            style: const WheelPickerStyle(
-                              squeeze: 1.1,
-                              diameterRatio: 1.2,
-                              magnification: 1.05,
-                            ),
-                            builder: (context, index) {
-                              final isSelected =
-                                  years[index] == currentYearSelected;
-                              final year = years[index];
-                              return Center(
-                                child: AnimatedDefaultTextStyle(
-                                  duration: const Duration(milliseconds: 150),
-                                  style: TextStyle(
-                                    fontSize: isSelected ? 20 : 14,
-                                    color: isSelected
-                                        ? Colors.white
-                                        : Colors.white.withOpacity(0.45),
-                                    fontWeight: isSelected
-                                        ? FontWeight.w600
-                                        : FontWeight.normal,
-                                  ),
-                                  child: Text(year.toString()),
-                                ),
-                              );
-                            },
-                            onIndexChanged: (index, reason) {
-                              setState(() {
-                                currentYearSelected = years[index];
-                              });
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      barrierColor: Colors.black54,
+      builder: (ctx) {
+        return Dialog(
+          backgroundColor: Colors.transparent, // critical for the glass to show
+          elevation: 0,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          child: LiquidGlass(
+            shape: LiquidRoundedSuperellipse(borderRadius: Radius.circular(20)),
+            settings: const LiquidGlassSettings(
+              thickness: 10,
+              blur: 8,
+              chromaticAberration: 0.01,
+              lightAngle: pi * 5 / 18,
+              lightIntensity: 0.5,
+              refractiveIndex: 1.4,
+              saturation: 1,
+              lightness: 1,
+            ),
+            child: Container(
+              height: 340,
+              width: 320,
+              padding: const EdgeInsets.all(16),
+              child: Column(
                 children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(ctx),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.white70,
+                  const Text(
+                    'Select Month & Year',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
-                    child: const Text('CANCEL'),
                   ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        // Month Picker
+                        Expanded(
+                          child: StatefulBuilder(
+                            builder: (context, setState) {
+                              return WheelPicker(
+                                controller: monthController,
+                                looping: false,
+                                enableTap: true,
+                                selectedIndexColor: Colors.transparent,
+                                style: const WheelPickerStyle(
+                                  squeeze: 1.1,
+                                  diameterRatio: 1.2,
+                                  magnification: 1.05,
+                                ),
+                                builder: (context, index) {
+                                  final isSelected = index == currentMonth - 1;
+                                  final month = months[index];
+                                  return Center(
+                                    child: AnimatedDefaultTextStyle(
+                                      duration: const Duration(
+                                        milliseconds: 150,
+                                      ),
+                                      style: TextStyle(
+                                        fontSize: isSelected ? 20 : 14,
+                                        color: isSelected
+                                            ? Colors.white
+                                            : Colors.white.withOpacity(0.45),
+                                        fontWeight: isSelected
+                                            ? FontWeight.w600
+                                            : FontWeight.normal,
+                                      ),
+                                      child: Text(month),
+                                    ),
+                                  );
+                                },
+                                onIndexChanged: (index, reason) {
+                                  setState(() {
+                                    currentMonth = index + 1;
+                                  });
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: VerticalDivider(
+                            color: Colors.white38,
+                            thickness: 1,
+                          ),
+                        ),
+                        // Year Picker
+                        Expanded(
+                          child: StatefulBuilder(
+                            builder: (context, setState) {
+                              return WheelPicker(
+                                controller: yearController,
+                                looping: false,
+                                enableTap: true,
+                                selectedIndexColor: Colors.transparent,
+                                style: const WheelPickerStyle(
+                                  squeeze: 1.1,
+                                  diameterRatio: 1.2,
+                                  magnification: 1.05,
+                                ),
+                                builder: (context, index) {
+                                  final isSelected =
+                                      years[index] == currentYearSelected;
+                                  final year = years[index];
+                                  return Center(
+                                    child: AnimatedDefaultTextStyle(
+                                      duration: const Duration(
+                                        milliseconds: 150,
+                                      ),
+                                      style: TextStyle(
+                                        fontSize: isSelected ? 20 : 14,
+                                        color: isSelected
+                                            ? Colors.white
+                                            : Colors.white.withOpacity(0.45),
+                                        fontWeight: isSelected
+                                            ? FontWeight.w600
+                                            : FontWeight.normal,
+                                      ),
+                                      child: Text(year.toString()),
+                                    ),
+                                  );
+                                },
+                                onIndexChanged: (index, reason) {
+                                  setState(() {
+                                    currentYearSelected = years[index];
+                                  });
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                    onPressed: () =>
-                        Navigator.pop(ctx, (currentMonth, currentYearSelected)),
-                    child: const Text('OK'),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white70,
+                        ),
+                        child: const Text('CANCEL'),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blueAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () => Navigator.pop(ctx, (
+                          currentMonth,
+                          currentYearSelected,
+                        )),
+                        child: const Text('OK'),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -256,7 +282,6 @@ class _WardenHistoryPageState extends State<WardenHistoryPage>
     );
     final tabLabels = WardenHistoryTab.values.map((t) => t.label).toList();
     final height = 84 + MediaQuery.of(context).viewPadding.bottom;
-
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -347,15 +372,10 @@ class _WardenHistoryPageState extends State<WardenHistoryPage>
             // Tabs
 
             // Segmented, scrollable tabs (your custom component)
-            Padding(
-              padding: horizontalPad,
-              child: SegmentedTabs(controller: _tabs, labels: tabLabels),
-            ),
-            const SizedBox(height: 6),
-            Padding(
-              padding: horizontalPad,
-              child: Divider(thickness: 2, color: Colors.grey.shade300),
-            ),
+            SegmentedTabs(controller: _tabs, labels: tabLabels),
+
+            // const SizedBox(height: 6),
+            Divider(thickness: 2, color: Colors.grey.shade300),
 
             // Tab Content
             Expanded(
