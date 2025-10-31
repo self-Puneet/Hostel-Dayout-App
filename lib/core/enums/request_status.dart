@@ -117,7 +117,7 @@ extension RequestStatusX on RequestStatus {
     }
   }
 
-  RequestStatus apiStringToStatus(String status) {
+  static RequestStatus apiStringToStatus(String status) {
     switch (status) {
       case "requested":
         return RequestStatus.requested;

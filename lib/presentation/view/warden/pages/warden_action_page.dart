@@ -1,10 +1,8 @@
 // lib/presentation/view/warden/warden_home_page.dart
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
-import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/presentation/components/simple_action_request_card.dart';
 import 'package:hostel_mgmt/presentation/components/skeleton_loaders/simple_action_request_card_skeleton.dart';
 import 'package:hostel_mgmt/presentation/components/warden_request_list_tab.dart';
@@ -64,7 +62,7 @@ class _WardenHomePageState extends State<WardenHomePage>
         );
         state.setBulkActionCallback(({required action}) async {
           await _controller.bulkActionSelected(action: action);
-          state.clearState();
+          state.resetForHostelChange();
           await _controller.fetchRequestsFromApi();
         });
       }
@@ -141,19 +139,19 @@ class _WardenHomePageState extends State<WardenHomePage>
                       width: 130,
                       child: DecoratedBox(
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: Colors.blueGrey,
                             width: 1.1,
                           ),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 6,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
+                          // boxShadow: const [
+                          //   BoxShadow(
+                          //     color: Colors.black12,
+                          //     blurRadius: 6,
+                          //     offset: Offset(0, 2),
+                          //   ),
+                          // ],
                         ),
                         child: hostelWidget(s),
                       ),
@@ -255,6 +253,28 @@ class _WardenHomePageState extends State<WardenHomePage>
   }
 
   Widget hostelWidget(WardenActionState s) {
+    final items = s.hostels
+        .map(
+          (h) => DropdownMenuItem<String>(
+            value: h.hostelId,
+            child: Row(
+              children: [
+                const Icon(Icons.home, color: Colors.blueGrey, size: 16),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(h.hostelName, overflow: TextOverflow.ellipsis),
+                ),
+              ],
+            ),
+          ),
+        )
+        .toList();
+
+    final hasValue = s.hostels.any((h) => h.hostelId == s.selectedHostelId);
+    final safeValue = hasValue
+        ? s.selectedHostelId
+        : (s.hostels.isNotEmpty ? s.hostels.first.hostelId : null);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: s.hostels.length <= 1 && s.selectedHostelId != null
@@ -287,33 +307,10 @@ class _WardenHomePageState extends State<WardenHomePage>
                 child: DropdownButton<String>(
                   isDense: true,
                   isExpanded: true,
+                  value: safeValue, // must be null or present in items
+                  items: items, // items built from s.hostels
+
                   itemHeight: 48.0,
-                  value: s.selectedHostelId,
-                  items: s.hostels.map((hostel) {
-                    return DropdownMenuItem<String>(
-                      value: hostel.hostelId,
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.home,
-                            color: Colors.blueGrey,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              hostel.hostelName,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: Colors.black87,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
                   onChanged: (val) async {
                     if (val == null) return;
 
@@ -322,6 +319,7 @@ class _WardenHomePageState extends State<WardenHomePage>
                       orElse: () => s.hostels.first,
                     );
 
+                    // s.layoutState.clearState();
                     s.setSelectedHostelId(hostel.hostelId, hostel.hostelName);
                     s.resetForHostelChange();
 
@@ -440,6 +438,7 @@ class _PendingApprovalList extends StatelessWidget {
 
           return Column(
             children: [
+              // Container(height: 200,),
               Expanded(
                 child: ListView.separated(
                   physics: const AlwaysScrollableScrollPhysics(),
@@ -481,16 +480,8 @@ class _PendingApprovalList extends StatelessWidget {
                                     : RequestAction.reject,
                                 requestId: req.requestId,
                               );
-                              s.clearState(); // preserving your original flow
-                              if (context.mounted) {
-                                context.goNamed(
-                                  AppRoutes.wardenHome,
-                                  queryParameters: {
-                                    'ts': DateTime.now().millisecondsSinceEpoch
-                                        .toString(),
-                                  },
-                                );
-                              }
+                              state.resetForHostelChange();
+                              await stateController.fetchRequestsFromApi();
                             }
                           : null,
                       onAcceptence: (!s.hasSelection && !s.isActioning)
@@ -501,17 +492,11 @@ class _PendingApprovalList extends StatelessWidget {
                                     : RequestAction.approve,
                                 requestId: req.requestId,
                               );
-                              if (context.mounted) {
-                                context.goNamed(
-                                  AppRoutes.wardenHome,
-                                  queryParameters: {
-                                    'ts': DateTime.now().millisecondsSinceEpoch
-                                        .toString(),
-                                  },
-                                );
-                              }
+                              state.resetForHostelChange();
+                              await stateController.fetchRequestsFromApi();
                             }
                           : null,
+                      otherSelected: state.hasSelection,
                     );
                   },
                 ),

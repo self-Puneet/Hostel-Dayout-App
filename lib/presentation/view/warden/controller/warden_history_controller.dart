@@ -11,8 +11,9 @@ class WardenHistoryPageController {
   // Load available hostels from the current session
   void loadHostelsFromSession() {
     final session = Get.find<LoginSession>();
-    final hostels = session.hostels ?? [];
-    state.setHostelList(hostels);
+    final base = session.hostels ?? const <HostelInfo>[];
+    final list = List<HostelInfo>.from(base);
+    state.setHostelList(list);
   }
 
   // Fetch requests from API based on hostel and month-year

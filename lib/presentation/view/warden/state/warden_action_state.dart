@@ -158,11 +158,31 @@ class WardenActionState extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Initialize hostel list and default selection
-  void setHostelList(List<HostelInfo> hostel) {
-    selectedHostelId ??= hostel.first.hostelId;
-    selectedHostelName ??= hostel.first.hostelName;
-    // hostel.add(HostelInfo(hostelId: "sdfsdf", hostelName: "sdfsdf"));
+  // // Initialize hostel list and default selection
+  // void setHostelList(List<HostelInfo> hostel) {
+  //   selectedHostelId ??= hostel.first.hostelId;
+  //   selectedHostelName ??= hostel.first.hostelName;
+  //   // hostel.add(HostelInfo(hostelId: "sdfsdf", hostelName: "sdfsdf"));
+  //   hostelsInitialized = true;
+  //   notifyListeners();
+  // }
+
+  void setHostelList(List<HostelInfo> list) {
+    // Store the list used by the UI
+    hostels = List<HostelInfo>.from(list);
+
+    // Keep selection valid relative to current list
+    final hasMatch = hostels.any((h) => h.hostelId == selectedHostelId);
+    if (!hasMatch) {
+      if (hostels.isNotEmpty) {
+        selectedHostelId = hostels.first.hostelId;
+        selectedHostelName = hostels.first.hostelName;
+      } else {
+        selectedHostelId = null;
+        selectedHostelName = null;
+      }
+    }
+
     hostelsInitialized = true;
     notifyListeners();
   }
@@ -182,6 +202,8 @@ class WardenActionState extends ChangeNotifier {
     _selectedIds.clear();
     _typeFilter = null;
     filterController.clear();
+
+    layoutState.hideActionsOverlay();
     notifyListeners();
   }
 
@@ -293,7 +315,11 @@ class WardenActionState extends ChangeNotifier {
     }
 
     if (query.isNotEmpty) {
-      base = base.where((r) => (r.$2.name).toLowerCase().contains(query));
+      base = base.where(
+        (r) =>
+            (r.$2.name.toLowerCase().contains(query)) ||
+            (r.$2.enrollmentNo.toLowerCase().contains(query)),
+      );
     }
 
     return base.map((pair) {

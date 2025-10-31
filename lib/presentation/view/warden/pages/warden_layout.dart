@@ -4,6 +4,7 @@ import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/core/theme/app_theme.dart';
+import 'package:hostel_mgmt/presentation/animation/layout_navbar_action_animation.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_action_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_layout_state.dart';
 import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/glass_nav_bar.dart';
@@ -114,9 +115,128 @@ class WardenLayout extends StatelessWidget {
                                         ],
                                       );
                                     },
-                                child: state.showActionOverlay
-                                    ? Consumer<WardenActionState>(
-                                        builder: (context, actionState, _) {
+                                // child: state.showActionOverlay
+                                //     ? Consumer<WardenActionState>(
+                                //         builder: (context, actionState, _) {
+                                //           return BulkActionsBar(
+                                //             key: const ValueKey('bulk-actions'),
+                                //             actor: actor,
+                                //             isActioning:
+                                //                 actionState.isActioning,
+                                //             hasSelection:
+                                //                 actionState.hasSelection,
+                                //             onLeftPressed: () async {
+                                //               final action =
+                                //                   actor ==
+                                //                       TimelineActor
+                                //                           .assistentWarden
+                                //                   ? RequestAction.cancel
+                                //                   : RequestAction.reject;
+                                //               await actionState
+                                //                   .triggerBulkAction(
+                                //                     action: action,
+                                //                   );
+                                //             },
+                                //             onRightPressed: () async {
+                                //               final action =
+                                //                   actor ==
+                                //                       TimelineActor
+                                //                           .assistentWarden
+                                //                   ? RequestAction.refer
+                                //                   : RequestAction.approve;
+                                //               await actionState
+                                //                   .triggerBulkAction(
+                                //                     action: action,
+                                //                   );
+                                //             },
+                                //             borderRadius: _barRadius,
+                                //             aspectRatio: _barAspect,
+                                //           );
+                                //         },
+                                //       )
+                                //     : LiquidGlassNavBar(
+                                //   onHomePressed: () => context.goNamed(
+                                //     (actor == TimelineActor.seniorWarden)
+                                //         ? AppRoutes.wardenHome
+                                //         : AppRoutes.wardenHome,
+                                //   ),
+                                //   onNewPressed: () => context.goNamed(
+                                //     AppRoutes.wardenActionPage,
+                                //   ),
+                                //   onProfilePressed: () => context.goNamed(
+                                //     AppRoutes.wardenHistory,
+                                //   ),
+                                //   rightIcon: Right(
+                                //     Icon(
+                                //       Icons.history,
+                                //       size: 34,
+                                //       color: Colors.black,
+                                //     ),
+                                //   ),
+                                //   leftIcon: Left(
+                                //     Image.asset(
+                                //       'assets/home.png',
+                                //       width: 34,
+                                //       height: 34,
+                                //     ),
+                                //   ),
+                                //   middleIcon: Right(
+                                //     Icon(
+                                //       Icons.playlist_add_check_outlined,
+                                //       size: 34,
+                                //       color: Colors.white,
+                                //     ),
+                                //   ),
+                                //   middleText: "REQ",
+                                // ),
+                                child: SequencedBarSwitcher(
+                                  showBulk: state.showActionOverlay,
+                                  slideDuration: const Duration(
+                                    milliseconds: 180,
+                                  ),
+                                  opacityDuration: const Duration(
+                                    milliseconds: 120,
+                                  ),
+                                  inCurve: Curves.easeOut, // come in
+                                  outCurve: Curves.easeIn, // go out
+                                  buildNavBar: (_) => LiquidGlassNavBar(
+                                    onHomePressed: () => context.goNamed(
+                                      (actor == TimelineActor.seniorWarden)
+                                          ? AppRoutes.wardenHome
+                                          : AppRoutes.wardenHome,
+                                    ),
+                                    onNewPressed: () => context.goNamed(
+                                      AppRoutes.wardenActionPage,
+                                    ),
+                                    onProfilePressed: () => context.goNamed(
+                                      AppRoutes.wardenHistory,
+                                    ),
+                                    rightIcon: Right(
+                                      Icon(
+                                        Icons.history,
+                                        size: 34,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    leftIcon: Left(
+                                      Image.asset(
+                                        'assets/home.png',
+                                        width: 34,
+                                        height: 34,
+                                      ),
+                                    ),
+                                    middleIcon: Right(
+                                      Icon(
+                                        Icons.playlist_add_check_outlined,
+                                        size: 34,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    middleText: "REQ",
+                                  ),
+                                  buildBulkBar: (_) =>
+                                      Consumer<WardenActionState>(
+                                        builder: (context, actionState, __) {
                                           return BulkActionsBar(
                                             key: const ValueKey('bulk-actions'),
                                             actor: actor,
@@ -152,42 +272,8 @@ class WardenLayout extends StatelessWidget {
                                             aspectRatio: _barAspect,
                                           );
                                         },
-                                      )
-                                    : LiquidGlassNavBar(
-                                        onHomePressed: () => context.goNamed(
-                                          (actor == TimelineActor.seniorWarden)
-                                              ? AppRoutes.wardenHome
-                                              : AppRoutes.wardenHome,
-                                        ),
-                                        onNewPressed: () => context.goNamed(
-                                          AppRoutes.wardenActionPage,
-                                        ),
-                                        onProfilePressed: () => context.goNamed(
-                                          AppRoutes.wardenHistory,
-                                        ),
-                                        rightIcon: Right(
-                                          Icon(
-                                            Icons.history,
-                                            size: 34,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        leftIcon: Left(
-                                          Image.asset(
-                                            'assets/home.png',
-                                            width: 34,
-                                            height: 34,
-                                          ),
-                                        ),
-                                        middleIcon: Right(
-                                          Icon(
-                                            Icons.playlist_add_check_outlined,
-                                            size: 34,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        middleText: "REQ",
                                       ),
+                                ),
                               ),
                             ),
                           ),

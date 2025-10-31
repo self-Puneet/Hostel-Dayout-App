@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:hostel_mgmt/core/config/constants.dart';
+import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:http/http.dart' as http;
@@ -104,7 +105,7 @@ class RequestService {
     }
   }
 
-  static Future<Either<String, RequestModel>> updateRequestStatus({
+  static Future<Either<String, RequestStatus>> updateRequestStatus({
     required String requestId,
     required String status,
     required String remark,
@@ -131,13 +132,13 @@ class RequestService {
       print("📡 Update Status: ${response.statusCode}");
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        print(data);
-        final updated = RequestModel.fromJson(data["request"] ?? data);
-        return right(updated);
+        return right(
+          RequestStatusX.apiStringToStatus(
+            jsonDecode(response.body)['request_status'],
+          ),
+        );
       } else {
-        print("Error: ${response.body}");
-        return left("Error: ${response.body}");
+        return left("Error: ${jsonDecode(response.body)['error']}");
       }
     } catch (e) {
       print("❌ Exception: $e");

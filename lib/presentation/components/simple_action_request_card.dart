@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/core/util/input_convertor.dart';
+import 'package:hostel_mgmt/presentation/animation/status_tag_checkbox_animation.dart';
 import 'package:hostel_mgmt/presentation/widgets/status_tag.dart';
 
 class SimpleActionRequestCard extends StatelessWidget {
@@ -17,6 +18,7 @@ class SimpleActionRequestCard extends StatelessWidget {
 
   // Selection UI + gestures
   final bool selected;
+  final bool otherSelected;
   final VoidCallback? onLongPress; // first selection when none selected
   final VoidCallback? onTap; // toggle when selection mode is active
 
@@ -46,6 +48,7 @@ class SimpleActionRequestCard extends StatelessWidget {
     this.onRejection,
     this.onAcceptence,
     this.selected = false,
+    this.otherSelected = false,
     this.onLongPress,
     this.onTap,
     required this.profileImageUrl,
@@ -192,10 +195,19 @@ class SimpleActionRequestCard extends StatelessWidget {
                               ],
                             ),
                           ),
-                          StatusTag(
-                            status: status.displayName,
-                            color: status.minimalStatusColor,
-                            overflow: overflowStatusTag,
+                          StatusWithCheck(
+                            tag: StatusTag(
+                              status: status.displayName,
+                              color: status.minimalStatusColor,
+                              overflow: overflowStatusTag,
+                            ),
+                            selected: selected, // shows check when true
+                            hasSelection:
+                                otherSelected, // shows empty circle when true & selected is false
+                            selectedColor: selectedColor,
+                            iconSize: 20,
+                            gap: 8,
+                            duration: const Duration(milliseconds: 300),
                           ),
                         ],
                       ),
@@ -289,16 +301,16 @@ class SimpleActionRequestCard extends StatelessWidget {
                 ),
 
                 // Selection badge (non-intrusive)
-                if (selected)
-                  const Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Icon(
-                      Icons.check_circle,
-                      size: 20,
-                      color: selectedColor, // blue badge
-                    ),
-                  ),
+                // if (selected)
+                //   const Positioned(
+                //     top: 8,
+                //     right: 8,
+                //     child: Icon(
+                //       Icons.check_circle,
+                //       size: 20,
+                //       color: selectedColor, // blue badge
+                //     ),
+                //   ),
               ],
             ),
           ),

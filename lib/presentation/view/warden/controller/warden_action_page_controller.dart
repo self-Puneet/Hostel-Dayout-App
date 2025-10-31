@@ -16,9 +16,9 @@ class WardenActionPageController {
   // Initialize hostel list and default selection from session.
   void loadHostelsFromSession() {
     final session = Get.find<LoginSession>();
-    final hostels = session.hostels ?? [];
-    hostels.add(HostelInfo(hostelId: "sdfsdf", hostelName: "sdfsdf"));
-    state.setHostelList(hostels);
+    final base = session.hostels ?? const <HostelInfo>[];
+    final list = List<HostelInfo>.from(base);
+    state.setHostelList(list);
   }
 
   Future<void> fetchRequestsFromApi({String? hostelId}) async {
@@ -78,9 +78,8 @@ class WardenActionPageController {
         (error) async {
           state.setError(true, error);
         },
-        (updatedRequestModel) async {
-          // Write back into the master list; all tabs re-filter on next build.
-          state.updateRequestInAll(updatedRequestModel);
+        (updatedStatus) async {
+          fetchRequestsFromApi();
           state.notifyListenerMethod();
         },
       );

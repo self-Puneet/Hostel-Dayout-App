@@ -94,10 +94,30 @@ class WardenHistoryState extends ChangeNotifier {
 
   // ===================== Hostel Management =====================
 
-  void setHostelList(List<HostelInfo> hostelList) {
-    selectedHostelId ??= hostelList.first.hostelId;
-    selectedHostelName ??= hostelList.first.hostelName;
-    hostels = hostelList;
+  // void setHostelList(List<HostelInfo> hostelList) {
+  //   selectedHostelId ??= hostelList.first.hostelId;
+  //   selectedHostelName ??= hostelList.first.hostelName;
+  //   hostels = hostelList;
+  //   hostelsInitialized = true;
+  //   notifyListeners();
+  // }
+
+  void setHostelList(List<HostelInfo> list) {
+    // Store the list used by the UI
+    hostels = List<HostelInfo>.from(list);
+
+    // Keep selection valid relative to current list
+    final hasMatch = hostels.any((h) => h.hostelId == selectedHostelId);
+    if (!hasMatch) {
+      if (hostels.isNotEmpty) {
+        selectedHostelId = hostels.first.hostelId;
+        selectedHostelName = hostels.first.hostelName;
+      } else {
+        selectedHostelId = null;
+        selectedHostelName = null;
+      }
+    }
+
     hostelsInitialized = true;
     notifyListeners();
   }
@@ -218,21 +238,29 @@ class WardenHistoryState extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<OnScreenRequest> buildListForTab(TimelineActor actor, WardenHistoryTab tab) {
-  final query = filterController.text.trim().toLowerCase();
+  List<OnScreenRequest> buildListForTab(
+    TimelineActor actor,
+    WardenHistoryTab tab,
+  ) {
+    final query = filterController.text.trim().toLowerCase();
 
-  if (_allRequests.isEmpty) return [];
+    if (_allRequests.isEmpty) return [];
 
-  final allowed = allowedStatusesForTab(actor, tab);
-  Iterable<(RequestModel, StudentProfileModel)> base = _allRequests.where(
-    (r) => allowed.contains(r.$1.status),
-  );
+    final allowed = allowedStatusesForTab(actor, tab);
+    Iterable<(RequestModel, StudentProfileModel)> base = _allRequests.where(
+      (r) => allowed.contains(r.$1.status),
+    );
 
-  if (query.isNotEmpty) {
-    base = base.where((r) => (r.$2.name).toLowerCase().contains(query));
+    if (query.isNotEmpty) {
+      base = base.where(
+        (r) =>
+            (r.$2.name.toLowerCase().contains(query)) ||
+            (r.$2.enrollmentNo.toLowerCase().contains(query)),
+      );
+    }
+
+    return base
+        .map((pair) => OnScreenRequest(request: pair.$1, student: pair.$2))
+        .toList();
   }
-
-  return base.map((pair) => OnScreenRequest(request: pair.$1, student: pair.$2)).toList();
-}
-
 }
