@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hostel_mgmt/core/routes/app_router.dart';
 import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/login/login_state.dart';
@@ -10,6 +11,16 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initDependencies();
   await dotenv.load();
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.green,
+      systemNavigationBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.light,
+    ),
+  );
+
+  
 
   runApp(
     ChangeNotifierProvider(create: (_) => LoginState(), child: const MyApp()),

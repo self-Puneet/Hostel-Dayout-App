@@ -174,6 +174,7 @@ class SimpleActionRequestCard extends StatelessWidget {
                     children: [
                       // Header row
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           _buildAvatar(),
                           const SizedBox(width: 12),
@@ -205,7 +206,7 @@ class SimpleActionRequestCard extends StatelessWidget {
                             hasSelection:
                                 otherSelected, // shows empty circle when true & selected is false
                             selectedColor: selectedColor,
-                            iconSize: 20,
+                            iconSize: 25,
                             gap: 8,
                             duration: const Duration(milliseconds: 300),
                           ),
