@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/presentation/animation/layout_navbar_action_animation.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_action_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_layout_state.dart';
@@ -325,69 +326,49 @@ class BulkActionsBar extends StatelessWidget {
     final bool disabled = isActioning;
     final bool isAssistant = actor == TimelineActor.assistentWarden;
 
-    final leftIcon = Icon(Icons.close);
-    final rightIcon = Icon(Icons.check);
+    final String leftText =
+        leftTextOverride ?? (isAssistant ? 'Cancel' : 'Reject');
+    final String rightText =
+        rightTextOverride ?? (isAssistant ? 'Refer' : 'Approve');
     final textTheme = Theme.of(context).textTheme;
 
     return GlassShell(
       borderRadius: borderRadius,
       aspectRatio: aspectRatio,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Row(
           children: [
             Expanded(
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: disabled ? null : onLeftPressed,
-                  borderRadius: const BorderRadius.all(Radius.circular(999)),
-                  child: Ink(
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.horizontal(
-                        left: Radius.circular(999),
-                        right: Radius.circular(0),
-                      ),
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: disabled ? Colors.grey : Colors.red,
-                        borderRadius: const BorderRadius.horizontal(
-                          left: Radius.circular(999),
-                          right: Radius.circular(0),
-                        ),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      alignment: Alignment.center,
-                      child: leftIcon
-                      ),
-                    ),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: disabled ? Colors.grey : Colors.red,
+                  foregroundColor: disabled ? Colors.black : Colors.white,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(999)),
                   ),
                 ),
+                onPressed: disabled ? null : onLeftPressed,
+                child: Text(
+                  leftText,
+                  style: textTheme.h4.copyWith(color: Colors.white),
+                ),
               ),
+            ),
+            const SizedBox(width: 12),
             Expanded(
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: disabled ? null : onRightPressed,
-                  borderRadius: const BorderRadius.all(Radius.circular(999)),
-                  child: Ink(
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(999)),
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: disabled ? Colors.grey : Colors.green,
-                        borderRadius: const BorderRadius.horizontal(
-                          right: Radius.circular(999),
-                          left: Radius.circular(0),
-                        ),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      alignment: Alignment.center,
-                      child: rightIcon,
-                    ),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: disabled ? Colors.grey : Colors.green,
+                  foregroundColor: disabled ? Colors.black : Colors.white,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(999)),
                   ),
+                ),
+                onPressed: disabled ? null : onRightPressed,
+                child: Text(
+                  rightText,
+                  style: textTheme.h4.copyWith(color: Colors.white),
                 ),
               ),
             ),

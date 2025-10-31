@@ -17,38 +17,33 @@ class GlassShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final media = MediaQuery.of(context);
-    return Container(
-      width: 200,
-      height: (31 * media.size.width / 402) * 65 / 340,
-      child: AspectRatio(
-        aspectRatio: aspectRatio,
-        child: CustomPaint(
-          painter: _OuterShadowPainter(borderRadius),
-          child: ClipRRect(
-            borderRadius: borderRadius,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                LiquidGlass(
-                  shape: LiquidRoundedSuperellipse(
-                    borderRadius: borderRadius.topLeft,
-                  ),
-                  settings: const LiquidGlassSettings(
-                    thickness: 10,
-                    blur: 8,
-                    chromaticAberration: 0.01,
-                    lightAngle: pi * 5 / 18,
-                    lightIntensity: 0.5,
-                    refractiveIndex: 1.4,
-                    saturation: 1,
-                    lightness: 1,
-                  ),
-                  child: const SizedBox.expand(),
+    return AspectRatio(
+      aspectRatio: aspectRatio,
+      child: CustomPaint(
+        painter: _OuterShadowPainter(borderRadius),
+        child: ClipRRect(
+          borderRadius: borderRadius,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              LiquidGlass(
+                shape: LiquidRoundedSuperellipse(
+                  borderRadius: borderRadius.topLeft,
                 ),
-                child,
-              ],
-            ),
+                settings: const LiquidGlassSettings(
+                  thickness: 10,
+                  blur: 8,
+                  chromaticAberration: 0.01,
+                  lightAngle: pi * 5 / 18,
+                  lightIntensity: 0.5,
+                  refractiveIndex: 1.4,
+                  saturation: 1,
+                  lightness: 1,
+                ),
+                child: const SizedBox.expand(),
+              ),
+              child,
+            ],
           ),
         ),
       ),
