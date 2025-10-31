@@ -159,35 +159,34 @@ class _WardenHomePageState extends State<WardenHomePage>
                   ],
                 ),
               ),
-              (state.currentTab == WardenTab.pendingApproval)
-                  ? Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        // Segmented, scrollable tabs
-                        Padding(
-                          padding: horizontalPad,
-                          child: SegmentedTabs(
-                            controller: _tabs,
-                            labels: labels,
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  // Segmented, scrollable tabs
+                  Padding(
+                    padding: horizontalPad,
+                    child: SegmentedTabs(controller: _tabs, labels: labels),
+                  ),
+                  // const SizedBox(height: 6),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: (state.currentTab == WardenTab.pendingApproval)
+                        ? -10
+                        : 0,
+                    child: Padding(
+                      padding: horizontalPad,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Divider(
+                              thickness: 2,
+                              height: 0,
+                              color: Colors.grey.shade300,
+                            ),
                           ),
-                        ),
-                        // const SizedBox(height: 6),
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: -10,
-                          child: Padding(
-                            padding: horizontalPad,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Divider(
-                                    thickness: 2,
-                                    height: 0,
-                                    color: Colors.grey.shade300,
-                                  ),
-                                ),
-                                GestureDetector(
+                          (state.currentTab == WardenTab.pendingApproval)
+                              ? GestureDetector(
                                   onTap: () {
                                     state.toggleAllSelectedCheckbox(
                                       widget.actor,
@@ -205,32 +204,14 @@ class _WardenHomePageState extends State<WardenHomePage>
                                       size: 20,
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  : Column(
-                      children: [
-                        Padding(
-                          padding: horizontalPad,
-                          child: SegmentedTabs(
-                            controller: _tabs,
-                            labels: labels,
-                          ),
-                        ),
-                        Padding(
-                          padding: horizontalPad,
-                          child: Divider(
-                            thickness: 2,
-                            height: 0,
-                            color: Colors.grey.shade300,
-                          ),
-                        ),
-                      ],
+                                )
+                              : Container(),
+                        ],
+                      ),
                     ),
+                  ),
+                ],
+              ),
 
               // Tab contents
               (s.isLoading && !s.hasData)

@@ -39,6 +39,7 @@ class WardenLayoutState extends ChangeNotifier {
   // Overlay API
   void showActionsOverlay() {
     if (_showActionOverlay) return;
+    print("here");
     _showActionOverlay = true;
     notifyListeners();
   }
@@ -59,7 +60,5 @@ class WardenLayoutState extends ChangeNotifier {
     _isActioning = false;
     _isErrored = false;
     _errorMessage = '';
-  
-  
   }
 }
