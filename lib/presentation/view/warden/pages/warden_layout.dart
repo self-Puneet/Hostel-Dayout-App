@@ -193,9 +193,11 @@ class WardenLayout extends StatelessWidget {
                                   showBulk: state.showActionOverlay,
                                   slideDuration: const Duration(
                                     milliseconds: 180,
+                                    seconds: 0,
                                   ),
                                   opacityDuration: const Duration(
-                                    milliseconds: 120,
+                                    milliseconds: 180,
+                                    seconds: 0,
                                   ),
                                   inCurve: Curves.easeOut, // come in
                                   outCurve: Curves.easeIn, // go out
@@ -320,7 +322,8 @@ class BulkActionsBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool disabled = isActioning || !hasSelection;
+    // final bool disabled = isActioning || !hasSelection;
+    final bool disabled = isActioning;
     final bool isAssistant = actor == TimelineActor.assistentWarden;
 
     final String leftText =

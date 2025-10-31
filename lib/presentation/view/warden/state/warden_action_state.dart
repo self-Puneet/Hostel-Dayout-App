@@ -69,6 +69,7 @@ class WardenActionState extends ChangeNotifier {
   bool _isErrored = false;
   bool _isActioning = false;
   String _errorMessage = '';
+  bool _allSelected = false;
 
   // Selection
   final Set<String> _selectedIds = {};
@@ -87,6 +88,7 @@ class WardenActionState extends ChangeNotifier {
   bool get isErrored => _isErrored;
   bool get isActioning => _isActioning;
   String get errorMessage => _errorMessage;
+  bool get allSelected => _allSelected;
 
   // Selection is valid only on Pending Approval
   bool get hasSelection =>
@@ -129,6 +131,60 @@ class WardenActionState extends ChangeNotifier {
 
   // ===========================================================================================
 
+  void setAllSelected(TimelineActor actor) {
+    if (_currentTab != WardenTab.pendingApproval) return;
+
+    final statuses = allowedForTab(actor, WardenTab.pendingApproval);
+    final visibleIds = buildListForStatuses(
+      statuses,
+    ).map((e) => e.request.requestId).toSet();
+
+    if (visibleIds.isEmpty) {
+      _allSelected = false;
+      notifyListeners();
+      return;
+    }
+
+    final wasEmpty = _selectedIds.isEmpty;
+    _selectedIds
+      ..clear()
+      ..addAll(visibleIds);
+
+    if (wasEmpty && _selectedIds.isNotEmpty) {
+      _onFirstSelected?.call();
+    }
+
+    _allSelected = true;
+    notifyListeners();
+  }
+
+  void setAllUnselected(TimelineActor actor) {
+    if (_currentTab != WardenTab.pendingApproval) return;
+
+    final hadSelection = _selectedIds.isNotEmpty;
+    _selectedIds.clear();
+
+    if (hadSelection) {
+      _onNoneSelected?.call();
+    }
+
+    _allSelected = false;
+    notifyListeners();
+  }
+
+  void toggleAllSelectedCheckbox(TimelineActor actor) {
+    if (_currentTab != WardenTab.pendingApproval) return;
+
+    if (_allSelected) {
+      setAllUnselected(actor);
+    } else {
+      setAllSelected(actor);
+    }
+    // Do not call notifyListeners() here; the called method already did.
+  }
+
+  // ===========================================================================================
+
   // NEW: Bulk action callback
   Future<void> Function({required RequestAction action})? _onBulkAction;
 
@@ -152,8 +208,14 @@ class WardenActionState extends ChangeNotifier {
 
   void setCurrentTab(WardenTab tab) {
     _currentTab = tab;
+    // Reset selection state when switching tabs. Ensure the "select all"
+    // checkbox is cleared regardless of which tab we switch to.
     if (tab != WardenTab.pendingApproval) {
       clearSelection();
+    } else {
+      // If switching back to pendingApproval, clear any residual selected ids
+      // to avoid stale selection when entering the tab.
+      _selectedIds.clear();
     }
     notifyListeners();
   }
@@ -202,6 +264,7 @@ class WardenActionState extends ChangeNotifier {
     _selectedIds.clear();
     _typeFilter = null;
     filterController.clear();
+    _allSelected = false;
 
     layoutState.hideActionsOverlay();
     notifyListeners();
@@ -242,7 +305,7 @@ class WardenActionState extends ChangeNotifier {
 
   bool isSelectedById(String id) => _selectedIds.contains(id);
 
-  void toggleSelectedById(String id) {
+  void toggleSelectedById(String id, TimelineActor actor) {
     if (_currentTab != WardenTab.pendingApproval) return;
 
     final hadSelection = _selectedIds.isNotEmpty;
@@ -262,6 +325,23 @@ class WardenActionState extends ChangeNotifier {
     } else if (hadSelection && !hasSelectionNow) {
       // 1 → 0 transition (none selected)
       _onNoneSelected?.call();
+    }
+
+    // triggering the checkbox for allSelection
+    // Recompute the set of visible ids for the pendingApproval tab for this actor
+    final statuses = allowedForTab(actor, WardenTab.pendingApproval);
+    final visibleIds = buildListForStatuses(
+      statuses,
+    ).map((e) => e.request.requestId).toSet();
+
+    if (visibleIds.isEmpty) {
+      _allSelected = false;
+    } else {
+      // If every visible id is present in _selectedIds, mark allSelected true
+      final allVisibleSelected = visibleIds.every(
+        (vid) => _selectedIds.contains(vid),
+      );
+      _allSelected = allVisibleSelected;
     }
 
     notifyListeners();
@@ -285,6 +365,7 @@ class WardenActionState extends ChangeNotifier {
   void clearSelection() {
     final hadSelection = _selectedIds.isNotEmpty;
     _selectedIds.clear();
+    _allSelected = false;
 
     if (hadSelection) {
       _onNoneSelected?.call();
@@ -395,6 +476,7 @@ class WardenActionState extends ChangeNotifier {
     _selectedIds.clear();
     _typeFilter = null;
     filterController.clear();
+    _allSelected = false;
 
     if (hadSelection) {
       _onNoneSelected?.call();

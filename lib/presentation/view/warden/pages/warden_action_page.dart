@@ -159,21 +159,78 @@ class _WardenHomePageState extends State<WardenHomePage>
                   ],
                 ),
               ),
-
-              // Segmented, scrollable tabs
-              Padding(
-                padding: horizontalPad,
-                child: SegmentedTabs(controller: _tabs, labels: labels),
-              ),
-              // const SizedBox(height: 6),
-              Padding(
-                padding: horizontalPad,
-                child: Divider(
-                  thickness: 2,
-                  height: 0,
-                  color: Colors.grey.shade300,
-                ),
-              ),
+              (state.currentTab == WardenTab.pendingApproval)
+                  ? Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        // Segmented, scrollable tabs
+                        Padding(
+                          padding: horizontalPad,
+                          child: SegmentedTabs(
+                            controller: _tabs,
+                            labels: labels,
+                          ),
+                        ),
+                        // const SizedBox(height: 6),
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: -10,
+                          child: Padding(
+                            padding: horizontalPad,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Divider(
+                                    thickness: 2,
+                                    height: 0,
+                                    color: Colors.grey.shade300,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    state.toggleAllSelectedCheckbox(
+                                      widget.actor,
+                                    );
+                                  },
+                                  child: Container(
+                                    color: const Color(0xFFE9E9E9),
+                                    height: 20,
+                                    width: 20,
+                                    child: Icon(
+                                      state.allSelected
+                                          ? Icons.check_box
+                                          : Icons.check_box_outline_blank,
+                                      color: Colors.black,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      children: [
+                        Padding(
+                          padding: horizontalPad,
+                          child: SegmentedTabs(
+                            controller: _tabs,
+                            labels: labels,
+                          ),
+                        ),
+                        Padding(
+                          padding: horizontalPad,
+                          child: Divider(
+                            thickness: 2,
+                            height: 0,
+                            color: Colors.grey.shade300,
+                          ),
+                        ),
+                      ],
+                    ),
 
               // Tab contents
               (s.isLoading && !s.hasData)
@@ -467,10 +524,10 @@ class _PendingApprovalList extends StatelessWidget {
                       toDate: req.appliedTo,
                       selected: selected,
                       onLongPress: (!s.isActioning && !s.hasSelection)
-                          ? () => s.toggleSelectedById(req.requestId)
+                          ? () => s.toggleSelectedById(req.requestId, actor)
                           : null,
                       onTap: (!s.isActioning && s.hasSelection)
-                          ? () => s.toggleSelectedById(req.requestId)
+                          ? () => s.toggleSelectedById(req.requestId, actor)
                           : null,
                       onRejection: (!s.hasSelection && !s.isActioning)
                           ? () async {
