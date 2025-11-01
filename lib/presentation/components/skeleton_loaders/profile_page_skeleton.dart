@@ -22,6 +22,7 @@ Widget profileTopSkeleton() {
         ),
       ),
       SizedBox(height: 16),
+
       // Name
       shimmerBox(width: 130, height: 22, borderRadius: 10),
       SizedBox(height: 4),

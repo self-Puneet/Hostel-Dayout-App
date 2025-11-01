@@ -191,24 +191,24 @@ class LoginPage extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0),
               child:
-                  LiquidGlass(
-                    // Same shape as GlassSegmentedTabs
-                    shape: LiquidRoundedSuperellipse(
-                      borderRadius: BorderRadius.circular(40).topLeft,
-                    ),
-                    // Same settings as GlassSegmentedTabs
-                    settings: const LiquidGlassSettings(
-                      thickness: 10,
-                      blur: 20, // increased from 8 for stronger frost
-                      chromaticAberration: 0.01,
-                      lightAngle: pi * 5 / 18,
-                      lightIntensity: 0.5,
-                      refractiveIndex: 1.4,
-                      saturation: 1,
-                      lightness: 1,
-                    ),
-                    // Glass body + your content
-                    child:
+                  // LiquidGlass(
+                  //   // Same shape as GlassSegmentedTabs
+                  //   shape: LiquidRoundedSuperellipse(
+                  //     borderRadius: BorderRadius.circular(40).topLeft,
+                  //   ),
+                  //   // Same settings as GlassSegmentedTabs
+                  //   settings: const LiquidGlassSettings(
+                  //     thickness: 10,
+                  //     blur: 20, // increased from 8 for stronger frost
+                  //     chromaticAberration: 0.01,
+                  //     lightAngle: pi * 5 / 18,
+                  //     lightIntensity: 0.5,
+                  //     refractiveIndex: 1.4,
+                  //     saturation: 1,
+                  //     lightness: 1,
+                  //   ),
+                  //   // Glass body + your content
+                  //   child:
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(40),
@@ -239,7 +239,7 @@ class LoginPage extends StatelessWidget {
           ),
         ),
       ),
-      ),
+      // ),
     );
   }
 }

@@ -11,44 +11,14 @@ class ParentHomeController {
 
   Future<void> fetchActiveRequests() async {
     state.setLoading(true);
+    state.isLoadingHistory = true;
     state.clearError();
     final result = await ParentService.getAllRequests();
     result.fold((err) => state.setError(err), (resp) {
       state.setRequests(resp);
-      //   state.setHistoryRequests([
-      //     RequestModel(
-      //       id: '1',
-      //       requestId: 'REQ1',
-      //       requestType: RequestType.leave,
-      //       studentEnrollmentNumber: 'ENR001',
-      //       appliedFrom: DateTime.now().subtract(Duration(days: 2)),
-      //       appliedTo: DateTime.now().subtract(Duration(days: 1)),
-      //       reason: 'Approved request',
-      //       status: RequestStatus.approved,
-      //       active: true,
-      //       createdBy: 'admin',
-      //       appliedAt: DateTime.now().subtract(Duration(days: 1)),
-      //       lastUpdatedAt: DateTime.now(),
-      //     ),
-      //     RequestModel(
-      //       id: '2',
-      //       requestId: 'REQ2',
-      //       requestType: RequestType.leave,
-      //       studentEnrollmentNumber: 'ENR002',
-      //       appliedFrom: DateTime.now().subtract(Duration(days: 3)),
-      //       appliedTo: DateTime.now().subtract(Duration(days: 2)),
-      //       reason: 'Rejected request',
-      //       status: RequestStatus.rejected,
-      //       active: false,
-      //       createdBy: 'admin',
-      //       appliedAt: DateTime.now().subtract(Duration(days: 2)),
-      //       lastUpdatedAt: DateTime.now(),
-      //     ),
-      //   ]);
     });
-    await fetchHistoryRequests();
-
     state.setLoading(false);
+    await fetchHistoryRequests();
   }
 
   // Generic action by id for parent: approve or reject
@@ -95,11 +65,12 @@ class ParentHomeController {
 
   Future<void> fetchHistoryRequests({String filter = 'All'}) async {
     try {
-      state.setLoading(true);
+      state.isLoadingHistory = true;
       final requests = await RequestService.getRequestsByStatusKey(filter);
       state.setHistoryRequests(requests);
+      state.isLoadingHistory = false;
     } catch (e) {
-      print('History fetch error ($filter): $e');
+      state.errorMessage = e.toString();
     } finally {
       state.setLoading(false);
     }

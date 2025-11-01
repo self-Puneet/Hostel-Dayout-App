@@ -82,9 +82,9 @@ class _HomePageState extends State<HomePage> {
             final List<String> hostelInfo = [];
             String hostelName = "";
 
-            profile.hostels!.forEach((hos) {
+            for (final hos in profile.hostels!) {
               hostelInfo.add(hos.hostelName);
-            });
+            }
 
             if (hostelInfo.length == 1) {
               hostelName = hostelInfo[0]; // use index 0
@@ -150,7 +150,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(28),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.25),
+                          color: Colors.black.withAlpha((0.25 * 225).toInt()),
                           offset: const Offset(0, 0),
                           blurRadius: 14,
                           spreadRadius: 2,

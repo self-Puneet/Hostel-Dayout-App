@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/presentation/widgets/shimmer_box.dart';
 import 'package:hostel_mgmt/presentation/widgets/skeleton_circle.dart';
 
-Widget activeRequestCardSkeleton() {
+Widget activeRequestCardSkeleton({bool actionButton = false}) {
   return Container(
     margin: EdgeInsets.symmetric(vertical: 24),
     padding: EdgeInsets.all(20),
@@ -50,7 +50,7 @@ Widget activeRequestCardSkeleton() {
             SizedBox(width: 12),
           ],
         ),
-        SizedBox(height: 28),
+        SizedBox(height: 23),
         // Progress dots and labels
         Stack(
           children: [
@@ -75,6 +75,21 @@ Widget activeRequestCardSkeleton() {
             ),
           ],
         ),
+        SizedBox(height: 23),
+        (actionButton)
+            ? Row(
+                children: [
+                  Expanded(
+                    child: shimmerBox(width: double.infinity, height: 40),
+                  ),
+                  const SizedBox(width: 12),
+
+                  Expanded(
+                    child: shimmerBox(width: double.infinity, height: 40),
+                  ),
+                ],
+              )
+            : Container(),
       ],
     ),
   );

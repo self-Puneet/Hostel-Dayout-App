@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
+import 'package:hostel_mgmt/presentation/components/skeleton_loaders/profile_page_skeleton.dart';
 import 'package:hostel_mgmt/presentation/view/parent/controllers/parent_profile_controller.dart';
 import 'package:hostel_mgmt/presentation/view/parent/state/parent_profile_state.dart';
 import 'package:hostel_mgmt/presentation/widgets/collapsing_header.dart';
+import 'package:hostel_mgmt/presentation/widgets/shimmer_box.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:hostel_mgmt/services/profile_service.dart';
@@ -47,28 +49,8 @@ class _ParentProfilePageState extends State<ParentProfilePage>
       value: state,
       child: Consumer<ParentProfileState>(
         builder: (context, state, _) {
-          // Loading
-          if (state.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          // Error
-          if (state.isErrored) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(state.errorMessage ?? 'Failed to load profile'),
-              ),
-            );
-          }
-
           // Empty
           final students = state.studentProfileModel;
-          if (students.isEmpty) {
-            return const Center(child: Text('No profile found'));
-          }
-
-          // Data
           final p = state.parentModel;
           final scheme = Theme.of(context).colorScheme;
           final mediaQuery = MediaQuery.of(context).size;
@@ -120,149 +102,183 @@ class _ParentProfilePageState extends State<ParentProfilePage>
                   SliverToBoxAdapter(
                     child: Container(
                       margin: padding2,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Avatar + camera button
-                          Center(
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              alignment: Alignment.center,
+                      child: (state.isLoading)
+                          ? Column(
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.all(3),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withAlpha(
-                                          (0.06 * 255).toInt(),
+                                profileTopSkeleton(),
+                                const Divider(),
+                                const SizedBox(height: 8),
+                                shimmerBox(
+                                  width: double.infinity,
+                                  height: 200,
+                                  borderRadius: 20,
+                                ),
+                                const SizedBox(height: 16),
+                                const Divider(),
+                                const SizedBox(height: 8),
+                                shimmerBox(
+                                  width: double.infinity,
+                                  height: 272,
+                                  borderRadius: 20,
+                                ),
+
+                                // parentInfoSkeleton(),
+                              ],
+                            )
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Avatar + camera button
+                                Center(
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(3),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withAlpha(
+                                                (0.06 * 255).toInt(),
+                                              ),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
                                         ),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 3),
+                                        child: CircleAvatar(
+                                          radius: 48,
+                                          backgroundImage:
+                                              null, // add when available
+                                          backgroundColor: Colors.blue.shade100,
+                                          child: Text(
+                                            _initials(
+                                              p?.name ?? students.first.name,
+                                            ),
+                                            style: const TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.blue,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
-                                  child: CircleAvatar(
-                                    radius: 48,
-                                    backgroundImage: null, // add when available
-                                    backgroundColor: Colors.blue.shade100,
-                                    child: Text(
-                                      _initials(p?.name ?? students.first.name),
-                                      style: const TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.blue,
-                                      ),
-                                    ),
-                                  ),
                                 ),
-                              ],
-                            ),
-                          ),
 
-                          const SizedBox(height: 12),
-                          Center(
-                            child: Text(
-                              p?.name ?? 'Parent',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          if (p?.phoneNo != null) ...[
-                            const SizedBox(height: 4),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.phone,
-                                  size: 16,
-                                  color: Colors.grey.shade700,
-                                ),
-                                const SizedBox(width: 6),
+                                const SizedBox(height: 12),
                                 Center(
-                                  child: Text(
-                                    p!.phoneNo,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey.shade700,
+                                  child:   Text(
+                                    p?.name ?? 'Parent',
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
+                                if (p?.phoneNo != null) ...[
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.phone,
+                                        size: 16,
+                                        color: Colors.grey.shade700,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Center(
+                                        child: Text(
+                                          p!.phoneNo,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey.shade700,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  const SizedBox(height: 16),
+                                ],
+
+                                const Divider(),
+                                const SizedBox(height: 8),
+
+                                if (p != null)
+                                  _section('Parent Info', [
+                                    _infoRow('Name', p.name),
+                                    _infoRow('Relation', p.relation),
+                                    _infoRow('Phone No', p.phoneNo),
+                                  ]),
+
+                                if (students.length > 1)
+                                  const SizedBox(height: 12),
+                                if (students.length > 1)
+                                  Center(
+                                    child: SmoothPageIndicator(
+                                      controller: _pageController,
+                                      count: students.length,
+                                      effect: JumpingDotEffect(
+                                        dotHeight: 9,
+                                        dotWidth: 9,
+                                        activeDotColor: Colors.black,
+                                        dotColor: Colors.grey[300]!,
+                                        jumpScale: 1,
+                                      ),
+                                    ),
+                                  ),
+
+                                const SizedBox(height: 16),
+                                const Divider(),
+                                const SizedBox(height: 8),
+
+                                // Constrained PageView for multiple children
+                                SizedBox(
+                                  height:
+                                      260, // give a fixed height to bound PageView
+                                  child: PageView.builder(
+                                    controller: _pageController,
+                                    itemCount: students.length,
+                                    itemBuilder: (context, index) {
+                                      final s = students[index];
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 4,
+                                        ),
+                                        child: _section('Student Info', [
+                                          _infoRow(
+                                            'Enrollment No',
+                                            s.enrollmentNo,
+                                          ),
+                                          _infoRow('Phone No', s.phoneNo),
+                                          _infoRow('Hostel', s.hostelName),
+                                          _infoRow('Room No', s.roomNo),
+                                          _infoRow('Branch', s.branch),
+                                          _infoRow(
+                                            'Semester',
+                                            s.semester.toString(),
+                                          ),
+                                        ]),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                SizedBox(
+                                  height:
+                                      84 +
+                                      MediaQuery.of(context).viewPadding.bottom,
+                                ),
                               ],
                             ),
-
-                            const SizedBox(height: 16),
-                          ],
-
-                          const Divider(),
-                          const SizedBox(height: 8),
-
-                          if (p != null)
-                            _section('Parent Info', [
-                              _infoRow('Name', p.name),
-                              _infoRow('Relation', p.relation),
-                              _infoRow('Phone No', p.phoneNo),
-                            ]),
-
-                          if (students.length > 1) const SizedBox(height: 12),
-                          if (students.length > 1)
-                            Center(
-                              child: SmoothPageIndicator(
-                                controller: _pageController,
-                                count: students.length,
-                                effect: JumpingDotEffect(
-                                  dotHeight: 9,
-                                  dotWidth: 9,
-                                  activeDotColor: Colors.black,
-                                  dotColor: Colors.grey[300]!,
-                                  jumpScale: 1,
-                                ),
-                              ),
-                            ),
-
-                          const SizedBox(height: 16),
-                          const Divider(),
-                          const SizedBox(height: 8),
-
-                          // Constrained PageView for multiple children
-                          SizedBox(
-                            height:
-                                260, // give a fixed height to bound PageView
-                            child: PageView.builder(
-                              controller: _pageController,
-                              itemCount: students.length,
-                              itemBuilder: (context, index) {
-                                final s = students[index];
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 4,
-                                  ),
-                                  child: _section('Student Info', [
-                                    _infoRow('Enrollment No', s.enrollmentNo),
-                                    _infoRow('Phone No', s.phoneNo),
-                                    _infoRow('Hostel', s.hostelName),
-                                    _infoRow('Room No', s.roomNo),
-                                    _infoRow('Branch', s.branch),
-                                    _infoRow('Semester', s.semester.toString()),
-                                  ]),
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          SizedBox(
-                            height:
-                                84 + MediaQuery.of(context).viewPadding.bottom,
-                          ),
-                        ],
-                      ),
                     ),
                   ),
                 ],

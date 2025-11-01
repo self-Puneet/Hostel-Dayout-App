@@ -20,8 +20,6 @@ Future<void> main() async {
     ),
   );
 
-  
-
   runApp(
     ChangeNotifierProvider(create: (_) => LoginState(), child: const MyApp()),
   );

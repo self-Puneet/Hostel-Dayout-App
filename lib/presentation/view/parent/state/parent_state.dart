@@ -7,6 +7,7 @@ class ParentState extends ChangeNotifier {
   bool isLoading = false;
   bool isErrored = false;
   String errorMessage = '';
+  bool isLoadingHistory = false;
 
   bool isActioning = false; // NEWx 
 
