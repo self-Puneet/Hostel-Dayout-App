@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
+import 'package:hostel_mgmt/core/config/constants.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 // import 'package:hostel_mgmt/models/hostels_model.dart';
 import 'package:hostel_mgmt/models/warden_model.dart';
@@ -273,15 +274,15 @@ class AuthService {
   static Future<Either<String, bool>> resetPassword({
     required String oldPassword,
     required String newPassword,
-    required String token,
   }) async {
     try {
+      final session = Get.find<LoginSession>();
+      final token = session.token;
+
       final payload = {'oldPassword': oldPassword, 'newPassword': newPassword};
 
       final response = await http.put(
-        Uri.parse(
-          "https://hostel-leave-3.onrender.com/api/admin/reset-password",
-        ),
+        Uri.parse("$baseUrl/admin/reset-password"),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
@@ -294,7 +295,7 @@ class AuthService {
       if (response.statusCode == 200) {
         return right(true);
       } else {
-        return left("${response.body}");
+        return left("${jsonDecode(response.body)['error']}");
       }
     } catch (e) {
       print("❌ Exception: $e");

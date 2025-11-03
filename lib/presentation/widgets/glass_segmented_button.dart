@@ -88,6 +88,7 @@ class _GlassSegmentedTabsState extends State<GlassSegmentedTabs>
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(40),
+                // color: Colors.transparent,
                 color: Colors.white.withAlpha((0.05 * 225).toInt()),
               ),
             ),
@@ -135,36 +136,32 @@ class _GlassSegmentedTabsState extends State<GlassSegmentedTabs>
       child: Builder(
         builder: (innerCtx) {
           _attachIfNeeded(DefaultTabController.of(innerCtx));
-
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              // UNBOUNDED HEIGHT: shrink-wrap; do NOT use TabBarView
-              if (!constraints.hasBoundedHeight) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (showTabsResolved)
-                      SizedBox(height: tabsHeight, child: header(context)),
-                    // Only the active view so it can dictate its own height
-                    widget.views[_index],
-                  ],
-                );
-              }
-
-              // BOUNDED HEIGHT: safe to use TabBarView with finite height
-              return Column(
-                children: [
-                  if (showTabsResolved)
-                    SizedBox(height: tabsHeight, child: header(context)),
-                  Expanded(
-                    child: TabBarView(
-                      physics: const NeverScrollableScrollPhysics(),
-                      children: widget.views,
-                    ),
+          // BOUNDED HEIGHT: overlay header above content so lists slide behind it
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // Content layer fills available space, offset below the header
+              Positioned.fill(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    top: showTabsResolved ? tabsHeight / 2 : 0,
                   ),
-                ],
-              );
-            },
+                  child: TabBarView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: widget.views,
+                  ),
+                ),
+              ),
+              // Overlay header stays fixed at the top
+              if (showTabsResolved)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: tabsHeight,
+                  child: header(context),
+                ),
+            ],
           );
         },
       ),

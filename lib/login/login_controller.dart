@@ -120,7 +120,12 @@ class LoginController {
               diSession.role = session.role;
               diSession.imageURL = profile.profilePic;
               diSession.roomNo = profile.roomNo;
-              diSession.hostels = [HostelInfo(hostelId: profile.hostelName, hostelName: profile.hostelName)];
+              diSession.hostels = [
+                HostelInfo(
+                  hostelId: profile.hostelName,
+                  hostelName: profile.hostelName,
+                ),
+              ];
 
               await diSession.saveToPrefs();
               print(diSession.roomNo);
@@ -279,7 +284,6 @@ class LoginController {
     final result = await AuthService.resetPassword(
       oldPassword: "MP8XS0GJRE",
       newPassword: "test",
-      token: token,
     );
 
     // Handle the result using functional Either style.

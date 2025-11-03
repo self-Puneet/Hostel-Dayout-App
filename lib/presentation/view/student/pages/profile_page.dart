@@ -1,7 +1,11 @@
 // lib/presentation/view/profile/pages/profile_page.dart
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:hostel_mgmt/core/enums/ui_eums/snackbar_type.dart';
 import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
+import 'package:hostel_mgmt/core/helpers/app_snackbar.dart';
+import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/models/parent_model.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
 import 'package:hostel_mgmt/presentation/widgets/collapsing_header.dart';
@@ -12,6 +16,7 @@ import '../state/profile_state.dart';
 import '../controllers/profile_controller.dart';
 import 'package:hostel_mgmt/services/profile_service.dart';
 import '../../../components/skeleton_loaders/profile_page_skeleton.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -72,6 +77,430 @@ class _ProfilePageState extends State<ProfilePage>
           ],
         ),
       ),
+    );
+  }
+
+  // // In ProfilePage (stateful), add this helper:
+  // void _showResetPasswordSheet() {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     useRootNavigator: true,
+  //     showDragHandle: true,
+  //     builder: (sheetCtx) {
+  //       return ChangeNotifierProvider<ProfileState>.value(
+  //         value: state, // reuse the same instance
+  //         child: Consumer<ProfileState>(
+  //           builder: (c, s, _) {
+  //             final viewInsets = MediaQuery.of(sheetCtx).viewInsets;
+  //             final textTheme = Theme.of(sheetCtx).textTheme;
+
+  //             return Padding(
+  //               padding: EdgeInsets.only(
+  //                 bottom: viewInsets.bottom,
+  //                 left: 16,
+  //                 right: 16,
+  //                 top: 12,
+  //               ),
+  //               child: SafeArea(
+  //                 top: false,
+  //                 child: Consumer<ProfileState>(
+  //                   builder: (context, s, _) {
+  //                     Widget floatingPasswordField({
+  //                       required String label,
+  //                       required TextEditingController controller,
+  //                       required bool touched,
+  //                       required String? error,
+  //                       FocusNode? focusNode,
+  //                       VoidCallback? onEditingComplete,
+  //                     }) {
+  //                       return TextFormField(
+  //                         controller: controller,
+  //                         focusNode: focusNode,
+  //                         obscureText: true,
+  //                         obscuringCharacter: '•',
+  //                         enableSuggestions: false,
+  //                         autocorrect: false,
+  //                         textInputAction: TextInputAction.next,
+  //                         onEditingComplete: onEditingComplete,
+  //                         decoration: InputDecoration(
+  //                           labelText: label, // label sits inside initially
+  //                           hintText: label, // optional: subtle hint text
+  //                           floatingLabelBehavior: FloatingLabelBehavior
+  //                               .auto, // floats on focus/text
+  //                           filled: true,
+  //                           fillColor: Colors.white,
+  //                           isDense: true,
+  //                           contentPadding: const EdgeInsets.symmetric(
+  //                             horizontal: 12,
+  //                             vertical: 14,
+  //                           ),
+  //                           border: OutlineInputBorder(
+  //                             borderRadius: BorderRadius.circular(10),
+  //                           ),
+  //                           enabledBorder: OutlineInputBorder(
+  //                             borderRadius: BorderRadius.circular(10),
+  //                             borderSide: BorderSide(
+  //                               color: Colors.grey.shade300,
+  //                               width: 1.2,
+  //                             ),
+  //                           ),
+  //                           errorText: touched
+  //                               ? error
+  //                               : null, // show error below when touched
+  //                         ),
+  //                       );
+  //                     }
+
+  //                     return Column(
+  //                       mainAxisSize: MainAxisSize.min,
+  //                       children: [
+  //                         const SizedBox(height: 4),
+  //                         Text('Reset Password', style: textTheme.titleLarge),
+  //                         const SizedBox(height: 12),
+  //                         floatingPasswordField(
+  //                           label: 'Old password',
+  //                           controller: s.oldPwC,
+  //                           touched: s.oldTouched,
+  //                           error: s.oldError,
+  //                         ),
+  //                         const SizedBox(height: 10),
+  //                         floatingPasswordField(
+  //                           label: 'New password',
+  //                           controller: s.newPwC,
+  //                           touched: s.newTouched,
+  //                           error: s.newError,
+  //                         ),
+  //                         const SizedBox(height: 10),
+  //                         floatingPasswordField(
+  //                           label: 'Confirm password',
+  //                           controller: s.confirmPwC,
+  //                           touched: s.confirmTouched,
+  //                           error: s.confirmError,
+  //                         ),
+  //                         const SizedBox(height: 16),
+  //                         Row(
+  //                           children: [
+  //                             Expanded(
+  //                               child: ElevatedButton(
+  //                                 onPressed: s.isResetLoading
+  //                                     ? null
+  //                                     : () {
+  //                                         Navigator.of(sheetCtx).maybePop();
+  //                                       },
+  //                                 child: const Text('Cancel'),
+  //                               ),
+  //                             ),
+  //                             const SizedBox(width: 12),
+  //                             Expanded(
+  //                               child: ElevatedButton(
+  //                                 onPressed: s.canSubmitReset
+  //                                     ? () async {
+  //                                         print("Resetting password...");
+  //                                         final result = await controller
+  //                                             .resetPassword();
+  //                                         result.fold(
+  //                                           (err) {
+  //                                             // Keep sheet open, show error
+  //                                             AppSnackBar.show(
+  //                                               sheetCtx,
+  //                                               message: err,
+  //                                               type: AppSnackBarType.error,
+  //                                               icon: Icons.error_outline,
+  //                                             );
+  //                                           },
+  //                                           (ok) {
+  //                                             // Success: close and show success
+  //                                             Navigator.of(sheetCtx).pop();
+  //                                             AppSnackBar.show(
+  //                                               context, // parent scaffold context
+  //                                               message:
+  //                                                   'Password reset successfully',
+  //                                               type: AppSnackBarType.success,
+  //                                               icon:
+  //                                                   Icons.check_circle_outline,
+  //                                             );
+  //                                             state.resetResetForm();
+  //                                           },
+  //                                         );
+  //                                       }
+  //                                     : null, // disabled until valid
+  //                                 child: s.isResetLoading
+  //                                     ? const SizedBox(
+  //                                         width: 18,
+  //                                         height: 18,
+  //                                         child: CircularProgressIndicator(
+  //                                           strokeWidth: 2,
+  //                                         ),
+  //                                       )
+  //                                     : const Text('Reset'),
+  //                               ),
+  //                             ),
+  //                           ],
+  //                         ),
+  //                         const SizedBox(height: 16),
+  //                       ],
+  //                     );
+  //                   },
+  //                 ),
+  //               ),
+  //             );
+  //           },
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+  // In your ProfilePage State class:
+  // 1) Accept a context that is UNDER the provider
+  // Call this with a provider-scoped BuildContext (e.g., inside Consumer builder)
+  void _showResetPasswordGlassDialog(BuildContext providerCtx) {
+    showDialog(
+      context: providerCtx,
+      barrierDismissible: false, // do not close on outside tap
+      barrierLabel: 'Dismiss',
+      barrierColor: Colors.black26, // subtle dim
+      // transitionDuration: const Duration(milliseconds: 250),
+      useRootNavigator: false, // keep under same navigator/provider subtree
+      builder: (dialogCtx) {
+        final mq = MediaQuery.of(dialogCtx);
+        final bottomInset = mq.viewInsets.bottom;
+
+        // In your dialog/widget code
+        Widget floatingPasswordField({
+          required String label,
+          required TextEditingController controller,
+          required FocusNode focusNode,
+          required bool touched,
+          required String? error,
+          TextInputAction action = TextInputAction.next,
+          VoidCallback? onSubmitted,
+        }) {
+          // Mirrors FloatingLabelBehavior.auto: floats on focus or when has text
+          final bool isFloating =
+              focusNode.hasFocus || controller.text.isNotEmpty;
+          final Color fill = isFloating ? Colors.transparent : Colors.white;
+
+          return TextFormField(
+            key: ValueKey(label),
+            controller: controller,
+            focusNode: focusNode,
+            obscureText: true,
+            obscuringCharacter: '•',
+            enableSuggestions: false,
+            autocorrect: false,
+            textInputAction: action,
+            onFieldSubmitted: (_) => onSubmitted?.call(),
+            decoration: InputDecoration(
+              labelText: label, // label inside initially [web:60]
+              hintText: label, // optional hint [web:60]
+              floatingLabelBehavior:
+                  FloatingLabelBehavior.auto, // float on focus/text [web:59]
+              filled: true, // enable background fill [web:60]
+              fillColor:
+                  fill, // white when idle/empty, transparent when floating [web:122]
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 14,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: Colors.black),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: Colors.grey.shade300, width: 1.2),
+              ),
+              errorText: touched
+                  ? error
+                  : null, // Material error handling [web:60]
+            ),
+          );
+        }
+
+        // Provide state above the entire dialog so both content and actions can read it
+        return ChangeNotifierProvider<ProfileState>.value(
+          value: state,
+          child: Padding(
+            // Lift the dialog above the keyboard to avoid overflow
+            padding: EdgeInsets.only(bottom: bottomInset),
+            child: Dialog(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              insetPadding: EdgeInsets.symmetric(
+                horizontal: (3 * 31 * mq.size.width) / (402 * 2),
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Glass background layer (non-interactive)
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: LiquidGlass(
+                        shape: LiquidRoundedSuperellipse(
+                          borderRadius: Radius.circular(20),
+                        ),
+                        settings: const LiquidGlassSettings(
+                          thickness: 10,
+                          blur: 20,
+                          chromaticAberration: 0.01,
+                          lightAngle: pi * 5 / 18,
+                          lightIntensity: 0.5,
+                          refractiveIndex: 10,
+                          saturation: 1,
+                          lightness: 1,
+                        ),
+                        child: const SizedBox.expand(),
+                      ),
+                    ),
+                  ),
+
+                  // Foreground card with content
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 520),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Material(
+                        color: Colors.white.withOpacity(0.15),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.3),
+                            ),
+                          ),
+                          child: SafeArea(
+                            top: false,
+                            child: Consumer<ProfileState>(
+                              builder: (c, s, _) => SingleChildScrollView(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Text(
+                                      'Reset Password',
+                                      style: Theme.of(
+                                        dialogCtx,
+                                      ).textTheme.titleLarge,
+                                    ),
+                                    const SizedBox(height: 12),
+
+                                    floatingPasswordField(
+                                      label: 'Old password',
+                                      controller: s.oldPwC,
+                                      focusNode: s.oldPwFn,
+                                      touched: s.oldTouched,
+                                      error: s.oldError,
+                                      onSubmitted: () => FocusScope.of(
+                                        dialogCtx,
+                                      ).requestFocus(s.newPwFn),
+                                    ),
+                                    const SizedBox(height: 10),
+
+                                    floatingPasswordField(
+                                      label: 'New password',
+                                      controller: s.newPwC,
+                                      focusNode: s.newPwFn,
+                                      touched: s.newTouched,
+                                      error: s.newError,
+                                      onSubmitted: () => FocusScope.of(
+                                        dialogCtx,
+                                      ).requestFocus(s.confirmPwFn),
+                                    ),
+                                    const SizedBox(height: 10),
+
+                                    floatingPasswordField(
+                                      label: 'Confirm password',
+                                      controller: s.confirmPwC,
+                                      focusNode: s.confirmPwFn,
+                                      touched: s.confirmTouched,
+                                      error: s.confirmError,
+                                      action: TextInputAction.done,
+                                      onSubmitted: () =>
+                                          FocusScope.of(dialogCtx).unfocus(),
+                                    ),
+
+                                    const SizedBox(height: 16),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: OutlinedButton(
+                                            onPressed: s.isResetLoading
+                                                ? null
+                                                : () => Navigator.of(
+                                                    dialogCtx,
+                                                  ).maybePop(),
+                                            child: const Text('Cancel'),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: ElevatedButton(
+                                            onPressed: s.canSubmitReset
+                                                ? () async {
+                                                    final result = await controller
+                                                        .resetPassword(); // token handled internally
+                                                    result.fold(
+                                                      (err) {
+                                                        AppSnackBar.show(
+                                                          providerCtx, // parent scaffold context
+                                                          message: err,
+                                                          type: AppSnackBarType
+                                                              .error,
+                                                          icon: Icons
+                                                              .error_outline,
+                                                        );
+                                                      },
+                                                      (ok) {
+                                                        Navigator.of(
+                                                          dialogCtx,
+                                                        ).pop();
+                                                        AppSnackBar.show(
+                                                          providerCtx,
+                                                          message:
+                                                              'Password reset successfully',
+                                                          type: AppSnackBarType
+                                                              .success,
+                                                          icon: Icons
+                                                              .check_circle_outline,
+                                                        );
+                                                        s.resetResetForm();
+                                                      },
+                                                    );
+                                                  }
+                                                : null,
+                                            child: s.isResetLoading
+                                                ? const SizedBox(
+                                                    width: 18,
+                                                    height: 18,
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                          strokeWidth: 2,
+                                                        ),
+                                                  )
+                                                : const Text('Reset'),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -193,8 +622,8 @@ class _ProfilePageState extends State<ProfilePage>
                                           color: Colors.white,
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black.withOpacity(
-                                                0.06,
+                                              color: Colors.black.withAlpha(
+                                                (0.06 * 225).toInt(),
                                               ),
                                               blurRadius: 8,
                                               offset: const Offset(0, 3),
@@ -274,8 +703,47 @@ class _ProfilePageState extends State<ProfilePage>
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
+                                  const SizedBox(height: 8),
 
-                                  const SizedBox(height: 16),
+                                  // ...inside the non-loading Column, just before:
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: ElevatedButton.icon(
+                                          icon: const Icon(Icons.lock_reset),
+                                          label: const Text('Reset pwd'),
+                                          style: ButtonStyle(
+                                            backgroundColor:
+                                                WidgetStateProperty.all(
+                                                  Colors.blue,
+                                                ),
+                                          ),
+                                          onPressed: () {
+                                            _showResetPasswordGlassDialog(
+                                              context,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: ElevatedButton.icon(
+                                          style: ButtonStyle(
+                                            backgroundColor:
+                                                WidgetStateProperty.all(
+                                                  Colors.red,
+                                                ),
+                                          ),
+
+                                          icon: const Icon(Icons.logout),
+                                          label: const Text('Logout'),
+                                          onPressed: () async {},
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  const SizedBox(height: 8),
                                   const Divider(),
                                   const SizedBox(height: 8),
 

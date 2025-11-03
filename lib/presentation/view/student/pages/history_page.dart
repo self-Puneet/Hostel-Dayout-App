@@ -199,7 +199,9 @@ class HistoryListView extends StatelessWidget {
               final key = monthKeys[index];
               final items = grouped[key]!;
               return Padding(
-                padding: EdgeInsets.symmetric(horizontal: padding),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 31 * mediaQuery.size.width / 402,
+                ),
                 child: MonthGroupCard(
                   monthTitle: key,
                   requests: items,
