@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:get/instance_manager.dart';
+import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/presentation/components/simple_action_request_card.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
@@ -8,6 +10,7 @@ import 'package:hostel_mgmt/presentation/view/warden/state/warden_history_state.
 import 'package:hostel_mgmt/presentation/view/warden/controller/warden_history_controller.dart';
 import 'package:hostel_mgmt/presentation/widgets/no_request_card.dart';
 import 'package:hostel_mgmt/presentation/widgets/segmented_scrollable_tab_view.dart';
+import 'package:hostel_mgmt/presentation/widgets/welcome_header.dart';
 import 'package:intl/intl.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'package:provider/provider.dart';
@@ -412,269 +415,314 @@ class _WardenHistoryPageState extends State<WardenHistoryPage>
     final tabLabels = WardenHistoryTab.values.map((t) => t.label).toList();
     final height = 84 + MediaQuery.of(context).viewPadding.bottom;
     final textTheme = Theme.of(context).textTheme;
+    final loginSession = Get.find<LoginSession>();
+    final topGap = media.size.height * 50 / 874;
 
-    return RefreshIndicator(
-      triggerMode: RefreshIndicatorTriggerMode.anywhere,
-      color: Colors.black,
-      backgroundColor: Colors.white,
-      notificationPredicate: (notification) =>
-          notification.metrics.axis == Axis.vertical && notification.depth > 0,
-      strokeWidth: 3,
-      displacement: 60,
-      onRefresh: () async {
-        state.resetForHostelChange();
-        await controller.fetchRequestsFromApi();
-      },
-      child: Column(
-        children: [
-          Padding(
-            padding: horizontalPad,
-            child: TextField(
-              controller: state.filterController,
-              decoration: InputDecoration(
-                hintText: 'Search by Name',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                isDense: true,
-              ),
-            ),
+    return Column(
+      children: [
+        SizedBox(height: topGap),
+
+        Container(
+          margin: horizontalPad,
+          child: WelcomeHeader(
+            enrollmentNumber: loginSession.identityId,
+            phoneNumber: loginSession.phone,
+            actor: loginSession.role,
+            hostelName: loginSession.hostels!
+                .map((h) => h.hostelName)
+                .toList()
+                .join('\n'),
+            name: loginSession.username,
+            avatarUrl: loginSession.imageURL,
+            greeting: 'Welcome back,',
           ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: horizontalPad,
-            child: Row(
+        ),
+
+        const SizedBox(height: 20),
+        Expanded(
+          // <-- give bounded height to the scrollable area
+          child: RefreshIndicator(
+            triggerMode: RefreshIndicatorTriggerMode.anywhere,
+            color: Colors.black,
+            backgroundColor: Colors.white,
+            notificationPredicate: (notification) =>
+                notification.metrics.axis == Axis.vertical &&
+                notification.depth > 0,
+            strokeWidth: 3,
+            displacement: 60,
+            onRefresh: () async {
+              state.resetForHostelChange();
+              await controller.fetchRequestsFromApi();
+            },
+            child: Column(
               children: [
-                Expanded(
-                  flex: 1,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.blueGrey, width: 1.1),
-                      // boxShadow: const [
-                      //   BoxShadow(
-                      //     color: Colors.black12,
-                      //     blurRadius: 6,
-                      //     offset: Offset(0, 2),
-                      //   ),
-                      // ],
+                Padding(
+                  padding: horizontalPad,
+                  child: TextField(
+                    controller: state.filterController,
+                    decoration: InputDecoration(
+                      hintText: 'Search by Name',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      isDense: true,
                     ),
-                    child: hostelWidget(state),
                   ),
                 ),
-                const SizedBox(width: 10),
-
-                // Month-Year Picker and Show widget
-                Expanded(
-                  flex: 1,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final state = context.read<WardenHistoryState>();
-                      final result = await showMonthYearWheelPickerLWSV(
-                        context,
-                        initialMonth: state.selectedMonth,
-                        initialYear: state.selectedYear,
-                      );
-                      if (result != null) {
-                        final (month, year) = result;
-                        state.setMonthYear(month, year);
-                        state.resetForHostelChange();
-                        await controller.fetchRequestsFromApi(
-                          monthYear: DateTime(year, month),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      side: const BorderSide(
-                        color: Colors.blueGrey,
-                        width: 1.1,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      elevation: 0,
-                    ),
-                    child: Row(
-                      // mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsetsGeometry.fromLTRB(10, 0, 0, 0),
-                          child: Icon(
-                            Icons.calendar_month_rounded,
-                            color: Colors.blueGrey,
-                            size: 18,
+                const SizedBox(height: 12),
+                Padding(
+                  padding: horizontalPad,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.blueGrey,
+                              width: 1.1,
+                            ),
+                            // boxShadow: const [
+                            //   BoxShadow(
+                            //     color: Colors.black12,
+                            //     blurRadius: 6,
+                            //     offset: Offset(0, 2),
+                            //   ),
+                            // ],
                           ),
+                          child: hostelWidget(state),
                         ),
-                        // const SizedBox(width: 8),
-                        Expanded(
-                          child: Center(
-                            child: Text(
-                              DateFormat('MMMM yyyy', 'en_US').format(
-                                DateTime(
-                                  state.selectedYear,
-                                  state.selectedMonth,
+                      ),
+                      const SizedBox(width: 10),
+
+                      // Month-Year Picker and Show widget
+                      Expanded(
+                        flex: 1,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            final state = context.read<WardenHistoryState>();
+                            final result = await showMonthYearWheelPickerLWSV(
+                              context,
+                              initialMonth: state.selectedMonth,
+                              initialYear: state.selectedYear,
+                            );
+                            if (result != null) {
+                              final (month, year) = result;
+                              state.setMonthYear(month, year);
+                              state.resetForHostelChange();
+                              await controller.fetchRequestsFromApi(
+                                monthYear: DateTime(year, month),
+                              );
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: const BorderSide(
+                              color: Colors.blueGrey,
+                              width: 1.1,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            elevation: 0,
+                          ),
+                          child: Row(
+                            // mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsetsGeometry.fromLTRB(
+                                  10,
+                                  0,
+                                  0,
+                                  0,
+                                ),
+                                child: Icon(
+                                  Icons.calendar_month_rounded,
+                                  color: Colors.blueGrey,
+                                  size: 18,
                                 ),
                               ),
-                              style: textTheme.h6.copyWith(
-                                color: Colors.blueGrey,
-                                fontWeight: FontWeight.w600,
+                              // const SizedBox(width: 8),
+                              Expanded(
+                                child: Center(
+                                  child: Text(
+                                    DateFormat('MMMM yyyy', 'en_US').format(
+                                      DateTime(
+                                        state.selectedYear,
+                                        state.selectedMonth,
+                                      ),
+                                    ),
+                                    style: textTheme.h6.copyWith(
+                                      color: Colors.blueGrey,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
+                ),
+                const SizedBox(height: 6),
+                Padding(
+                  padding: horizontalPad,
+                  child: SegmentedTabs(
+                    controller: _tabs,
+                    labels: tabLabels,
+                    scrollable: false,
+                  ),
+                ),
+                Padding(
+                  padding: horizontalPad,
+                  child: Divider(
+                    height: 0,
+                    thickness: 2,
+                    color: Colors.grey.shade300,
+                  ),
+                ),
+                // Tab Content
+                Expanded(
+                  child: (state.isLoading && !state.hasData)
+                      // true
+                      ? Padding(
+                          padding:
+                              horizontalPad +
+                              const EdgeInsets.symmetric(
+                                horizontal: 0,
+                                vertical: 8,
+                              ),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: List.generate(2, (index) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 8,
+                                  ),
+                                  child: simpleActionRequestCardSkeleton(),
+                                );
+                              }),
+                            ),
+                          ),
+                        )
+                      : TabBarView(
+                          controller: _tabs,
+                          physics: const NeverScrollableScrollPhysics(),
+                          children: WardenHistoryTab.values.map((tab) {
+                            final result = controller.getRequestsForTab(
+                              widget.actor,
+                              tab,
+                            );
+
+                            if (state.isErrored) {
+                              // return Center(
+                              //   child: Text('Error: ${state.errorMessage}'),
+                              // );
+                              final q = state.filterController.text.trim();
+                              return LayoutBuilder(
+                                builder: (context, constraints) =>
+                                    SingleChildScrollView(
+                                      physics:
+                                          const AlwaysScrollableScrollPhysics(),
+                                      child: ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          minHeight: constraints.maxHeight,
+                                        ),
+                                        child: Center(
+                                          child: EmptyQueueCard(
+                                            title: q.isEmpty
+                                                ? 'Your queue is empty.'
+                                                : 'No matches found.',
+                                            subtitle: q.isEmpty
+                                                ? 'All clear! No requests for now.'
+                                                : 'Try refining your search.',
+                                            minHeight: 280,
+                                            bottomPadding:
+                                                height, // already added via padding
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                              );
+                            }
+
+                            if (result.isEmpty) {
+                              final q = state.filterController.text.trim();
+                              return LayoutBuilder(
+                                builder: (context, constraints) =>
+                                    SingleChildScrollView(
+                                      physics:
+                                          const AlwaysScrollableScrollPhysics(),
+                                      child: ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          minHeight: constraints.maxHeight,
+                                        ),
+                                        child: Center(
+                                          child: EmptyQueueCard(
+                                            title: q.isEmpty
+                                                ? 'Your queue is empty.'
+                                                : 'No matches found.',
+                                            subtitle: q.isEmpty
+                                                ? 'All clear! No requests for now.'
+                                                : 'Try refining your search.',
+                                            minHeight: 280,
+                                            bottomPadding:
+                                                height, // already added via padding
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                              );
+                            }
+
+                            return ListView.separated(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: EdgeInsets.fromLTRB(0, 16, 0, height),
+                              itemCount: result.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(height: 10),
+                              itemBuilder: (context, i) {
+                                final wrap = result[i];
+                                final req = wrap.request;
+                                final stu = wrap.student;
+                                final safeName = stu.name.isEmpty
+                                    ? 'Unknown'
+                                    : stu.name;
+
+                                return Padding(
+                                  padding: horizontalPad,
+                                  child: SimpleActionRequestCard(
+                                    overflowStatusTag: true,
+                                    reason: req.reason,
+                                    name: safeName,
+                                    status: req.status,
+                                    leaveType: req.requestType,
+                                    fromDate: req.appliedFrom,
+                                    toDate: req.appliedTo,
+                                    profileImageUrl: stu.profilePic,
+                                    isAcceptence: false,
+                                    isLate: false,
+                                    isRejection: false,
+                                  ),
+                                );
+                              },
+                            );
+                          }).toList(),
+                        ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 6),
-          Padding(
-            padding: horizontalPad,
-            child: SegmentedTabs(
-              controller: _tabs,
-              labels: tabLabels,
-              scrollable: false,
-            ),
-          ),
-          Padding(
-            padding: horizontalPad,
-            child: Divider(
-              height: 0,
-              thickness: 2,
-              color: Colors.grey.shade300,
-            ),
-          ),
-          // Tab Content
-          Expanded(
-            child: (state.isLoading && !state.hasData)
-                // true
-                ? Padding(
-                    padding:
-                        horizontalPad +
-                        const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: List.generate(2, (index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: simpleActionRequestCardSkeleton(),
-                          );
-                        }),
-                      ),
-                    ),
-                  )
-                : TabBarView(
-                    controller: _tabs,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: WardenHistoryTab.values.map((tab) {
-                      final result = controller.getRequestsForTab(
-                        widget.actor,
-                        tab,
-                      );
-
-                      if (state.isErrored) {
-                        // return Center(
-                        //   child: Text('Error: ${state.errorMessage}'),
-                        // );
-                        final q = state.filterController.text.trim();
-                        return LayoutBuilder(
-                          builder: (context, constraints) =>
-                              SingleChildScrollView(
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                child: ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                    minHeight: constraints.maxHeight,
-                                  ),
-                                  child: Center(
-                                    child: EmptyQueueCard(
-                                      title: q.isEmpty
-                                          ? 'Your queue is empty.'
-                                          : 'No matches found.',
-                                      subtitle: q.isEmpty
-                                          ? 'All clear! No requests for now.'
-                                          : 'Try refining your search.',
-                                      minHeight: 280,
-                                      bottomPadding:
-                                          height, // already added via padding
-                                    ),
-                                  ),
-                                ),
-                              ),
-                        );
-                      }
-
-                      if (result.isEmpty) {
-                        final q = state.filterController.text.trim();
-                        return LayoutBuilder(
-                          builder: (context, constraints) =>
-                              SingleChildScrollView(
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                child: ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                    minHeight: constraints.maxHeight,
-                                  ),
-                                  child: Center(
-                                    child: EmptyQueueCard(
-                                      title: q.isEmpty
-                                          ? 'Your queue is empty.'
-                                          : 'No matches found.',
-                                      subtitle: q.isEmpty
-                                          ? 'All clear! No requests for now.'
-                                          : 'Try refining your search.',
-                                      minHeight: 280,
-                                      bottomPadding:
-                                          height, // already added via padding
-                                    ),
-                                  ),
-                                ),
-                              ),
-                        );
-                      }
-
-                      return ListView.separated(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: EdgeInsets.fromLTRB(0, 16, 0, height),
-                        itemCount: result.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
-                        itemBuilder: (context, i) {
-                          final wrap = result[i];
-                          final req = wrap.request;
-                          final stu = wrap.student;
-                          final safeName = stu.name.isEmpty
-                              ? 'Unknown'
-                              : stu.name;
-
-                          return Padding(
-                            padding: horizontalPad,
-                            child: SimpleActionRequestCard(
-                              overflowStatusTag: true,
-                              reason: req.reason,
-                              name: safeName,
-                              status: req.status,
-                              leaveType: req.requestType,
-                              fromDate: req.appliedFrom,
-                              toDate: req.appliedTo,
-                              profileImageUrl: stu.profilePic,
-                              isAcceptence: false,
-                              isLate: false,
-                              isRejection: false,
-                            ),
-                          );
-                        },
-                      );
-                    }).toList(),
-                  ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

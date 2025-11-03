@@ -13,7 +13,6 @@ import 'package:hostel_mgmt/presentation/view/parent/pages/parent_profile_page.d
 import 'package:hostel_mgmt/presentation/view/parent/state/parent_state.dart';
 import 'package:hostel_mgmt/presentation/view/student/pages/request_page.dart';
 import 'package:hostel_mgmt/presentation/view/warden/controller/warden_home_controller.dart';
-import 'package:hostel_mgmt/presentation/view/warden/controller/warden_profile_controller.dart';
 import 'package:hostel_mgmt/presentation/view/warden/pages/warden_action_page.dart';
 import 'package:hostel_mgmt/presentation/view/warden/pages/warden_history_page.dart';
 import 'package:hostel_mgmt/presentation/view/warden/pages/warden_home_page.dart';
@@ -77,9 +76,9 @@ String? _initialRoute() {
 
   switch (role) {
     case TimelineActor.student:
-      return AppRoutes.profile;
+      return AppRoutes.studentHome;
     case TimelineActor.assistentWarden:
-      return AppRoutes.wardenActionPage;
+      return AppRoutes.wardenProfile;
     case TimelineActor.seniorWarden:
       return AppRoutes.wardenActionPage;
     case TimelineActor.parent:
@@ -187,6 +186,22 @@ class AppRouter {
                   child: ChangeNotifierProvider(
                     create: (_) => WardenProfileState(),
                     child: WardenProfilePage(),
+                  ),
+                );
+              },
+            ),
+
+            // warden history page route
+            GoRoute(
+              path: AppRoutes.wardenHistory, // e.g., '/warden/history'
+              name: AppRoutes.wardenHistory,
+              pageBuilder: (context, state) {
+                final loginSession = Get.find<LoginSession>();
+                return AppTransitionPage(
+                  key: state.pageKey,
+                  child: ChangeNotifierProvider(
+                    create: (_) => WardenHistoryState(),
+                    child: WardenHistoryPage(actor: loginSession.role),
                   ),
                 );
               },

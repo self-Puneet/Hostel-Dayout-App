@@ -8,7 +8,7 @@ import 'package:hostel_mgmt/presentation/animation/layout_navbar_action_animatio
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_action_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_layout_state.dart';
 import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/glass_nav_bar.dart';
-import 'package:hostel_mgmt/presentation/widgets/welcome_header.dart';
+// import 'package:hostel_mgmt/presentation/widgets/welcome_header.dart';
 import 'package:provider/provider.dart';
 import 'package:dartz/dartz.dart';
 import '../../../components/glass_shell.dart';
@@ -29,10 +29,10 @@ class WardenLayout extends StatelessWidget {
     final showBarArea = !isKeyboardOpen;
     final double barBottomOffset = bottomSafe + 12;
 
-    final horizontalPad = EdgeInsets.symmetric(
-      horizontal: 31 * media.size.width / 402,
-    );
-    final double headerTop = media.size.height * 50 / 874;
+    // final horizontalPad = EdgeInsets.symmetric(
+    //   horizontal: 31 * media.size.width / 402,
+    // );
+    // final double headerTop = media.size.height * 50 / 874;
 
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
@@ -52,31 +52,8 @@ class WardenLayout extends StatelessWidget {
                 children: [
                   // Content
                   Positioned.fill(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: headerTop),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: horizontalPad,
-                            child: WelcomeHeader(
-                              enrollmentNumber: state.loginSession.identityId,
-                              phoneNumber: state.loginSession.phone,
-                              actor: actor,
-                              hostelName: state.loginSession.hostels!
-                                  .map((h) => h.hostelName)
-                                  .toList()
-                                  .join('\n'),
-                              name: state.loginSession.username,
-                              avatarUrl: state.loginSession.imageURL,
-                              greeting: 'Welcome back,',
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Expanded(child: child),
-                        ],
-                      ),
-                    ),
+                    child:
+                        child, // Let the page fully control top spacing like the student page
                   ),
 
                   // Floating bar area (nav bar or actions overlay)
@@ -115,80 +92,6 @@ class WardenLayout extends StatelessWidget {
                                         ],
                                       );
                                     },
-                                // child: state.showActionOverlay
-                                //     ? Consumer<WardenActionState>(
-                                //         builder: (context, actionState, _) {
-                                //           return BulkActionsBar(
-                                //             key: const ValueKey('bulk-actions'),
-                                //             actor: actor,
-                                //             isActioning:
-                                //                 actionState.isActioning,
-                                //             hasSelection:
-                                //                 actionState.hasSelection,
-                                //             onLeftPressed: () async {
-                                //               final action =
-                                //                   actor ==
-                                //                       TimelineActor
-                                //                           .assistentWarden
-                                //                   ? RequestAction.cancel
-                                //                   : RequestAction.reject;
-                                //               await actionState
-                                //                   .triggerBulkAction(
-                                //                     action: action,
-                                //                   );
-                                //             },
-                                //             onRightPressed: () async {
-                                //               final action =
-                                //                   actor ==
-                                //                       TimelineActor
-                                //                           .assistentWarden
-                                //                   ? RequestAction.refer
-                                //                   : RequestAction.approve;
-                                //               await actionState
-                                //                   .triggerBulkAction(
-                                //                     action: action,
-                                //                   );
-                                //             },
-                                //             borderRadius: _barRadius,
-                                //             aspectRatio: _barAspect,
-                                //           );
-                                //         },
-                                //       )
-                                //     : LiquidGlassNavBar(
-                                //   onHomePressed: () => context.goNamed(
-                                //     (actor == TimelineActor.seniorWarden)
-                                //         ? AppRoutes.wardenHome
-                                //         : AppRoutes.wardenHome,
-                                //   ),
-                                //   onNewPressed: () => context.goNamed(
-                                //     AppRoutes.wardenActionPage,
-                                //   ),
-                                //   onProfilePressed: () => context.goNamed(
-                                //     AppRoutes.wardenHistory,
-                                //   ),
-                                //   rightIcon: Right(
-                                //     Icon(
-                                //       Icons.history,
-                                //       size: 34,
-                                //       color: Colors.black,
-                                //     ),
-                                //   ),
-                                //   leftIcon: Left(
-                                //     Image.asset(
-                                //       'assets/home.png',
-                                //       width: 34,
-                                //       height: 34,
-                                //     ),
-                                //   ),
-                                //   middleIcon: Right(
-                                //     Icon(
-                                //       Icons.playlist_add_check_outlined,
-                                //       size: 34,
-                                //       color: Colors.white,
-                                //     ),
-                                //   ),
-                                //   middleText: "REQ",
-                                // ),
                                 child: SequencedBarSwitcher(
                                   showBulk: state.showActionOverlay,
                                   slideDuration: const Duration(

@@ -59,13 +59,13 @@ class WelcomeHeader extends StatelessWidget {
                   avatarUrl: avatarUrl,
                   onEditProfile: () {
                     // go route for AppRoutes.profile
-                    // context.go(
-                    //   (actor == TimelineActor.assistentWarden ||
-                    //           actor == TimelineActor.seniorWarden)
-                    //       ? AppRoutes.wardenProfile
-                    //       : AppRoutes.profile,
-                    // );
-                    context.go(AppRoutes.wardenProfile);
+                    context.go(
+                      (actor == TimelineActor.assistentWarden ||
+                              actor == TimelineActor.seniorWarden)
+                          ? AppRoutes.wardenProfile
+                          : AppRoutes.profile,
+                    );
+                    // context.go(AppRoutes.wardenProfile);
                     Navigator.pop(context);
                     debugPrint("Edit Profile clicked");
                   },

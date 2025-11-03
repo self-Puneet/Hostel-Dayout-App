@@ -204,6 +204,11 @@ class _WardenProfilePageState extends State<WardenProfilePage>
                                                               .resetPassword();
                                                       result.fold(
                                                         (err) {
+                                                          // Use the parent/provider context (page's scaffold)
+                                                          // instead of the dialog's context. Looking up
+                                                          // ancestors on the dialog context can fail if
+                                                          // the dialog is being disposed, causing the
+                                                          // "deactivated widget's ancestor" error.
                                                           AppSnackBar.show(
                                                             providerCtx,
                                                             message: err,
@@ -232,6 +237,45 @@ class _WardenProfilePageState extends State<WardenProfilePage>
                                                         },
                                                       );
                                                     },
+
+                                                    // Inside onPressed -> result.fold(...)
+                                                    //   (err) {
+                                                    //     // Use a stable, scaffold-owned context, not dialogCtx.
+                                                    //     AppSnackBar.show(
+                                                    //       providerCtx,
+                                                    //       message: err,
+                                                    //       type:
+                                                    //           AppSnackBarType
+                                                    //               .error,
+                                                    //       icon: Icons
+                                                    //           .error_outline,
+                                                    //     );
+                                                    //   },
+
+                                                    //   (ok) {
+                                                    //     Navigator.of(
+                                                    //       dialogCtx,
+                                                    //     ).pop();
+                                                    //     // Defer to the next frame to avoid ancestor lookup during route removal.
+                                                    //     WidgetsBinding
+                                                    //         .instance
+                                                    //         .addPostFrameCallback((
+                                                    //           _,
+                                                    //         ) {
+                                                    //           AppSnackBar.show(
+                                                    //             providerCtx,
+                                                    //             message:
+                                                    //                 'Password reset successfully',
+                                                    //             type: AppSnackBarType
+                                                    //                 .success,
+                                                    //             icon: Icons
+                                                    //                 .check_circle_outline,
+                                                    //           );
+                                                    //         });
+                                                    //     s.resetResetForm();
+                                                    //   },
+                                                    // );
+                                                    // },
                                                     child: const Text('Reset'),
                                                   ),
                                           ),
@@ -298,6 +342,9 @@ class _WardenProfilePageState extends State<WardenProfilePage>
               child: CustomScrollView(
                 slivers: [
                   SliverPadding(
+                    // removed top padding here because the parent layout (WardenLayout)
+                    // already offsets its child by a headerTop. Having both adds an
+                    // extra gap above the content. Keep horizontal padding only.
                     padding: EdgeInsets.only(
                       left: 25 * mediaQuery.width / 402,
                       right: 31 * mediaQuery.width / 402,
@@ -374,7 +421,7 @@ class _WardenProfilePageState extends State<WardenProfilePage>
                                         : null,
                                   ),
 
-                                  const SizedBox(height: 12),
+                                  const SizedBox(height: 120),
 
                                   // Name and email
                                   Text(

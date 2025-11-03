@@ -482,24 +482,24 @@ class _ProfilePageState extends State<ProfilePage>
                                               ),
                                             ],
                                           ),
-                                          child: state.isUploadingPic
-                                              ? CircularProgressIndicator(
-                                                  strokeWidth: 2,
-                                                  color: Colors.white,
-                                                )
-                                              : IconButton(
-                                                  icon: const Icon(
+                                          child: IconButton(
+                                            icon: state.isUploadingPic
+                                                ? const Icon(
+                                                    Icons.cloud_upload,
+                                                    size: 16,
+                                                    color: Colors.white,
+                                                  )
+                                                : const Icon(
                                                     Icons.camera_alt_outlined,
                                                     size: 16,
                                                     color: Colors.white,
                                                   ),
-                                                  onPressed:
-                                                      state.isUploadingPic
-                                                      ? null
-                                                      : _showPickSheet,
-                                                  padding: EdgeInsets.zero,
-                                                  constraints: BoxConstraints(),
-                                                ),
+                                            onPressed: state.isUploadingPic
+                                                ? null
+                                                : _showPickSheet,
+                                            padding: EdgeInsets.zero,
+                                            constraints: BoxConstraints(),
+                                          ),
                                         ),
                                       ),
                                     ],
