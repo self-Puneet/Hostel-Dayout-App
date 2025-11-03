@@ -291,27 +291,29 @@ class _GlassWardenRoleBarState extends State<GlassWardenRoleBar>
         children: [
           // Glass background
           Positioned.fill(
-            child: LiquidGlass(
-              shape: LiquidRoundedSuperellipse(
-                borderRadius: BorderRadius.circular(40).topLeft,
-              ),
-              settings: const LiquidGlassSettings(
-                thickness: 10,
-                blur: 0,
-                chromaticAberration: 0.01,
-                lightAngle: pi * 5 / 18,
-                lightIntensity: 0.5,
-                refractiveIndex: 1.4,
-                saturation: 1,
-                lightness: 1,
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(40),
-                  color: Colors.white.withOpacity(0.14),
+            child:
+                // LiquidGlass(
+                //   shape: LiquidRoundedSuperellipse(
+                //     borderRadius: BorderRadius.circular(40).topLeft,
+                //   ),
+                //   settings: const LiquidGlassSettings(
+                //     thickness: 10,
+                //     blur: 0,
+                //     chromaticAberration: 0.01,
+                //     lightAngle: pi * 5 / 18,
+                //     lightIntensity: 0.5,
+                //     refractiveIndex: 1.4,
+                //     saturation: 1,
+                //     lightness: 1,
+                //   ),
+                //   child:
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(40),
+                    color: Colors.white.withOpacity(0.14),
+                  ),
                 ),
-              ),
-            ),
+            // ),
           ),
 
           // Segmented control only (no TabBarView)

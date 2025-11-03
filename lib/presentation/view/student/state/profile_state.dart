@@ -24,42 +24,44 @@ class ProfileState extends ChangeNotifier {
   String? newError;
   String? confirmError;
 
+  // Network/request loading for reset API
   bool isResetLoading = false;
 
-    // Persisted focus nodes to avoid IME flicker on rebuild
+  // Persisted focus nodes to avoid IME flicker on rebuild
   final FocusNode oldPwFn = FocusNode();
   final FocusNode newPwFn = FocusNode();
   final FocusNode confirmPwFn = FocusNode();
-
 
   ProfileState() {
     // Real-time validation
     oldPwC.addListener(_onAnyChanged);
     newPwC.addListener(_onAnyChanged);
     confirmPwC.addListener(_onAnyChanged);
-    _validateReset();
+    validateReset();
   }
 
-  // Computed submit availability
-  bool get canSubmitReset =>
-      oldError == null &&
-      newError == null &&
-      confirmError == null &&
-      oldPwC.text.isNotEmpty &&
-      newPwC.text.isNotEmpty &&
-      confirmPwC.text.isNotEmpty &&
-      !isResetLoading;
+  // Computed submit availability (pure validation; no loading mixed in)
+  bool get canSubmitReset {
+    final old = oldPwC.text.trim();
+    final nw = newPwC.text.trim();
+    final cnf = confirmPwC.text.trim();
+    return old.isNotEmpty &&
+        nw.isNotEmpty &&
+        cnf.isNotEmpty &&
+        nw != old &&
+        cnf == nw;
+  }
 
   void _onAnyChanged() {
     // Mark touched on first input
     if (!oldTouched && oldPwC.text.isNotEmpty) oldTouched = true;
     if (!newTouched && newPwC.text.isNotEmpty) newTouched = true;
     if (!confirmTouched && confirmPwC.text.isNotEmpty) confirmTouched = true;
-    _validateReset();
-    notifyListeners();
+    validateReset();
   }
 
-  void _validateReset() {
+  // Public validation (kept explicit for controller/UI triggers)
+  void validateReset() {
     final old = oldPwC.text.trim();
     final nw = newPwC.text.trim();
     final cnf = confirmPwC.text.trim();
@@ -71,6 +73,8 @@ class ProfileState extends ChangeNotifier {
     confirmError = cnf.isEmpty
         ? 'Confirm password is required'
         : (cnf != nw ? 'Passwords do not match' : null);
+
+    notifyListeners(); // Ensure UI rebuilds
   }
 
   void setResetLoading(bool value) {
@@ -85,17 +89,47 @@ class ProfileState extends ChangeNotifier {
     oldTouched = false;
     newTouched = false;
     confirmTouched = false;
-    _validateReset();
-    notifyListeners();
+    validateReset();
   }
 
   // Existing setters
-  void setLoading(bool value) { isLoading = value; notifyListeners(); }
-  void setUploadingPic(bool value) { isUploadingPic = value; notifyListeners(); }
-  void setErrored(String message) { isErrored = true; errorMessage = message; notifyListeners(); }
-  void clearError() { isErrored = false; errorMessage = null; notifyListeners(); }
-  void setProfile(StudentProfileModel p) { profile = p; notifyListeners(); }
-  void setProfilePic(String url) { if (profile != null) { profile = profile!.copyWith(profilePic: url); notifyListeners(); } }
+  void setLoading(bool value) {
+    isLoading = value;
+    notifyListeners();
+  }
+
+  void setUploadingPic(bool value) {
+    isUploadingPic = value;
+    notifyListeners();
+  }
+
+  void setErrored(String message) {
+    isErrored = true;
+    errorMessage = message;
+    notifyListeners();
+  }
+
+  void notifyListenersAbstraction() {
+    notifyListeners();
+  }
+
+  void clearError() {
+    isErrored = false;
+    errorMessage = null;
+    notifyListeners();
+  }
+
+  void setProfile(StudentProfileModel p) {
+    profile = p;
+    notifyListeners();
+  }
+
+  void setProfilePic(String url) {
+    if (profile != null) {
+      profile = profile!.copyWith(profilePic: url);
+      notifyListeners();
+    }
+  }
 
   void clear() {
     profile = null;

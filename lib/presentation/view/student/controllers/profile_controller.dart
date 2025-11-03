@@ -48,30 +48,29 @@ class ProfileController {
   }
 
   Future<Either<String, bool>> resetPassword() async {
-    // Ensure latest validation
+    // Ensure latest validation snapshot
+    state.validateReset();
+
+    // Guard: do not proceed if invalid
+    if (!state.canSubmitReset) {
+      return left('Please fix the validation errors to continue');
+    }
+
     state.setResetLoading(true);
     try {
       final oldPassword = state.oldPwC.text.trim();
       final newPassword = state.newPwC.text.trim();
 
-      // Guard: should already be enforced by disabled button, but safe to check
-      if (!state.canSubmitReset) {
-        state.setResetLoading(false);
-        print("Validation errors present");
-        return left('Please fix the validation errors to continue');
-      }
-
-      print("Inside resetPassword method");
       final res = await AuthService.resetPassword(
         oldPassword: oldPassword,
         newPassword: newPassword,
       );
 
-      state.setResetLoading(false);
       return res;
     } catch (e) {
-      state.setResetLoading(false);
       return left('Unexpected error: $e');
+    } finally {
+      state.setResetLoading(false);
     }
   }
 }

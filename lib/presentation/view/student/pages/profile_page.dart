@@ -1,4 +1,3 @@
-// lib/presentation/view/profile/pages/profile_page.dart
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -6,10 +5,13 @@ import 'package:hostel_mgmt/core/enums/ui_eums/snackbar_type.dart';
 import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
 import 'package:hostel_mgmt/core/helpers/app_snackbar.dart';
 import 'package:hostel_mgmt/core/theme/app_theme.dart';
+import 'package:hostel_mgmt/core/theme/elevated_button_theme.dart';
+import 'package:hostel_mgmt/login/login_controller.dart';
 import 'package:hostel_mgmt/models/parent_model.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
 import 'package:hostel_mgmt/presentation/widgets/collapsing_header.dart';
 import 'package:hostel_mgmt/presentation/widgets/shimmer_box.dart';
+import 'package:hostel_mgmt/presentation/widgets/text_field.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../state/profile_state.dart';
@@ -80,181 +82,8 @@ class _ProfilePageState extends State<ProfilePage>
     );
   }
 
-  // // In ProfilePage (stateful), add this helper:
-  // void _showResetPasswordSheet() {
-  //   showModalBottomSheet(
-  //     context: context,
-  //     isScrollControlled: true,
-  //     useRootNavigator: true,
-  //     showDragHandle: true,
-  //     builder: (sheetCtx) {
-  //       return ChangeNotifierProvider<ProfileState>.value(
-  //         value: state, // reuse the same instance
-  //         child: Consumer<ProfileState>(
-  //           builder: (c, s, _) {
-  //             final viewInsets = MediaQuery.of(sheetCtx).viewInsets;
-  //             final textTheme = Theme.of(sheetCtx).textTheme;
-
-  //             return Padding(
-  //               padding: EdgeInsets.only(
-  //                 bottom: viewInsets.bottom,
-  //                 left: 16,
-  //                 right: 16,
-  //                 top: 12,
-  //               ),
-  //               child: SafeArea(
-  //                 top: false,
-  //                 child: Consumer<ProfileState>(
-  //                   builder: (context, s, _) {
-  //                     Widget floatingPasswordField({
-  //                       required String label,
-  //                       required TextEditingController controller,
-  //                       required bool touched,
-  //                       required String? error,
-  //                       FocusNode? focusNode,
-  //                       VoidCallback? onEditingComplete,
-  //                     }) {
-  //                       return TextFormField(
-  //                         controller: controller,
-  //                         focusNode: focusNode,
-  //                         obscureText: true,
-  //                         obscuringCharacter: '•',
-  //                         enableSuggestions: false,
-  //                         autocorrect: false,
-  //                         textInputAction: TextInputAction.next,
-  //                         onEditingComplete: onEditingComplete,
-  //                         decoration: InputDecoration(
-  //                           labelText: label, // label sits inside initially
-  //                           hintText: label, // optional: subtle hint text
-  //                           floatingLabelBehavior: FloatingLabelBehavior
-  //                               .auto, // floats on focus/text
-  //                           filled: true,
-  //                           fillColor: Colors.white,
-  //                           isDense: true,
-  //                           contentPadding: const EdgeInsets.symmetric(
-  //                             horizontal: 12,
-  //                             vertical: 14,
-  //                           ),
-  //                           border: OutlineInputBorder(
-  //                             borderRadius: BorderRadius.circular(10),
-  //                           ),
-  //                           enabledBorder: OutlineInputBorder(
-  //                             borderRadius: BorderRadius.circular(10),
-  //                             borderSide: BorderSide(
-  //                               color: Colors.grey.shade300,
-  //                               width: 1.2,
-  //                             ),
-  //                           ),
-  //                           errorText: touched
-  //                               ? error
-  //                               : null, // show error below when touched
-  //                         ),
-  //                       );
-  //                     }
-
-  //                     return Column(
-  //                       mainAxisSize: MainAxisSize.min,
-  //                       children: [
-  //                         const SizedBox(height: 4),
-  //                         Text('Reset Password', style: textTheme.titleLarge),
-  //                         const SizedBox(height: 12),
-  //                         floatingPasswordField(
-  //                           label: 'Old password',
-  //                           controller: s.oldPwC,
-  //                           touched: s.oldTouched,
-  //                           error: s.oldError,
-  //                         ),
-  //                         const SizedBox(height: 10),
-  //                         floatingPasswordField(
-  //                           label: 'New password',
-  //                           controller: s.newPwC,
-  //                           touched: s.newTouched,
-  //                           error: s.newError,
-  //                         ),
-  //                         const SizedBox(height: 10),
-  //                         floatingPasswordField(
-  //                           label: 'Confirm password',
-  //                           controller: s.confirmPwC,
-  //                           touched: s.confirmTouched,
-  //                           error: s.confirmError,
-  //                         ),
-  //                         const SizedBox(height: 16),
-  //                         Row(
-  //                           children: [
-  //                             Expanded(
-  //                               child: ElevatedButton(
-  //                                 onPressed: s.isResetLoading
-  //                                     ? null
-  //                                     : () {
-  //                                         Navigator.of(sheetCtx).maybePop();
-  //                                       },
-  //                                 child: const Text('Cancel'),
-  //                               ),
-  //                             ),
-  //                             const SizedBox(width: 12),
-  //                             Expanded(
-  //                               child: ElevatedButton(
-  //                                 onPressed: s.canSubmitReset
-  //                                     ? () async {
-  //                                         print("Resetting password...");
-  //                                         final result = await controller
-  //                                             .resetPassword();
-  //                                         result.fold(
-  //                                           (err) {
-  //                                             // Keep sheet open, show error
-  //                                             AppSnackBar.show(
-  //                                               sheetCtx,
-  //                                               message: err,
-  //                                               type: AppSnackBarType.error,
-  //                                               icon: Icons.error_outline,
-  //                                             );
-  //                                           },
-  //                                           (ok) {
-  //                                             // Success: close and show success
-  //                                             Navigator.of(sheetCtx).pop();
-  //                                             AppSnackBar.show(
-  //                                               context, // parent scaffold context
-  //                                               message:
-  //                                                   'Password reset successfully',
-  //                                               type: AppSnackBarType.success,
-  //                                               icon:
-  //                                                   Icons.check_circle_outline,
-  //                                             );
-  //                                             state.resetResetForm();
-  //                                           },
-  //                                         );
-  //                                       }
-  //                                     : null, // disabled until valid
-  //                                 child: s.isResetLoading
-  //                                     ? const SizedBox(
-  //                                         width: 18,
-  //                                         height: 18,
-  //                                         child: CircularProgressIndicator(
-  //                                           strokeWidth: 2,
-  //                                         ),
-  //                                       )
-  //                                     : const Text('Reset'),
-  //                               ),
-  //                             ),
-  //                           ],
-  //                         ),
-  //                         const SizedBox(height: 16),
-  //                       ],
-  //                     );
-  //                   },
-  //                 ),
-  //               ),
-  //             );
-  //           },
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-  // In your ProfilePage State class:
-  // 1) Accept a context that is UNDER the provider
-  // Call this with a provider-scoped BuildContext (e.g., inside Consumer builder)
   void _showResetPasswordGlassDialog(BuildContext providerCtx) {
+    final textTheme = Theme.of(context).textTheme;
     showDialog(
       context: providerCtx,
       barrierDismissible: false, // do not close on outside tap
@@ -265,59 +94,6 @@ class _ProfilePageState extends State<ProfilePage>
       builder: (dialogCtx) {
         final mq = MediaQuery.of(dialogCtx);
         final bottomInset = mq.viewInsets.bottom;
-
-        // In your dialog/widget code
-        Widget floatingPasswordField({
-          required String label,
-          required TextEditingController controller,
-          required FocusNode focusNode,
-          required bool touched,
-          required String? error,
-          TextInputAction action = TextInputAction.next,
-          VoidCallback? onSubmitted,
-        }) {
-          // Mirrors FloatingLabelBehavior.auto: floats on focus or when has text
-          final bool isFloating =
-              focusNode.hasFocus || controller.text.isNotEmpty;
-          final Color fill = isFloating ? Colors.transparent : Colors.white;
-
-          return TextFormField(
-            key: ValueKey(label),
-            controller: controller,
-            focusNode: focusNode,
-            obscureText: true,
-            obscuringCharacter: '•',
-            enableSuggestions: false,
-            autocorrect: false,
-            textInputAction: action,
-            onFieldSubmitted: (_) => onSubmitted?.call(),
-            decoration: InputDecoration(
-              labelText: label, // label inside initially [web:60]
-              hintText: label, // optional hint [web:60]
-              floatingLabelBehavior:
-                  FloatingLabelBehavior.auto, // float on focus/text [web:59]
-              filled: true, // enable background fill [web:60]
-              fillColor:
-                  fill, // white when idle/empty, transparent when floating [web:122]
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 14,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.black),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.grey.shade300, width: 1.2),
-              ),
-              errorText: touched
-                  ? error
-                  : null, // Material error handling [web:60]
-            ),
-          );
-        }
 
         // Provide state above the entire dialog so both content and actions can read it
         return ChangeNotifierProvider<ProfileState>.value(
@@ -362,12 +138,14 @@ class _ProfilePageState extends State<ProfilePage>
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20),
                       child: Material(
-                        color: Colors.white.withOpacity(0.15),
+                        color: Colors.white.withAlpha((0.15 * 225).toInt()),
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withAlpha(
+                                (0.3 * 225).toInt(),
+                              ),
                             ),
                           ),
                           child: SafeArea(
@@ -381,14 +159,17 @@ class _ProfilePageState extends State<ProfilePage>
                                       CrossAxisAlignment.stretch,
                                   children: [
                                     Text(
-                                      'Reset Password',
-                                      style: Theme.of(
-                                        dialogCtx,
-                                      ).textTheme.titleLarge,
+                                      'Reset\nPassword',
+                                      style: textTheme.h2.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        height: 1.2,
+                                      ),
                                     ),
-                                    const SizedBox(height: 12),
+                                    const SizedBox(height: 24),
 
-                                    floatingPasswordField(
+                                    CustomLabelPasswordField(
+                                      // icon: Icons.lock_outline,
+                                      obscure: true,
                                       label: 'Old password',
                                       controller: s.oldPwC,
                                       focusNode: s.oldPwFn,
@@ -397,10 +178,13 @@ class _ProfilePageState extends State<ProfilePage>
                                       onSubmitted: () => FocusScope.of(
                                         dialogCtx,
                                       ).requestFocus(s.newPwFn),
+                                      placeholder: '',
                                     ),
-                                    const SizedBox(height: 10),
+                                    const SizedBox(height: 15),
 
-                                    floatingPasswordField(
+                                    CustomLabelPasswordField(
+                                      // icon: Icons.lock,
+                                      obscure: true,
                                       label: 'New password',
                                       controller: s.newPwC,
                                       focusNode: s.newPwFn,
@@ -409,10 +193,12 @@ class _ProfilePageState extends State<ProfilePage>
                                       onSubmitted: () => FocusScope.of(
                                         dialogCtx,
                                       ).requestFocus(s.confirmPwFn),
+                                      placeholder: '',
                                     ),
-                                    const SizedBox(height: 10),
-
-                                    floatingPasswordField(
+                                    const SizedBox(height: 15),
+                                    CustomLabelPasswordField(
+                                      // icon: Icons.check_circle_outline,
+                                      obscure: true,
                                       label: 'Confirm password',
                                       controller: s.confirmPwC,
                                       focusNode: s.confirmPwFn,
@@ -421,67 +207,88 @@ class _ProfilePageState extends State<ProfilePage>
                                       action: TextInputAction.done,
                                       onSubmitted: () =>
                                           FocusScope.of(dialogCtx).unfocus(),
+                                      placeholder: '',
                                     ),
 
                                     const SizedBox(height: 16),
                                     Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: [
                                         Expanded(
-                                          child: OutlinedButton(
-                                            onPressed: s.isResetLoading
-                                                ? null
-                                                : () => Navigator.of(
-                                                    dialogCtx,
-                                                  ).maybePop(),
-                                            child: const Text('Cancel'),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                            ),
+                                            child: Text(
+                                              'Cancel',
+                                              style: textTheme.h5.copyWith(
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                         const SizedBox(width: 12),
-                                        Expanded(
-                                          child: ElevatedButton(
-                                            onPressed: s.canSubmitReset
-                                                ? () async {
-                                                    final result = await controller
-                                                        .resetPassword(); // token handled internally
-                                                    result.fold(
-                                                      (err) {
-                                                        AppSnackBar.show(
-                                                          providerCtx, // parent scaffold context
-                                                          message: err,
-                                                          type: AppSnackBarType
-                                                              .error,
-                                                          icon: Icons
-                                                              .error_outline,
-                                                        );
-                                                      },
-                                                      (ok) {
-                                                        Navigator.of(
-                                                          dialogCtx,
-                                                        ).pop();
-                                                        AppSnackBar.show(
-                                                          providerCtx,
-                                                          message:
-                                                              'Password reset successfully',
-                                                          type: AppSnackBarType
-                                                              .success,
-                                                          icon: Icons
-                                                              .check_circle_outline,
-                                                        );
-                                                        s.resetResetForm();
-                                                      },
-                                                    );
-                                                  }
-                                                : null,
-                                            child: s.isResetLoading
-                                                ? const SizedBox(
-                                                    width: 18,
-                                                    height: 18,
-                                                    child:
-                                                        CircularProgressIndicator(
-                                                          strokeWidth: 2,
-                                                        ),
+
+                                        Align(
+                                          alignment: Alignment.centerRight,
+                                          child: AnimatedSwitcher(
+                                            duration: const Duration(
+                                              milliseconds: 200,
+                                            ),
+                                            switchInCurve: Curves.easeOut,
+                                            switchOutCurve: Curves.easeIn,
+                                            child:
+                                                (s.isResetLoading ||
+                                                    !s.canSubmitReset)
+                                                ? DisabledElevatedButton(
+                                                    key: const ValueKey(
+                                                      'disabled-reset',
+                                                    ),
+                                                    text: 'Reset',
+                                                    onPressed:
+                                                        null, // fully untappable
                                                   )
-                                                : const Text('Reset'),
+                                                : ElevatedButton(
+                                                    key: const ValueKey(
+                                                      'enabled-reset',
+                                                    ),
+                                                    onPressed: () async {
+                                                      final result =
+                                                          await controller
+                                                              .resetPassword();
+                                                      result.fold(
+                                                        (err) {
+                                                          AppSnackBar.show(
+                                                            providerCtx,
+                                                            message: err,
+                                                            type:
+                                                                AppSnackBarType
+                                                                    .error,
+                                                            icon: Icons
+                                                                .error_outline,
+                                                          );
+                                                        },
+                                                        (ok) {
+                                                          Navigator.of(
+                                                            dialogCtx,
+                                                          ).pop();
+                                                          AppSnackBar.show(
+                                                            providerCtx,
+                                                            message:
+                                                                'Password reset successfully',
+                                                            type:
+                                                                AppSnackBarType
+                                                                    .success,
+                                                            icon: Icons
+                                                                .check_circle_outline,
+                                                          );
+                                                          s.resetResetForm();
+                                                        },
+                                                      );
+                                                    },
+                                                    child: const Text('Reset'),
+                                                  ),
                                           ),
                                         ),
                                       ],
@@ -550,7 +357,7 @@ class _ProfilePageState extends State<ProfilePage>
                 slivers: [
                   SliverPadding(
                     padding: EdgeInsets.only(
-                      left: 31 * mediaQuery.width / 402,
+                      left: 25 * mediaQuery.width / 402,
                       right: 31 * mediaQuery.width / 402,
                       top: mediaQuery.height * 25 / 874,
                     ),
@@ -656,34 +463,49 @@ class _ProfilePageState extends State<ProfilePage>
                                       // Small blue camera FAB pinned to the bottom-right
                                       Positioned(
                                         bottom: -2,
-                                        right: -2,
-                                        child: FloatingActionButton.small(
-                                          heroTag: 'edit-avatar',
-                                          backgroundColor: Colors.blue,
-                                          foregroundColor: Colors.white,
-                                          elevation: 1,
-                                          onPressed: state.isUploadingPic
-                                              ? null
-                                              : _showPickSheet,
+                                        right: 2,
+                                        child: Container(
+                                          width: 30, // smaller width than FAB
+                                          height: 30, // smaller height than FAB
+                                          decoration: BoxDecoration(
+                                            color: Colors.blue,
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ), // circular shape
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(
+                                                  0.2,
+                                                ),
+                                                blurRadius: 2,
+                                                offset: Offset(0, 1),
+                                              ),
+                                            ],
+                                          ),
                                           child: state.isUploadingPic
-                                              ? const SizedBox(
-                                                  width: 16,
-                                                  height: 16,
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                        strokeWidth: 2,
-                                                      ),
+                                              ? CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                  color: Colors.white,
                                                 )
-                                              : const Icon(
-                                                  Icons.camera_alt_outlined,
-                                                  size: 18,
+                                              : IconButton(
+                                                  icon: const Icon(
+                                                    Icons.camera_alt_outlined,
+                                                    size: 16,
+                                                    color: Colors.white,
+                                                  ),
+                                                  onPressed:
+                                                      state.isUploadingPic
+                                                      ? null
+                                                      : _showPickSheet,
+                                                  padding: EdgeInsets.zero,
+                                                  constraints: BoxConstraints(),
                                                 ),
                                         ),
                                       ),
                                     ],
                                   ),
 
-                                  // const SizedBox(height: 16),
+                                  const SizedBox(height: 12),
 
                                   // Name emphasized
                                   Text(
@@ -694,7 +516,6 @@ class _ProfilePageState extends State<ProfilePage>
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
-                                  const SizedBox(height: 4),
                                   Text(
                                     p.email,
                                     style: TextStyle(
@@ -703,48 +524,55 @@ class _ProfilePageState extends State<ProfilePage>
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: 16),
 
                                   // ...inside the non-loading Column, just before:
                                   Row(
                                     children: [
                                       Expanded(
-                                        child: ElevatedButton.icon(
-                                          icon: const Icon(Icons.lock_reset),
-                                          label: const Text('Reset pwd'),
-                                          style: ButtonStyle(
-                                            backgroundColor:
-                                                WidgetStateProperty.all(
-                                                  Colors.blue,
-                                                ),
-                                          ),
+                                        child: OutlinedButton.icon(
                                           onPressed: () {
                                             _showResetPasswordGlassDialog(
                                               context,
                                             );
                                           },
+                                          icon: const Icon(Icons.key),
+                                          label: const Text(
+                                            "Change pwd",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          style: OutlinedButton.styleFrom(
+                                            iconColor: Colors.black,
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 12,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                       const SizedBox(width: 12),
                                       Expanded(
                                         child: ElevatedButton.icon(
-                                          style: ButtonStyle(
-                                            backgroundColor:
-                                                WidgetStateProperty.all(
-                                                  Colors.red,
-                                                ),
-                                          ),
-
                                           icon: const Icon(Icons.logout),
                                           label: const Text('Logout'),
-                                          onPressed: () async {},
+                                          onPressed: () async {
+                                            LoginController.logout(context);
+                                          },
                                         ),
                                       ),
                                     ],
                                   ),
 
                                   const SizedBox(height: 8),
-                                  const Divider(),
+                                  Padding(
+                                    padding: EdgeInsetsGeometry.symmetric(),
+                                    child: const Divider(),
+                                  ),
                                   const SizedBox(height: 8),
 
                                   _section('Student Info', [

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:dartz/dartz.dart';
 import 'package:hostel_mgmt/core/config/constants.dart';
 import 'package:hostel_mgmt/models/hostels_model.dart';
+import 'package:hostel_mgmt/models/warden_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
@@ -205,6 +206,38 @@ class ProfileService {
           .toList();
       print("result");
       return right(result);
+    } catch (e) {
+      return left("Exception: $e");
+    }
+  }
+
+  static Future<Either<String, WardenModel>> getWardenProfile() async {
+    try {
+      final session = Get.find<LoginSession>();
+      final token = session.token;
+
+      final response = await http.get(
+        Uri.parse("$url/warden/profile"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        final payload = decoded['profile'];
+        if (decoded is Map<String, dynamic>) {
+          final warden = WardenModel.fromJson(payload);
+          return right(warden);
+        } else {
+          return left("Unexpected response shape");
+        }
+      } else if (response.statusCode == 401) {
+        return left("Unauthorized: invalid or expired token");
+      } else {
+        return left("Error ${response.statusCode}: ${response.body}");
+      }
     } catch (e) {
       return left("Exception: $e");
     }

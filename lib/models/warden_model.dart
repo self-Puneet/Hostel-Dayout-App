@@ -123,4 +123,39 @@ class WardenModel {
       languagePreference: languagePreference ?? this.languagePreference,
     );
   }
+
+  @override
+  String toString() {
+    final hostelsStr = hostels == null ? 'null' : '[${hostels!.join(', ')}]';
+    return 'WardenModel{'
+        'wardenId: $wardenId, '
+        'empId: $empId, '
+        'name: $name, '
+        'phoneNo: $phoneNo, '
+        'hostelId: [${hostelId.join(', ')}], '
+        'hostels: $hostelsStr, '
+        'profilePicUrl: ${profilePicUrl ?? 'null'}, '
+        'wardenRole: ${wardenRole.displayName} (${wardenRole.apiValue}), '
+        'email: ${email ?? 'null'}, '
+        'languagePreference: ${languagePreference ?? 'null'}'
+        '}';
+  }
+
+  /// Multi-line pretty representation (useful for debugging).
+  String toPrettyString() {
+    final hostelsStr = hostels == null ? 'null' : '[${hostels!.join(', ')}]';
+    return '''
+WardenModel(
+  wardenId: $wardenId,
+  empId: $empId,
+  name: $name,
+  phoneNo: $phoneNo,
+  hostelId: [${hostelId.join(', ')}],
+  hostels: $hostelsStr,
+  profilePicUrl: ${profilePicUrl ?? 'null'},
+  wardenRole: ${wardenRole.displayName} (${wardenRole.apiValue}),
+  email: ${email ?? 'null'},
+  languagePreference: ${languagePreference ?? 'null'},
+)''';
+  }
 }

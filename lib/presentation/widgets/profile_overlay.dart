@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
+// no external routing imports here - navigation should be handled by the caller
 
 class ProfileOverlay extends StatelessWidget {
   final String name;
@@ -165,8 +164,9 @@ class ProfileOverlay extends StatelessWidget {
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: () {
-                            context.push(AppRoutes.profile);
-                            Navigator.pop(context);
+                            // Use the callback provided by the caller so callers
+                            // can decide which route to push (student vs warden).
+                            onEditProfile();
                           },
                           icon: const Icon(Icons.person),
                           label: const Text(

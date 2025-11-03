@@ -485,7 +485,7 @@ class OneUiCollapsingHeader extends StatelessWidget {
     this.largeTitleTopPaddingExpanded = 2, // extra top padding (expanded)
     this.largeTitleTopPaddingCollapsed =
         0, // extra top padding (near collapsed)
-    // NEW: control back button radius shrink
+    // NEW: control back button radius shrink`
     this.leadingRadiusExpanded = 35,
     this.leadingRadiusCollapsed = 20,
   });

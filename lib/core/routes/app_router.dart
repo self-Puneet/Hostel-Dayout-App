@@ -13,10 +13,12 @@ import 'package:hostel_mgmt/presentation/view/parent/pages/parent_profile_page.d
 import 'package:hostel_mgmt/presentation/view/parent/state/parent_state.dart';
 import 'package:hostel_mgmt/presentation/view/student/pages/request_page.dart';
 import 'package:hostel_mgmt/presentation/view/warden/controller/warden_home_controller.dart';
+import 'package:hostel_mgmt/presentation/view/warden/controller/warden_profile_controller.dart';
 import 'package:hostel_mgmt/presentation/view/warden/pages/warden_action_page.dart';
 import 'package:hostel_mgmt/presentation/view/warden/pages/warden_history_page.dart';
 import 'package:hostel_mgmt/presentation/view/warden/pages/warden_home_page.dart';
 import 'package:hostel_mgmt/presentation/view/warden/pages/warden_layout.dart';
+import 'package:hostel_mgmt/presentation/view/warden/pages/warden_profile_page.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_action_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_history_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_home_state.dart';
@@ -31,19 +33,21 @@ String? _requireAuthRedirect(BuildContext context, GoRouterState state) {
   final session = Get.find<LoginSession>();
 
   // Not logged in → go to login
-  print(session.token);
+  debugPrint(session.token);
   if (session.token.isEmpty || !session.isValid) {
     return AppRoutes.login;
   }
 
   final allowedRoutes = AppRoutes.routeAllowence[session.role] ?? [];
+  print(state.matchedLocation);
+  print(allowedRoutes);
   if (allowedRoutes.any(
     (allowed) => state.matchedLocation.startsWith(allowed),
   )) {
-    print("Allowed route, no redirect");
+    debugPrint("Allowed route, no redirect -------------- ");
     return null;
   } else {
-    print("Not allowed route, redirecting to home");
+    debugPrint("Not allowed route, redirecting to home");
   }
 
   // Otherwise, redirect user to home based on role
@@ -104,6 +108,7 @@ class AppRouter {
           ),
         ),
 
+        // warden shell route
         ShellRoute(
           builder: (context, state, child) {
             final layoutState = WardenLayoutState();
@@ -172,17 +177,16 @@ class AppRouter {
               },
             ),
 
-            // warden history page route
+            // warden profile page route (matching the style of the history route)
             GoRoute(
-              path: AppRoutes.wardenHistory, // e.g., '/warden/history'
-              name: AppRoutes.wardenHistory,
+              path: AppRoutes.wardenProfile,
+              name: AppRoutes.wardenProfile,
               pageBuilder: (context, state) {
-                final profile = context.read<WardenProfileState>();
                 return AppTransitionPage(
                   key: state.pageKey,
                   child: ChangeNotifierProvider(
-                    create: (_) => WardenHistoryState(),
-                    child: WardenHistoryPage(actor: profile.loginSession.role),
+                    create: (_) => WardenProfileState(),
+                    child: WardenProfilePage(),
                   ),
                 );
               },
