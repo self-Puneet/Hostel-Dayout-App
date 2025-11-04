@@ -74,27 +74,30 @@ class RequestFormPage extends StatelessWidget {
         final loginSession = Get.find<LoginSession>();
         // Use Consumer here to get the provider instance safely
         return Consumer<RequestFormState>(
-          builder: (context, provider, _) => Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(top: mediaQuery.height * 50 / 874),
-                child: Container(
-                  margin: padding,
-                  child: WelcomeHeader(
-                    phoneNumber: loginSession.phone,
-                    enrollmentNumber: loginSession.identityId,
-                    hostelName: loginSession.hostels!.first.hostelName,
-                    roomNumber: loginSession.roomNo,
-                    actor: TimelineActor.student,
-                    name: loginSession.username,
-                    avatarUrl: loginSession.imageURL,
-                    greeting: 'Welcome,',
+          builder: (context, provider, _) => Container(
+            color: const Color(0xFFE9E9E9),
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: mediaQuery.height * 50 / 874),
+                  child: Container(
+                    margin: padding,
+                    child: WelcomeHeader(
+                      phoneNumber: loginSession.phone,
+                      enrollmentNumber: loginSession.identityId,
+                      hostelName: loginSession.hostels!.first.hostelName,
+                      roomNumber: loginSession.roomNo,
+                      actor: TimelineActor.student,
+                      name: loginSession.username,
+                      avatarUrl: loginSession.imageURL,
+                      greeting: 'Welcome,',
+                    ),
                   ),
                 ),
-              ),
-              // Pass provider down or wrap below with Consumer accordingly
-              const Expanded(child: _RequestFormView()),
-            ],
+                // Pass provider down or wrap below with Consumer accordingly
+                const Expanded(child: _RequestFormView()),
+              ],
+            ),
           ),
         );
       },

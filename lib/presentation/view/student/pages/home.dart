@@ -174,144 +174,149 @@ class _HomePageState extends State<HomePage> {
             }
 
             // Header is now OUTSIDE the refreshable area.
-            return Column(
-              children: [
-                // Top spacing (unchanged) - fixed
-                SizedBox(height: topGap),
+            return Container(
+              color: const Color(0xFFE9E9E9),
+              child: Column(
+                children: [
+                  // Top spacing (unchanged) - fixed
+                  SizedBox(height: topGap),
 
-                // Welcome header - fixed
-                Container(
-                  margin: padding,
-                  child: WelcomeHeader(
-                    phoneNumber: profile.phone,
-                    enrollmentNumber: profile.identityId,
-                    hostelName: hostelName,
-                    roomNumber: profile.roomNo,
-                    actor: TimelineActor.student,
-                    name: state.profile?.name ?? "",
-                    avatarUrl: state.profile?.profilePic,
-                    greeting: 'Welcome,',
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Scrollable + refreshable content BELOW header
-                Expanded(
-                  child: AppRefreshWrapper(
-                    onRefresh: () async {
-                      state.clear();
-                      await context
-                          .read<HomeController>()
-                          .fetchProfileAndRequests();
-                      context.read<HomeController>().fetchHistoryRequests();
-                    },
-                    child: ListView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: EdgeInsets.zero,
-                      children: [
-                        SizedBox(height: 20),
-                        yourRequestsTitle(),
-
-                        activeRequestView(),
-                        if (hasMultiple) ...[
-                          Center(
-                            child: SmoothPageIndicator(
-                              controller: _pageController,
-                              count: activeRequests.length,
-                              effect: JumpingDotEffect(
-                                dotHeight: 9,
-                                dotWidth: 9,
-                                activeDotColor: Colors.black,
-                                dotColor: Colors.grey[300]!,
-                                jumpScale: 1,
-                              ),
-                            ),
-                          ),
-                        ],
-                        const SizedBox(height: 18),
-
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: mediaQuery.size.width * 44 / 402,
-                          ),
-                          child: const Divider(
-                            thickness: 1,
-                            color: Color(0xFF757575),
-                          ),
-                        ),
-
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                            horizontal: 36 * mediaQuery.size.width / 402,
-                            vertical: 20,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text('History', style: textTheme.h2.w500),
-                                  const SizedBox(width: 12),
-                                  dropdown,
-                                ],
-                              ),
-                              ClickableText(
-                                text: "See all",
-                                onTap: () {
-                                  context.push(AppRoutes.history);
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Container(
-                          margin: padding,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 26,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(
-                                color: const Color.fromRGBO(117, 117, 117, 1),
-                              ),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: state.isLoadingHistory || state.isLoading
-                                ? simpleRequestCardSkeleton()
-                                : state.filteredRequests == null
-                                ? const Center(child: Text('No requests found'))
-                                : SimpleRequestCard(
-                                    requestType:
-                                        state.filteredRequests!.requestType,
-                                    fromDate:
-                                        state.filteredRequests!.appliedFrom,
-                                    toDate: state.filteredRequests!.appliedTo,
-                                    status: state.filteredRequests!.status,
-                                    statusDate:
-                                        state.filteredRequests!.lastUpdatedAt,
-                                    reason: state.filteredRequests!.reason,
-                                    requestId:
-                                        state.filteredRequests!.requestId,
-                                    actor: TimelineActor.student,
-                                  ),
-                          ),
-                        ),
-
-                        // Spacer for bottom safe area as before
-                        Container(
-                          height:
-                              84 + MediaQuery.of(context).viewPadding.bottom,
-                        ),
-                      ],
+                  // Welcome header - fixed
+                  Container(
+                    margin: padding,
+                    child: WelcomeHeader(
+                      phoneNumber: profile.phone,
+                      enrollmentNumber: profile.identityId,
+                      hostelName: hostelName,
+                      roomNumber: profile.roomNo,
+                      actor: TimelineActor.student,
+                      name: state.profile?.name ?? "",
+                      avatarUrl: state.profile?.profilePic,
+                      greeting: 'Welcome,',
                     ),
                   ),
-                ),
-              ],
+
+                  const SizedBox(height: 20),
+
+                  // Scrollable + refreshable content BELOW header
+                  Expanded(
+                    child: AppRefreshWrapper(
+                      onRefresh: () async {
+                        state.clear();
+                        await context
+                            .read<HomeController>()
+                            .fetchProfileAndRequests();
+                        context.read<HomeController>().fetchHistoryRequests();
+                      },
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: EdgeInsets.zero,
+                        children: [
+                          SizedBox(height: 20),
+                          yourRequestsTitle(),
+
+                          activeRequestView(),
+                          if (hasMultiple) ...[
+                            Center(
+                              child: SmoothPageIndicator(
+                                controller: _pageController,
+                                count: activeRequests.length,
+                                effect: JumpingDotEffect(
+                                  dotHeight: 9,
+                                  dotWidth: 9,
+                                  activeDotColor: Colors.black,
+                                  dotColor: Colors.grey[300]!,
+                                  jumpScale: 1,
+                                ),
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 18),
+
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: mediaQuery.size.width * 44 / 402,
+                            ),
+                            child: const Divider(
+                              thickness: 1,
+                              color: Color(0xFF757575),
+                            ),
+                          ),
+
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                              horizontal: 36 * mediaQuery.size.width / 402,
+                              vertical: 20,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text('History', style: textTheme.h2.w500),
+                                    const SizedBox(width: 12),
+                                    dropdown,
+                                  ],
+                                ),
+                                ClickableText(
+                                  text: "See all",
+                                  onTap: () {
+                                    context.push(AppRoutes.history);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          Container(
+                            margin: padding,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 26,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                  color: const Color.fromRGBO(117, 117, 117, 1),
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: state.isLoadingHistory || state.isLoading
+                                  ? simpleRequestCardSkeleton()
+                                  : state.filteredRequests == null
+                                  ? const Center(
+                                      child: Text('No requests found'),
+                                    )
+                                  : SimpleRequestCard(
+                                      requestType:
+                                          state.filteredRequests!.requestType,
+                                      fromDate:
+                                          state.filteredRequests!.appliedFrom,
+                                      toDate: state.filteredRequests!.appliedTo,
+                                      status: state.filteredRequests!.status,
+                                      statusDate:
+                                          state.filteredRequests!.lastUpdatedAt,
+                                      reason: state.filteredRequests!.reason,
+                                      requestId:
+                                          state.filteredRequests!.requestId,
+                                      actor: TimelineActor.student,
+                                    ),
+                            ),
+                          ),
+
+                          // Spacer for bottom safe area as before
+                          Container(
+                            height:
+                                84 + MediaQuery.of(context).viewPadding.bottom,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             );
           },
         );

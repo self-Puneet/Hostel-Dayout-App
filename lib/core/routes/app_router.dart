@@ -38,8 +38,6 @@ String? _requireAuthRedirect(BuildContext context, GoRouterState state) {
   }
 
   final allowedRoutes = AppRoutes.routeAllowence[session.role] ?? [];
-  print(state.matchedLocation);
-  print(allowedRoutes);
   if (allowedRoutes.any(
     (allowed) => state.matchedLocation.startsWith(allowed),
   )) {
@@ -64,6 +62,8 @@ String? _requireAuthRedirect(BuildContext context, GoRouterState state) {
   }
 }
 
+// Helper: normalize and compare paths (ignores query/fragment and trailing slash)
+// Normalize and compare paths (ignores trailing slash)
 String? _initialRoute() {
   final session = Get.find<LoginSession>();
 

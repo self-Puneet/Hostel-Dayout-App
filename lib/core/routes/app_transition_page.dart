@@ -6,19 +6,46 @@ class AppTransitionPage<T> extends CustomTransitionPage<T> {
   AppTransitionPage({
     required Widget child,
     LocalKey? key,
-    Duration transitionDuration = const Duration(milliseconds: 250),
+    Duration duration = const Duration(milliseconds: 500),
+    double dimMaxOpacity = 0.5,
   }) : super(
          key: key,
          child: child,
-         transitionDuration: transitionDuration,
+         transitionDuration: duration,
+         reverseTransitionDuration: duration,
          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-           // First page disappears instantly, then new one fades in
-           final curved = CurvedAnimation(
-             parent: animation,
-             curve: Curves.easeInOut,
+           // Incoming page: slide from right → center
+           final slide = Tween<Offset>(
+             begin: const Offset(1.0, 0.0),
+             end: Offset.zero,
+           ).chain(CurveTween(curve: Curves.easeOutCubic)).animate(animation);
+
+           // Underlying page: dim while covered by a new route
+           final dim = Tween<double>(begin: 0.0, end: dimMaxOpacity)
+               .chain(CurveTween(curve: Curves.easeOutCubic))
+               .animate(secondaryAnimation);
+
+           // Apply a dimming overlay driven by secondaryAnimation
+           final dimmedChild = AnimatedBuilder(
+             animation: dim,
+             builder: (context, _) => Stack(
+               fit: StackFit.passthrough,
+               children: [
+                 child,
+                 if (dim.value > 0)
+                   IgnorePointer(
+                     ignoring: true,
+                     child: Opacity(
+                       opacity: dim.value,
+                       child: const ColoredBox(color: Colors.black),
+                     ),
+                   ),
+               ],
+             ),
            );
 
-           return FadeTransition(opacity: curved, child: child);
+           // Slide the incoming page; on the underlying page this is a no-op (animation is 1.0)
+           return SlideTransition(position: slide, child: dimmedChild);
          },
        );
 }

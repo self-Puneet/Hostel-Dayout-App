@@ -500,7 +500,7 @@ class _RequestPageState extends State<RequestPage> {
                 const SizedBox(height: 15),
                 Container(
                   decoration: BoxDecoration(
-                    color: Color.fromRGBO(246, 246, 246, 1),
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   padding: EdgeInsets.symmetric(vertical: 25),

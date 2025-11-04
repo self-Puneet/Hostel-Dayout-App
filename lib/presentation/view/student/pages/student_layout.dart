@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:hostel_mgmt/core/routes/go_router_extensions.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/glass_nav_bar.dart';
 
@@ -63,11 +63,11 @@ class StudentLayout extends StatelessWidget {
                           ),
                           child: LiquidGlassNavBar(
                             onHomePressed: () =>
-                                context.push(AppRoutes.studentHome),
+                                context.pushIfNotCurrent(AppRoutes.studentHome),
                             onNewPressed: () =>
-                                context.push(AppRoutes.requestForm),
+                                context.pushIfNotCurrent(AppRoutes.requestForm),
                             onProfilePressed: () =>
-                                context.push(AppRoutes.profile),
+                                context.pushIfNotCurrent(AppRoutes.profile),
                             rightIcon: Left(
                               Image.asset(
                                 'assets/user.png',
