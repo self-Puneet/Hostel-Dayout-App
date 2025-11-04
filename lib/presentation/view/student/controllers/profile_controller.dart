@@ -36,10 +36,9 @@ class ProfileController {
       );
       print("-----------------");
       print(result);
-      result.fold(
-        (err) => state.setErrored(err),
-        (updated) => state.setProfile(updated),
-      );
+      result.fold((err) => state.setErrored(err), (updated) {
+        state.setProfilePic(updated.profilePic!); // ✅ Uses existing method
+      });
     } catch (e) {
       state.setErrored('Failed to update profile picture');
     } finally {

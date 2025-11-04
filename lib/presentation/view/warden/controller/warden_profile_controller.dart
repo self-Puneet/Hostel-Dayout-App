@@ -17,11 +17,37 @@ class WardenProfileController {
         (err) => state.setErrored(err),
         (warden) => state.setProfile(warden),
       );
+
+      final hostelNames = await getHostelNamesFromProfile();
+
+      // IMPORTANT: assign the copy back into state so listeners are notified
+      if (state.profile != null) {
+        state.setProfile(state.profile!.copyWith(hostels: hostelNames));
+      }
     } catch (e) {
       state.setErrored('Failed to load profile data');
     } finally {
       state.setLoading(false);
     }
+  }
+
+  // for getting all hostel info from a service then getting those hostels name whose ids are present in warden profile and returning those names as list of strings
+  Future<List<String>> getHostelNamesFromProfile() async {
+    final warden = state.profile;
+    if (warden == null) return [];
+
+    // Fetch once
+    final hostelResult = await ProfileService.getAllHostelInfo();
+
+    return hostelResult.fold<List<String>>((err) => [], (hostels) {
+      final byId = {for (final h in hostels) h.hostelId: h.hostelName};
+      final names = <String>[];
+      for (final id in warden.hostelId) {
+        final name = byId[id];
+        if (name != null) names.add(name);
+      }
+      return names;
+    });
   }
 
   Future<Either<String, bool>> resetPassword() async {

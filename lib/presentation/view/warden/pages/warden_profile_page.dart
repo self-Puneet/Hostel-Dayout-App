@@ -162,9 +162,21 @@ class _WardenProfilePageState extends State<WardenProfilePage>
                                           CrossAxisAlignment.center,
                                       children: [
                                         Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
+                                          child: TextButton(
+                                            onPressed: () => Navigator.of(
+                                              dialogCtx,
+                                            ).pop(), // close the dialog
+                                            style: TextButton.styleFrom(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                    vertical: 12,
+                                                  ),
+                                              alignment: Alignment
+                                                  .centerLeft, // keep text left like before
+                                              tapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
                                             ),
                                             child: Text(
                                               'Cancel',
@@ -329,7 +341,9 @@ class _WardenProfilePageState extends State<WardenProfilePage>
 
           final hostelsText = (p.hostels != null && p.hostels!.isNotEmpty)
               ? p.hostels!.join(', ')
-              : (p.hostelId.isNotEmpty ? p.hostelId.join(', ') : '');
+              : ((p.hostels != null && p.hostels!.isEmpty)
+                    ? p.hostels!.join(', ')
+                    : '');
 
           return Scaffold(
             backgroundColor: const Color(0xFFE9E9E9),
@@ -380,18 +394,33 @@ class _WardenProfilePageState extends State<WardenProfilePage>
                             ? Column(
                                 children: [
                                   profileTopSkeleton(),
-                                  const Divider(),
-                                  shimmerBox(
-                                    width: double.infinity,
-                                    height: 272,
-                                    borderRadius: 20,
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: shimmerBox(
+                                          width: double.infinity,
+                                          height: 45,
+                                          borderRadius: 10,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+
+                                      Expanded(
+                                        child: shimmerBox(
+                                          width: double.infinity,
+                                          height: 45,
+                                          borderRadius: 10,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(height: 16),
+
+                                  SizedBox(height: 8),
                                   const Divider(),
-                                  const SizedBox(height: 8),
+                                  SizedBox(height: 8),
                                   shimmerBox(
                                     width: double.infinity,
-                                    height: 200,
+                                    height: 250,
                                     borderRadius: 20,
                                   ),
                                 ],
@@ -421,7 +450,7 @@ class _WardenProfilePageState extends State<WardenProfilePage>
                                         : null,
                                   ),
 
-                                  const SizedBox(height: 120),
+                                  const SizedBox(height: 12),
 
                                   // Name and email
                                   Text(
@@ -460,14 +489,17 @@ class _WardenProfilePageState extends State<WardenProfilePage>
                                               color: Colors.black,
                                             ),
                                           ),
+
                                           style: OutlinedButton.styleFrom(
-                                            iconColor: Colors.black,
                                             padding: const EdgeInsets.symmetric(
-                                              vertical: 12,
+                                              vertical: 14,
+                                              horizontal: 20,
                                             ),
+                                            iconColor: Colors.black,
+
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(12),
+                                                  BorderRadius.circular(10),
                                             ),
                                           ),
                                         ),

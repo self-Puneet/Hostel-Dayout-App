@@ -216,9 +216,21 @@ class _ProfilePageState extends State<ProfilePage>
                                           CrossAxisAlignment.center,
                                       children: [
                                         Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
+                                          child: TextButton(
+                                            onPressed: () => Navigator.of(
+                                              dialogCtx,
+                                            ).pop(), // close the dialog
+                                            style: TextButton.styleFrom(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                    vertical: 12,
+                                                  ),
+                                              alignment: Alignment
+                                                  .centerLeft, // keep text left like before
+                                              tapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
                                             ),
                                             child: Text(
                                               'Cancel',
@@ -253,6 +265,17 @@ class _ProfilePageState extends State<ProfilePage>
                                                     key: const ValueKey(
                                                       'enabled-reset',
                                                     ),
+                                                    style:
+                                                        ElevatedButton.styleFrom(
+                                                          textStyle:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .h5
+                                                                  .copyWith(
+                                                                    height: 1.0,
+                                                                  ),
+                                                        ),
+
                                                     onPressed: () async {
                                                       final result =
                                                           await controller
@@ -393,7 +416,29 @@ class _ProfilePageState extends State<ProfilePage>
                             ? Column(
                                 children: [
                                   profileTopSkeleton(),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: shimmerBox(
+                                          width: double.infinity,
+                                          height: 45,
+                                          borderRadius: 10,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+
+                                      Expanded(
+                                        child: shimmerBox(
+                                          width: double.infinity,
+                                          height: 45,
+                                          borderRadius: 10,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8),
                                   const Divider(),
+                                  SizedBox(height: 8),
                                   shimmerBox(
                                     width: double.infinity,
                                     height: 272,

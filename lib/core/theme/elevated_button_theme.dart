@@ -4,15 +4,13 @@ class DisabledElevatedButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed; // keep for API parity, pass null to disable
 
-  const DisabledElevatedButton({
-    super.key,
-    required this.text,
-    this.onPressed,
-  });
+  const DisabledElevatedButton({super.key, required this.text, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = Theme.of(context).textTheme.labelLarge?.copyWith(fontSize: 14);
+    final textStyle = Theme.of(
+      context,
+    ).textTheme.labelLarge?.copyWith(fontSize: 14);
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         // match your enabled theme’s geometry
