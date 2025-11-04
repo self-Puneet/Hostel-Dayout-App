@@ -1,6 +1,7 @@
 // presentation/view/student/request_form_page.dart
 import 'package:flutter/material.dart';
 import 'package:get/instance_manager.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/core/theme/app_theme.dart';
@@ -89,7 +90,8 @@ class RequestFormPage extends StatelessWidget {
                       roomNumber: loginSession.roomNo,
                       actor: TimelineActor.student,
                       name: loginSession.username,
-                      avatarUrl: loginSession.imageURL,
+                      avatarUrl: null,
+                      // avatarUrl: loginSession.imageURL,
                       greeting: 'Welcome,',
                     ),
                   ),
@@ -359,6 +361,7 @@ class _RequestFormView extends StatelessWidget {
                   onPressed: provider.isSubmittable
                       ? () async {
                           await controller.submit();
+                          context.pop();
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
@@ -377,7 +380,9 @@ class _RequestFormView extends StatelessWidget {
                           provider.isDayout
                               ? "Submit Dayout Request"
                               : "Submit Leave Request",
-                          style: textTheme.h5.w500.copyWith(color: greyColor),
+                          style: textTheme.h5.w500.copyWith(
+                            color: Colors.white,
+                          ),
                         ),
                 ),
               ),

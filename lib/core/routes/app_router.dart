@@ -126,6 +126,86 @@ class AppRouter {
           },
           routes: [
             // warden action page route
+            // GoRoute(
+            //   path: AppRoutes.wardenActionPage,
+            //   name: AppRoutes.wardenActionPage,
+            //   pageBuilder: (context, state) {
+            //     final layoutState = context.read<WardenLayoutState>();
+            //     final tabParam = state.uri.queryParameters['tab'];
+            //     final initialTab = WardenTab.values.firstWhere(
+            //       (t) => t.name == tabParam,
+            //       orElse: () => WardenTab.pendingApproval,
+            //     );
+            //     return AppTransitionPage(
+            //       key: state.pageKey,
+            //       child: WardenActionSelectionGuard(
+            //         child: WardenHomePage(
+            //           actor: layoutState.loginSession.role,
+            //           initialTab: initialTab,
+            //         ),
+            //       ),
+            //     );
+            //   },
+            // ),
+
+            // // // warden home page route
+            // GoRoute(
+            //   path: AppRoutes.wardenHome,
+            //   name: AppRoutes.wardenHome,
+            //   pageBuilder: (context, state) {
+            //     // Instead of only providing state, provide both state and controller
+            //     return AppTransitionPage(
+            //       key: state.pageKey,
+            //       child: MultiProvider(
+            //         providers: [
+            //           ChangeNotifierProvider(
+            //             create: (_) => WardenStatisticsState(),
+            //           ),
+            //           ProxyProvider<
+            //             WardenStatisticsState,
+            //             WardenStatisticsController
+            //           >(
+            //             // ProxyProvider injects the state into the controller
+            //             update: (_, wardenState, __) =>
+            //                 WardenStatisticsController(wardenState),
+            //           ),
+            //         ],
+            //         child: HomeDashboardPage(),
+            //       ),
+            //     );
+            //   },
+            // ),
+
+            // // warden profile page route (matching the style of the history route)
+            // GoRoute(
+            //   path: AppRoutes.wardenProfile,
+            //   name: AppRoutes.wardenProfile,
+            //   pageBuilder: (context, state) {
+            //     return AppTransitionPage(
+            //       key: state.pageKey,
+            //       child: ChangeNotifierProvider(
+            //         create: (_) => WardenProfileState(),
+            //         child: WardenProfilePage(),
+            //       ),
+            //     );
+            //   },
+            // ),
+
+            // // warden history page route
+            // GoRoute(
+            //   path: AppRoutes.wardenHistory, // e.g., '/warden/history'
+            //   name: AppRoutes.wardenHistory,
+            //   pageBuilder: (context, state) {
+            //     final loginSession = Get.find<LoginSession>();
+            //     return AppTransitionPage(
+            //       key: state.pageKey,
+            //       child: ChangeNotifierProvider(
+            //         create: (_) => WardenHistoryState(),
+            //         child: WardenHistoryPage(actor: loginSession.role),
+            //       ),
+            //     );
+            //   },
+            // ),
             GoRoute(
               path: AppRoutes.wardenActionPage,
               name: AppRoutes.wardenActionPage,
@@ -144,56 +224,53 @@ class AppRouter {
                       initialTab: initialTab,
                     ),
                   ),
+                  slideFrom: (state.extra is SlideFrom)
+                      ? state.extra as SlideFrom
+                      : SlideFrom.right,
                 );
               },
             ),
-
-            // // warden home page route
             GoRoute(
               path: AppRoutes.wardenHome,
               name: AppRoutes.wardenHome,
-              pageBuilder: (context, state) {
-                // Instead of only providing state, provide both state and controller
-                return AppTransitionPage(
-                  key: state.pageKey,
-                  child: MultiProvider(
-                    providers: [
-                      ChangeNotifierProvider(
-                        create: (_) => WardenStatisticsState(),
-                      ),
-                      ProxyProvider<
-                        WardenStatisticsState,
-                        WardenStatisticsController
-                      >(
-                        // ProxyProvider injects the state into the controller
-                        update: (_, wardenState, __) =>
-                            WardenStatisticsController(wardenState),
-                      ),
-                    ],
-                    child: HomeDashboardPage(),
-                  ),
-                );
-              },
+              pageBuilder: (context, state) => AppTransitionPage(
+                key: state.pageKey,
+                child: MultiProvider(
+                  providers: [
+                    ChangeNotifierProvider(
+                      create: (_) => WardenStatisticsState(),
+                    ),
+                    ProxyProvider<
+                      WardenStatisticsState,
+                      WardenStatisticsController
+                    >(
+                      update: (_, wardenState, __) =>
+                          WardenStatisticsController(wardenState),
+                    ),
+                  ],
+                  child: HomeDashboardPage(),
+                ),
+                slideFrom: (state.extra is SlideFrom)
+                    ? state.extra as SlideFrom
+                    : SlideFrom.right,
+              ),
             ),
-
-            // warden profile page route (matching the style of the history route)
             GoRoute(
               path: AppRoutes.wardenProfile,
               name: AppRoutes.wardenProfile,
-              pageBuilder: (context, state) {
-                return AppTransitionPage(
-                  key: state.pageKey,
-                  child: ChangeNotifierProvider(
-                    create: (_) => WardenProfileState(),
-                    child: WardenProfilePage(),
-                  ),
-                );
-              },
+              pageBuilder: (context, state) => AppTransitionPage(
+                key: state.pageKey,
+                child: ChangeNotifierProvider(
+                  create: (_) => WardenProfileState(),
+                  child: WardenProfilePage(),
+                ),
+                slideFrom: (state.extra is SlideFrom)
+                    ? state.extra as SlideFrom
+                    : SlideFrom.right,
+              ),
             ),
-
-            // warden history page route
             GoRoute(
-              path: AppRoutes.wardenHistory, // e.g., '/warden/history'
+              path: AppRoutes.wardenHistory,
               name: AppRoutes.wardenHistory,
               pageBuilder: (context, state) {
                 final loginSession = Get.find<LoginSession>();
@@ -203,6 +280,9 @@ class AppRouter {
                     create: (_) => WardenHistoryState(),
                     child: WardenHistoryPage(actor: loginSession.role),
                   ),
+                  slideFrom: (state.extra is SlideFrom)
+                      ? state.extra as SlideFrom
+                      : SlideFrom.right,
                 );
               },
             ),
@@ -222,6 +302,9 @@ class AppRouter {
                   create: (_) => ParentState(),
                   child: ParentHomePage(),
                 ),
+                slideFrom: (state.extra is SlideFrom)
+                    ? state.extra as SlideFrom
+                    : SlideFrom.right,
               ),
             ),
             GoRoute(
@@ -230,6 +313,9 @@ class AppRouter {
               pageBuilder: (context, state) => AppTransitionPage(
                 key: state.pageKey,
                 child: const HistoryPage(),
+                slideFrom: (state.extra is SlideFrom)
+                    ? state.extra as SlideFrom
+                    : SlideFrom.right,
               ),
             ),
             GoRoute(
@@ -238,12 +324,14 @@ class AppRouter {
               pageBuilder: (context, state) => AppTransitionPage(
                 key: state.pageKey,
                 child: ParentProfilePage(),
+                slideFrom: (state.extra is SlideFrom)
+                    ? state.extra as SlideFrom
+                    : SlideFrom.right,
               ),
             ),
             GoRoute(
-              // Make this absolute and not a child: keep it as a sibling
-              path: AppRoutes
-                  .parentRequestDetails, // e.g. '/student/create-request/:id'
+              // keep as child if you want the parent shell visible above details
+              path: AppRoutes.parentRequestDetails, // '/parent/request/:id'
               name: 'request-detail-parent',
               pageBuilder: (context, state) {
                 final requestId = state.pathParameters['id'] ?? '';
@@ -251,11 +339,18 @@ class AppRouter {
                 return AppTransitionPage(
                   key: state.pageKey,
                   child: RequestPage(actor: role, requestId: requestId),
+                  slideFrom: (state.extra is SlideFrom)
+                      ? state.extra as SlideFrom
+                      : SlideFrom.right,
                 );
               },
             ),
           ],
         ),
+
+        // Student request details (absolute route) - keep as a sibling so
+        // the details page can be opened from other shells/widgets regardless
+        // of the active ShellRoute.
 
         /// Login
         GoRoute(
@@ -265,7 +360,6 @@ class AppRouter {
               AppTransitionPage(key: state.pageKey, child: const LoginLayout()),
         ),
 
-        /// Student shell
         ShellRoute(
           builder: (context, state, child) => StudentLayout(child: child),
           routes: [
@@ -275,6 +369,10 @@ class AppRouter {
               pageBuilder: (context, state) => AppTransitionPage(
                 key: state.pageKey,
                 child: const HomePage(),
+                // Use extra direction if provided, else default.
+                slideFrom: (state.extra is SlideFrom)
+                    ? state.extra as SlideFrom
+                    : SlideFrom.right,
               ),
             ),
             GoRoute(
@@ -283,12 +381,35 @@ class AppRouter {
               pageBuilder: (context, state) => AppTransitionPage(
                 key: state.pageKey,
                 child: const HistoryPage(),
+                slideFrom: (state.extra is SlideFrom)
+                    ? state.extra as SlideFrom
+                    : SlideFrom.right,
               ),
             ),
             GoRoute(
-              // Make this absolute and not a child: keep it as a sibling
-              path: AppRoutes
-                  .requestDetails, // e.g. '/student/create-request/:id'
+              path: AppRoutes.requestForm,
+              name: 'request',
+              pageBuilder: (context, state) => AppTransitionPage(
+                key: state.pageKey,
+                child: RequestFormPage(),
+                slideFrom: (state.extra is SlideFrom)
+                    ? state.extra as SlideFrom
+                    : SlideFrom.right,
+              ),
+            ),
+            GoRoute(
+              path: AppRoutes.profile,
+              name: 'profile',
+              pageBuilder: (context, state) => AppTransitionPage(
+                key: state.pageKey,
+                child: const ProfilePage(),
+                slideFrom: (state.extra is SlideFrom)
+                    ? state.extra as SlideFrom
+                    : SlideFrom.right,
+              ),
+            ),
+            GoRoute(
+              path: AppRoutes.requestDetails,
               name: 'request-detail',
               pageBuilder: (context, state) {
                 final requestId = state.pathParameters['id'] ?? '';
@@ -298,22 +419,6 @@ class AppRouter {
                   child: RequestPage(actor: role, requestId: requestId),
                 );
               },
-            ),
-            GoRoute(
-              path: AppRoutes.requestForm,
-              name: 'request',
-              pageBuilder: (context, state) => AppTransitionPage(
-                key: state.pageKey,
-                child: RequestFormPage(),
-              ),
-            ),
-            GoRoute(
-              path: AppRoutes.profile,
-              name: 'profile',
-              pageBuilder: (context, state) => AppTransitionPage(
-                key: state.pageKey,
-                child: const ProfilePage(),
-              ),
             ),
           ],
         ),

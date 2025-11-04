@@ -1,5 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hostel_mgmt/core/routes/app_transition_page.dart';
 import 'package:hostel_mgmt/core/routes/go_router_extensions.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/glass_nav_bar.dart';
@@ -62,12 +64,24 @@ class StudentLayout extends StatelessWidget {
                             horizontal: 31 * media.size.width / 402,
                           ),
                           child: LiquidGlassNavBar(
-                            onHomePressed: () =>
-                                context.pushIfNotCurrent(AppRoutes.studentHome),
-                            onNewPressed: () =>
-                                context.pushIfNotCurrent(AppRoutes.requestForm),
-                            onProfilePressed: () =>
-                                context.pushIfNotCurrent(AppRoutes.profile),
+                            onHomePressed: () => context.pushIfNotCurrent(
+                              AppRoutes.studentHome,
+                              extra: SlideFrom.left,
+                            ),
+
+                            onNewPressed: () => context.pushIfNotCurrent(
+                              AppRoutes.requestForm,
+                              extra:
+                                  GoRouterState.of(context).uri.path ==
+                                      AppRoutes.studentHome
+                                  ? SlideFrom.right
+                                  : SlideFrom.left,
+                            ),
+
+                            onProfilePressed: () => context.pushIfNotCurrent(
+                              AppRoutes.profile,
+                              extra: SlideFrom.right,
+                            ),
                             rightIcon: Left(
                               Image.asset(
                                 'assets/user.png',

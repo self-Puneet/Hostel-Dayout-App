@@ -5,28 +5,26 @@ extension GoNoDup on BuildContext {
   bool _sameUri(Uri a, Uri b) =>
       a.path == b.path && a.query == b.query && a.fragment == b.fragment;
 
-  // Use for top-level destinations (tabs/home) so you don't grow the stack.
-  void goIfNotCurrent(String location) {
+  void goIfNotCurrent(String location, {Object? extra}) {
     final current = GoRouterState.of(this).uri;
     final target = Uri.parse(location);
     if (_sameUri(current, target)) return;
-    go(location);
+    go(location, extra: extra); // go supports `extra`
   }
 
-  // Use for secondary/detail pages; still guard duplicates.
-  Future<T?> pushIfNotCurrent<T extends Object?>(String location) {
+  Future<T?> pushIfNotCurrent<T extends Object?>(String location, {Object? extra}) {
     final current = GoRouterState.of(this).uri;
     final target = Uri.parse(location);
     if (_sameUri(current, target)) return Future.value(null);
-    return push<T>(location);
+    return push<T>(location, extra: extra); // push supports `extra`
   }
 
-  // Prefer named APIs to get canonical locations (handles params/query uniformly).
   void goNamedIfNotCurrent(
     String name, {
     Map<String, String> pathParameters = const {},
     Map<String, String> queryParameters = const {},
     String? fragment,
+    Object? extra,
   }) {
     final router = GoRouter.of(this);
     final current = GoRouterState.of(this).uri;
@@ -38,7 +36,12 @@ extension GoNoDup on BuildContext {
     );
     final target = Uri.parse(loc);
     if (_sameUri(current, target)) return;
-    go(loc);
+    goNamed(
+      name,
+      pathParameters: pathParameters,
+      queryParameters: queryParameters,
+      extra: extra,
+    );
   }
 
   Future<T?> pushNamedIfNotCurrent<T extends Object?>(
@@ -46,6 +49,7 @@ extension GoNoDup on BuildContext {
     Map<String, String> pathParameters = const {},
     Map<String, String> queryParameters = const {},
     String? fragment,
+    Object? extra,
   }) {
     final router = GoRouter.of(this);
     final current = GoRouterState.of(this).uri;
@@ -61,7 +65,7 @@ extension GoNoDup on BuildContext {
       name,
       pathParameters: pathParameters,
       queryParameters: queryParameters,
-      extra: null,
+      extra: extra,
     );
   }
 }

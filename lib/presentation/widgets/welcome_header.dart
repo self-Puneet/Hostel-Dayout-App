@@ -63,6 +63,8 @@ class WelcomeHeader extends StatelessWidget {
                       (actor == TimelineActor.assistentWarden ||
                               actor == TimelineActor.seniorWarden)
                           ? AppRoutes.wardenProfile
+                          : (actor == TimelineActor.parent)
+                          ? AppRoutes.parentProfile
                           : AppRoutes.profile,
                     );
                     // context.go(AppRoutes.wardenProfile);

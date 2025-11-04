@@ -28,9 +28,13 @@ class RequestService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print("peeche dekho peeche");
+        // print("hmmm");
+        // (data['requests'] as List<dynamic>).map((request) {
+        //   print(request['applied_from']);
+        // }).toList();
+        // print("hmmm");
         final apiResponse = RequestApiResponse.fromJson(data);
-        print(apiResponse.requests[0].assistantWardenAction);
+        // print(apiResponse.requests[0].assistantWardenAction);
         return right(apiResponse);
       } else {
         return left("Error: ${response.body}");

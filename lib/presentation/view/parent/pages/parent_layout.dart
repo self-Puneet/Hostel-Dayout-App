@@ -2,6 +2,8 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
+import 'package:hostel_mgmt/core/routes/app_transition_page.dart';
+import 'package:hostel_mgmt/core/routes/go_router_extensions.dart';
 import 'package:hostel_mgmt/presentation/widgets/liquid_glass_morphism/glass_nav_bar.dart';
 
 class ParentLayout extends StatelessWidget {
@@ -51,12 +53,24 @@ class ParentLayout extends StatelessWidget {
                             horizontal: 31 * media.size.width / 402,
                           ),
                           child: LiquidGlassNavBar(
-                            onHomePressed: () =>
-                                context.push(AppRoutes.parentHome),
-                            onNewPressed: () =>
-                                context.push(AppRoutes.parentHistory),
-                            onProfilePressed: () =>
-                                context.push(AppRoutes.parentProfile),
+                            onHomePressed: () => context.pushIfNotCurrent(
+                              AppRoutes.parentHome,
+                              extra: SlideFrom.left,
+                            ),
+
+                            onNewPressed: () => context.pushIfNotCurrent(
+                              AppRoutes.parentHistory,
+                              extra:
+                                  GoRouterState.of(context).uri.path ==
+                                      AppRoutes.parentHome
+                                  ? SlideFrom.right
+                                  : SlideFrom.left,
+                            ),
+
+                            onProfilePressed: () => context.pushIfNotCurrent(
+                              AppRoutes.parentProfile,
+                              extra: SlideFrom.right,
+                            ),
 
                             leftIcon: Left(
                               Image.asset(

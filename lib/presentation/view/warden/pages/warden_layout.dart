@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
+import 'package:hostel_mgmt/core/routes/app_transition_page.dart';
+import 'package:hostel_mgmt/core/routes/go_router_extensions.dart';
 import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/presentation/animation/layout_navbar_action_animation.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_action_state.dart';
@@ -105,17 +107,29 @@ class WardenLayout extends StatelessWidget {
                                   inCurve: Curves.easeOut, // come in
                                   outCurve: Curves.easeIn, // go out
                                   buildNavBar: (_) => LiquidGlassNavBar(
-                                    onHomePressed: () => context.goNamed(
-                                      (actor == TimelineActor.seniorWarden)
-                                          ? AppRoutes.wardenHome
-                                          : AppRoutes.wardenHome,
-                                    ),
-                                    onNewPressed: () => context.goNamed(
-                                      AppRoutes.wardenActionPage,
-                                    ),
-                                    onProfilePressed: () => context.goNamed(
-                                      AppRoutes.wardenHistory,
-                                    ),
+                                    onHomePressed: () =>
+                                        context.pushIfNotCurrent(
+                                          AppRoutes.wardenHome,
+                                          extra: SlideFrom.left,
+                                        ),
+
+                                    onNewPressed: () =>
+                                        context.pushIfNotCurrent(
+                                          AppRoutes.wardenActionPage,
+                                          extra:
+                                              GoRouterState.of(
+                                                    context,
+                                                  ).uri.path ==
+                                                  AppRoutes.wardenHome
+                                              ? SlideFrom.right
+                                              : SlideFrom.left,
+                                        ),
+
+                                    onProfilePressed: () =>
+                                        context.pushIfNotCurrent(
+                                          AppRoutes.wardenHistory,
+                                          extra: SlideFrom.right,
+                                        ),
                                     rightIcon: Right(
                                       Icon(
                                         Icons.history,

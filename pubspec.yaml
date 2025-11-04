@@ -47,6 +47,7 @@ dependencies:
   month_year_picker: ^0.5.0+1
   syncfusion_flutter_datepicker: ^31.2.2
   wheel_picker: ^0.2.2
+  timezone: ^0.10.1
 
 dev_dependencies:
   flutter_test:

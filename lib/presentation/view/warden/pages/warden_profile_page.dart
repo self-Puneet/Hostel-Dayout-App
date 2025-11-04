@@ -493,7 +493,7 @@ class _WardenProfilePageState extends State<WardenProfilePage>
                                           style: OutlinedButton.styleFrom(
                                             padding: const EdgeInsets.symmetric(
                                               vertical: 14,
-                                              horizontal: 20,
+                                              horizontal: 15,
                                             ),
                                             iconColor: Colors.black,
 

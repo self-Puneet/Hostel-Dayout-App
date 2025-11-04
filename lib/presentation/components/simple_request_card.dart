@@ -30,7 +30,9 @@ class SimpleRequestCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-
+    print(fromDate);
+    print(InputConverter.formatTime(fromDate));
+    print("please");
     return InkWell(
       highlightColor: Colors.transparent,
       splashColor: Colors.transparent,

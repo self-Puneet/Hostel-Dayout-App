@@ -37,7 +37,9 @@ class HomeDashboardPage extends StatelessWidget {
     );
     final loginSession = Get.find<LoginSession>();
 
-    return Column(
+    return Container(
+      color: const Color(0xFFE9E9E9),
+      child: Column(
       children: [
         SizedBox(height: topGap),
 
@@ -125,7 +127,7 @@ class HomeDashboardPage extends StatelessWidget {
           ),
         ),
       ],
-    );
+    ));
   }
 }
 

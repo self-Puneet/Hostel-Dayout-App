@@ -1,15 +1,18 @@
 // presentation/view/student/controllers/request_form_controller.dart
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+// import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/helpers/app_snackbar.dart';
-import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
+// import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
+// import 'package:hostel_mgmt/core/routes/app_transition_page.dart';
+// import 'package:hostel_mgmt/core/routes/go_router_extensions.dart';
 import 'package:hostel_mgmt/login/login_controller.dart';
 import 'package:hostel_mgmt/models/restriction_window.dart';
 import 'package:hostel_mgmt/services/profile_service.dart';
 import 'package:hostel_mgmt/services/request_service.dart';
 import '../../../../core/enums/ui_eums/snackbar_type.dart';
 import '../state/request_form_state.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class RequestFormController {
   final RequestFormState state;
@@ -119,13 +122,25 @@ class RequestFormController {
             (state.leaveToTime ?? const TimeOfDay(hour: 23, minute: 59)).hour,
             (state.leaveToTime ?? const TimeOfDay(hour: 23, minute: 59)).minute,
           );
+    String isoInIST(DateTime dt) {
+      final kolkata = tz.getLocation('Asia/Kolkata');
+      final ist = tz.TZDateTime.from(dt, kolkata);
+      final base = ist.toIso8601String().split('.').first; // local form
+      final off = ist.timeZoneOffset; // +05:30 for IST
+      final sign = off.isNegative ? '-' : '+';
+      final hh = off.inHours.abs().toString().padLeft(2, '0');
+      final mm = (off.inMinutes.abs() % 60).toString().padLeft(2, '0');
+      return '$base$sign$hh:$mm';
+    }
 
     final payload = <String, dynamic>{
       'request_type': _mapRequestType(state.requestType),
-      'applied_from': from.toUtc().toIso8601String().split('.').first + 'Z',
-      'applied_to': to.toUtc().toIso8601String().split('.').first + 'Z',
-      'reason': state.reason
-          .trim(), // wire your reason field if present in state
+      // 'applied_from': from.toUtc().toIso8601String().split('.').first + 'Z',
+      // 'applied_to': to.toUtc().toIso8601String().split('.').first + 'Z',
+      'applied_from': isoInIST(from),
+      'applied_to': isoInIST(to),
+
+      'reason': state.reason.trim(),
     };
 
     state.setSubmitting(true);
@@ -139,7 +154,8 @@ class RequestFormController {
           type: AppSnackBarType.success,
           icon: LoginSnackBarType.success.icon,
         );
-        context.go(AppRoutes.studentHome);
+        // print("hereherehereherehereherehereherehere");
+        // context.goIfNotCurrent(AppRoutes.studentHome, extra: SlideFrom.left);
       });
     } catch (_) {
       AppSnackBar.show(
@@ -177,13 +193,16 @@ class RequestFormController {
   // }
 
   void _showSnackBar(String message) {
-    ScaffoldMessenger.of(
+    AppSnackBar.show(
       context,
-    ).showSnackBar(SnackBar(content: Text("Request Submitted Successfully")));
+      message: "Request Submitted Successfully",
+      type: AppSnackBarType.success,
+      icon: LoginSnackBarType.success.icon,
+    );
   }
 
   String _mapRequestType(RequestType t) {
     // Map to API types as needed
-    return t == RequestType.dayout ? 'outing' : 'outing';
+    return t == RequestType.dayout ? 'outing' : 'leave';
   }
 }

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 // import 'package:go_router/go_router.dart';
+import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/presentation/widgets/status_tag.dart';
@@ -112,15 +113,11 @@ class ActiveRequestCard extends StatelessWidget {
       splashColor: Colors.transparent,
       onTap: () {
         if (actor == TimelineActor.student) {
-          context.pushNamed(
-            'request-detail',
-            pathParameters: {'id': requestId},
-          );
+          // Use the explicit path helper so we don't rely on a route name that
+          // may not be registered in the router configuration.
+          context.push(AppRoutes.requestDetailsPath(requestId));
         } else if (actor == TimelineActor.parent) {
-          context.pushNamed(
-            'request-detail-parent',
-            pathParameters: {'id': requestId},
-          );
+          context.push(AppRoutes.parentLayoutPath(requestId));
         }
       },
       borderRadius: BorderRadius.circular(28),

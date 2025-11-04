@@ -6,6 +6,8 @@ import 'package:hostel_mgmt/login/login_state.dart';
 import 'package:provider/provider.dart';
 import 'dependency_injection.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +21,8 @@ Future<void> main() async {
       statusBarIconBrightness: Brightness.light,
     ),
   );
+  tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
 
   runApp(
     ChangeNotifierProvider(create: (_) => LoginState(), child: const MyApp()),

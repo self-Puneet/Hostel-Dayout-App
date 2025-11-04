@@ -2,6 +2,7 @@ import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/enums/request_status.dart';
 import 'package:hostel_mgmt/core/enums/request_type.dart';
 import 'package:hostel_mgmt/core/enums/security_status.dart';
+import 'package:hostel_mgmt/core/util/datetime_extension.dart';
 import 'package:hostel_mgmt/models/warden_model.dart';
 import 'package:hostel_mgmt/models/parent_model.dart';
 import 'package:hostel_mgmt/models/security_guard_model.dart';
@@ -157,7 +158,6 @@ class RequestModel {
 
   /// Deserialize from JSON
   factory RequestModel.fromJson(Map<String, dynamic> json) {
-
     return RequestModel(
       id: json['_id'] ?? '',
       requestId: json['request_id'] ?? '',
@@ -165,13 +165,13 @@ class RequestModel {
           ? RequestType.leave
           : RequestType.dayout,
       studentEnrollmentNumber: json['student_enrollment_number'] ?? '',
-      appliedFrom: DateTime.parse(json['applied_from']),
-      appliedTo: DateTime.parse(json['applied_to']),
+      appliedFrom: DateTime.parse(json['applied_from']).toIST,
+      appliedTo: DateTime.parse(json['applied_to']).toIST,
       reason: json['reason'] ?? '',
       status: _statusFromString(json['request_status']),
       active: json['active'] ?? false,
       createdBy: json['created_by'] ?? '',
-      appliedAt: DateTime.parse(json['applied_at']),
+      appliedAt: DateTime.parse(json['applied_at']).toIST,
       lastUpdatedAt: DateTime.parse(json['last_updated_at']),
       securityStatus: json['security_status'] != null
           ? SecurityStatus.values.firstWhere(

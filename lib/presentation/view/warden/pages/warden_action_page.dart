@@ -89,245 +89,251 @@ class _WardenHomePageState extends State<WardenHomePage>
     );
     final loginSession = Get.find<LoginSession>();
     final mediaQuery = MediaQuery.of(context);
-        final topGap = mediaQuery.size.height * 50 / 874;
+    final topGap = mediaQuery.size.height * 50 / 874;
 
+    return Container(
+      color: const Color(0xFFE9E9E9),
+      child: Column(
+        children: [
+          SizedBox(height: topGap),
 
-    return Column(
-      children: [
-                SizedBox(height: topGap),
-
-        Container(
-          margin: horizontalPad,
-          child: WelcomeHeader(
-            enrollmentNumber: loginSession.identityId,
-            phoneNumber: loginSession.phone,
-            actor: loginSession.role,
-            hostelName: loginSession.hostels!
-                .map((h) => h.hostelName)
-                .toList()
-                .join('\n'),
-            name: loginSession.username,
-            avatarUrl: loginSession.imageURL,
-            greeting: 'Welcome back,',
+          Container(
+            margin: horizontalPad,
+            child: WelcomeHeader(
+              enrollmentNumber: loginSession.identityId,
+              phoneNumber: loginSession.phone,
+              actor: loginSession.role,
+              hostelName: loginSession.hostels!
+                  .map((h) => h.hostelName)
+                  .toList()
+                  .join('\n'),
+              name: loginSession.username,
+              avatarUrl: loginSession.imageURL,
+              greeting: 'Welcome back,',
+            ),
           ),
-        ),
 
-        const SizedBox(height: 20),
-        Expanded(
-          // <-- give bounded height to the scrollable area
-          child: RefreshIndicator(
-            triggerMode: RefreshIndicatorTriggerMode.anywhere,
-            color: Colors.black,
-            backgroundColor: Colors.white,
-            notificationPredicate: (notification) =>
-                notification.metrics.axis == Axis.vertical &&
-                notification.depth > 0,
-            strokeWidth: 3,
-            displacement: 60,
-            onRefresh: () async {
-              state.resetForHostelChange();
-              await _controller.fetchRequestsFromApi();
-            },
-            child: Consumer<WardenActionState>(
-              builder: (context, s, _) {
-                if (!s.hostelsInitialized) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    WardenActionPageController(s).loadHostelsFromSession();
-                  });
-                }
+          const SizedBox(height: 20),
+          Expanded(
+            // <-- give bounded height to the scrollable area
+            child: RefreshIndicator(
+              triggerMode: RefreshIndicatorTriggerMode.anywhere,
+              color: Colors.black,
+              backgroundColor: Colors.white,
+              notificationPredicate: (notification) =>
+                  notification.metrics.axis == Axis.vertical &&
+                  notification.depth > 0,
+              strokeWidth: 3,
+              displacement: 60,
+              onRefresh: () async {
+                state.resetForHostelChange();
+                await _controller.fetchRequestsFromApi();
+              },
+              child: Consumer<WardenActionState>(
+                builder: (context, s, _) {
+                  if (!s.hostelsInitialized) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      WardenActionPageController(s).loadHostelsFromSession();
+                    });
+                  }
 
-                if (s.hostelsInitialized &&
-                    !s.isLoading &&
-                    !s.isErrored &&
-                    !s.hasData) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    WardenActionPageController(s).fetchRequestsFromApi();
-                  });
-                }
+                  if (s.hostelsInitialized &&
+                      !s.isLoading &&
+                      !s.isErrored &&
+                      !s.hasData) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      WardenActionPageController(s).fetchRequestsFromApi();
+                    });
+                  }
 
-                return Column(
-                  children: [
-                    // Search + hostel picker
-                    Padding(
-                      padding: horizontalPad,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: s.filterController,
-                              decoration: InputDecoration(
-                                hintText: 'Search by Name',
-                                prefixIcon: const Icon(Icons.search),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                  return Column(
+                    children: [
+                      // Search + hostel picker
+                      Padding(
+                        padding: horizontalPad,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: s.filterController,
+                                decoration: InputDecoration(
+                                  hintText: 'Search by Name',
+                                  prefixIcon: const Icon(Icons.search),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  isDense: true,
                                 ),
-                                isDense: true,
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          SizedBox(
-                            width: 130,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: Colors.blueGrey,
-                                  width: 1.1,
+                            const SizedBox(width: 8),
+                            SizedBox(
+                              width: 130,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.blueGrey,
+                                    width: 1.1,
+                                  ),
+                                  // boxShadow: const [
+                                  //   BoxShadow(
+                                  //     color: Colors.black12,
+                                  //     blurRadius: 6,
+                                  //     offset: Offset(0, 2),
+                                  //   ),
+                                  // ],
                                 ),
-                                // boxShadow: const [
-                                //   BoxShadow(
-                                //     color: Colors.black12,
-                                //     blurRadius: 6,
-                                //     offset: Offset(0, 2),
-                                //   ),
-                                // ],
+                                child: hostelWidget(s),
                               ),
-                              child: hostelWidget(s),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          // Segmented, scrollable tabs
+                          Padding(
+                            padding: horizontalPad,
+                            child: SegmentedTabs(
+                              controller: _tabs,
+                              labels: labels,
+                            ),
+                          ),
+                          // const SizedBox(height: 6),
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom:
+                                (state.currentTab == WardenTab.pendingApproval)
+                                ? -10
+                                : 0,
+                            child: Padding(
+                              padding: horizontalPad,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Divider(
+                                      thickness: 2,
+                                      height: 0,
+                                      color: Colors.grey.shade300,
+                                    ),
+                                  ),
+                                  (state.currentTab ==
+                                          WardenTab.pendingApproval)
+                                      ? GestureDetector(
+                                          onTap: () {
+                                            state.toggleAllSelectedCheckbox(
+                                              widget.actor,
+                                            );
+                                          },
+                                          child: Container(
+                                            color: const Color(0xFFE9E9E9),
+                                            height: 20,
+                                            width: 20,
+                                            child: Icon(
+                                              state.allSelected
+                                                  ? Icons.check_box
+                                                  : Icons
+                                                        .check_box_outline_blank,
+                                              color: Colors.black,
+                                              size: 20,
+                                            ),
+                                          ),
+                                        )
+                                      : Container(),
+                                ],
+                              ),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        // Segmented, scrollable tabs
-                        Padding(
-                          padding: horizontalPad,
-                          child: SegmentedTabs(
-                            controller: _tabs,
-                            labels: labels,
-                          ),
-                        ),
-                        // const SizedBox(height: 6),
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom:
-                              (state.currentTab == WardenTab.pendingApproval)
-                              ? -10
-                              : 0,
-                          child: Padding(
-                            padding: horizontalPad,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Divider(
-                                    thickness: 2,
-                                    height: 0,
-                                    color: Colors.grey.shade300,
-                                  ),
-                                ),
-                                (state.currentTab == WardenTab.pendingApproval)
-                                    ? GestureDetector(
-                                        onTap: () {
-                                          state.toggleAllSelectedCheckbox(
-                                            widget.actor,
-                                          );
-                                        },
-                                        child: Container(
-                                          color: const Color(0xFFE9E9E9),
-                                          height: 20,
-                                          width: 20,
-                                          child: Icon(
-                                            state.allSelected
-                                                ? Icons.check_box
-                                                : Icons.check_box_outline_blank,
-                                            color: Colors.black,
-                                            size: 20,
-                                          ),
-                                        ),
-                                      )
-                                    : Container(),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
 
-                    // Tab contents
-                    (s.isLoading && !s.hasData)
-                        ? Padding(
-                            padding:
-                                horizontalPad +
-                                const EdgeInsets.symmetric(
-                                  horizontal: 0,
+                      // Tab contents
+                      (s.isLoading && !s.hasData)
+                          ? Padding(
+                              padding:
+                                  horizontalPad +
+                                  const EdgeInsets.symmetric(
+                                    horizontal: 0,
+                                    vertical: 8,
+                                  ),
+                              child: SingleChildScrollView(
+                                padding: const EdgeInsets.symmetric(
                                   vertical: 8,
                                 ),
-                            child: SingleChildScrollView(
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              child: Column(
-                                children: List.generate(2, (index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 8,
+                                child: Column(
+                                  children: List.generate(2, (index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 8,
+                                      ),
+                                      child: simpleActionRequestCardSkeleton(),
+                                    );
+                                  }),
+                                ),
+                              ),
+                            )
+                          : Expanded(
+                              child: TabBarView(
+                                controller: _tabs,
+                                physics: const NeverScrollableScrollPhysics(),
+                                children: [
+                                  if (widget.actor ==
+                                      TimelineActor.seniorWarden) ...[
+                                    // Pending (senior: referred + parentApproved)
+                                    finalApprovalTab(_controller, state),
+                                    // Approved
+                                    approvedTab(_controller),
+                                    // Pending Parent (show referred or parentApproved per your UX);
+                                    parentPendingTab(_controller),
+                                    // Requested
+                                    requestedTab(_controller),
+                                  ] else if (widget.actor ==
+                                      TimelineActor.assistentWarden) ...[
+                                    // Pending (assistant: requested + cancelledStudent)
+                                    _PendingApprovalList(
+                                      actor: widget.actor,
+                                      stateController: _controller,
+                                      state: state,
+                                      // status param kept for compatibility; ignored internally.
+                                      status: RequestStatus.requested,
                                     ),
-                                    child: simpleActionRequestCardSkeleton(),
-                                  );
-                                }),
+                                    // Approved
+                                    StatusList(
+                                      actor: widget.actor,
+                                      stateController: _controller,
+                                      status: RequestStatus.approved,
+                                      showParent: true,
+                                    ),
+                                    // Referred
+                                    StatusList(
+                                      actor: widget.actor,
+                                      stateController: _controller,
+                                      status: RequestStatus.referred,
+                                      showParent: true,
+                                    ),
+                                    // Parent Approved
+                                    StatusList(
+                                      actor: widget.actor,
+                                      stateController: _controller,
+                                      status: RequestStatus.parentApproved,
+                                      showParent: true,
+                                    ),
+                                  ],
+                                ],
                               ),
                             ),
-                          )
-                        : Expanded(
-                            child: TabBarView(
-                              controller: _tabs,
-                              physics: const NeverScrollableScrollPhysics(),
-                              children: [
-                                if (widget.actor ==
-                                    TimelineActor.seniorWarden) ...[
-                                  // Pending (senior: referred + parentApproved)
-                                  finalApprovalTab(_controller, state),
-                                  // Approved
-                                  approvedTab(_controller),
-                                  // Pending Parent (show referred or parentApproved per your UX);
-                                  parentPendingTab(_controller),
-                                  // Requested
-                                  requestedTab(_controller),
-                                ] else if (widget.actor ==
-                                    TimelineActor.assistentWarden) ...[
-                                  // Pending (assistant: requested + cancelledStudent)
-                                  _PendingApprovalList(
-                                    actor: widget.actor,
-                                    stateController: _controller,
-                                    state: state,
-                                    // status param kept for compatibility; ignored internally.
-                                    status: RequestStatus.requested,
-                                  ),
-                                  // Approved
-                                  StatusList(
-                                    actor: widget.actor,
-                                    stateController: _controller,
-                                    status: RequestStatus.approved,
-                                    showParent: true,
-                                  ),
-                                  // Referred
-                                  StatusList(
-                                    actor: widget.actor,
-                                    stateController: _controller,
-                                    status: RequestStatus.referred,
-                                    showParent: true,
-                                  ),
-                                  // Parent Approved
-                                  StatusList(
-                                    actor: widget.actor,
-                                    stateController: _controller,
-                                    status: RequestStatus.parentApproved,
-                                    showParent: true,
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                  ],
-                );
-              },
+                    ],
+                  );
+                },
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
