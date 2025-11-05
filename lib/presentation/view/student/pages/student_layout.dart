@@ -12,14 +12,14 @@ class StudentLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final media = MediaQuery.of(context);
-    final bottomInset = media.viewInsets.bottom;
-    final bottomSafe = media.viewPadding.bottom;
+      final media = MediaQuery.of(context);
+      final bottomInset = media.viewInsets.bottom;
+      final bottomSafe = media.viewPadding.bottom;
 
-    final bool isKeyboardOpen = bottomInset > 0;
-    final bool showNavBar = !isKeyboardOpen;
+      final bool isKeyboardOpen = bottomInset > 0;
+      final bool showNavBar = !isKeyboardOpen;
 
-    final double barBottomOffset = bottomSafe + 12;
+      final double barBottomOffset = bottomSafe + 12;
 
     return GestureDetector(
       behavior: HitTestBehavior.translucent,

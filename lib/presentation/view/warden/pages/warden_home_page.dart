@@ -9,6 +9,7 @@ import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/models/expandable_stat_card_data.dart';
 import 'package:hostel_mgmt/models/warden_statistics.dart';
 import 'package:hostel_mgmt/presentation/components/expandable_stat_card.dart';
+import 'package:hostel_mgmt/presentation/components/skeleton_loaders/warden_home_page_skeleton.dart';
 import 'package:hostel_mgmt/presentation/view/warden/controller/warden_home_controller.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_action_state.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_home_state.dart';
@@ -40,94 +41,92 @@ class HomeDashboardPage extends StatelessWidget {
     return Container(
       color: const Color(0xFFE9E9E9),
       child: Column(
-      children: [
-        SizedBox(height: topGap),
+        children: [
+          SizedBox(height: topGap),
 
-        Container(
-          margin: horizontalPad,
-          child: WelcomeHeader(
-            enrollmentNumber: loginSession.identityId,
-            phoneNumber: loginSession.phone,
-            actor: loginSession.role,
-            hostelName: loginSession.hostels!
-                .map((h) => h.hostelName)
-                .toList()
-                .join('\n'),
-            name: loginSession.username,
-            avatarUrl: loginSession.imageURL,
-            greeting: 'Welcome back,',
+          Container(
+            margin: horizontalPad,
+            child: WelcomeHeader(
+              enrollmentNumber: loginSession.identityId,
+              phoneNumber: loginSession.phone,
+              actor: loginSession.role,
+              hostelName: loginSession.hostels!
+                  .map((h) => h.hostelName)
+                  .toList()
+                  .join('\n'),
+              name: loginSession.username,
+              avatarUrl: loginSession.imageURL,
+              greeting: 'Welcome back,',
+            ),
           ),
-        ),
 
-        const SizedBox(height: 20),
-        Expanded(
-          // <-- give bounded height to the scrollable area
-          child: AppRefreshWrapper(
-            onRefresh: () => controller.refresh(),
-            child: Padding(
-              padding: horizontalPad,
-              child: ListView(
-                padding: const EdgeInsets.all(0),
-                children: [
-                  if (state.isLoading)
-                    const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(32),
-                        child: CircularProgressIndicator(),
-                      ),
-                    )
-                  else if (state.error != null)
-                    Card(
-                      color: Theme.of(context).colorScheme.errorContainer,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text(state.error!),
-                      ),
-                    )
-                  else if (state.stats != null)
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        HostelSummaryCard(
-                          selectedHostelName:
-                              state.selectedHostelName ?? "Unknown",
-                          hostels: state.hostels,
-                          selectedHostelId: state.selectedHostelId!,
-                          onHostelSelected: (HostelInfo selected) {
-                            controller.selectHostel(
-                              selected.hostelId,
-                              selected.hostelName,
-                            );
-                          },
-                          monthCount: state.stats!.monthCount,
-                          todayCount: state.stats!.actionCount,
+          const SizedBox(height: 20),
+          Expanded(
+            // <-- give bounded height to the scrollable area
+            child: AppRefreshWrapper(
+              onRefresh: () => controller.refresh(),
+              child: Padding(
+                padding: horizontalPad,
+                child: ListView(
+                  padding: const EdgeInsets.all(0),
+                  children: [
+                    if (state.isLoading)
+                      Center(child: wardenHomePageSkeelton())
+                    else if (state.error != null)
+                      Card(
+                        color: Theme.of(context).colorScheme.errorContainer,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Text(state.error!),
                         ),
-
-                        const SizedBox(height: 20),
-                        const Padding(
-                          padding: EdgeInsetsGeometry.symmetric(horizontal: 11),
-                          child: Divider(
-                            color: Color.fromRGBO(117, 117, 117, 1),
+                      )
+                    else if (state.stats != null)
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          HostelSummaryCard(
+                            selectedHostelName:
+                                state.selectedHostelName ?? "Unknown",
+                            hostels: state.hostels,
+                            selectedHostelId: state.selectedHostelId!,
+                            onHostelSelected: (HostelInfo selected) {
+                              controller.selectHostel(
+                                selected.hostelId,
+                                selected.hostelName,
+                              );
+                            },
+                            monthCount: state.stats!.monthCount,
+                            todayCount: state.stats!.actionCount,
                           ),
-                        ),
-                        const SizedBox(height: 20),
 
-                        // Statistics section
-                        DashboardGrid(stats: state.stats!),
-                        Container(
-                          height:
-                              84 + MediaQuery.of(context).viewPadding.bottom,
-                        ),
-                      ],
-                    ),
-                ],
+                          const SizedBox(height: 20),
+                          const Padding(
+                            padding: EdgeInsetsGeometry.symmetric(
+                              horizontal: 11,
+                            ),
+                            child: Divider(
+                              color: Color.fromRGBO(117, 117, 117, 1),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Statistics section
+                          DashboardGrid(stats: state.stats!),
+                          Container(
+                            height:
+                                84 + MediaQuery.of(context).viewPadding.bottom,
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ],
-    ));
+        ],
+      ),
+    );
   }
 }
 
@@ -140,7 +139,7 @@ class HostelSummaryCard extends StatelessWidget {
   final int todayCount;
   final IconData icon;
 
-  const HostelSummaryCard({
+  const   HostelSummaryCard({
     super.key,
     required this.selectedHostelName,
     required this.hostels,

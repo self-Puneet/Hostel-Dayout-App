@@ -12,8 +12,7 @@ import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 
 class AuthService {
-  static const String apiUrl =
-      "https://hostel-leave-3.onrender.com/api/student/login";
+  static const String apiUrl = "$baseUrl/student/login";
 
   static Future<Either<String, LoginSession>> loginStudent({
     required String enrollmentNo,
@@ -95,8 +94,7 @@ class AuthService {
     }
   }
 
-  static const String apiBaseWarden =
-      "https://hostel-leave-3.onrender.com/api/warden";
+  static const String apiBaseWarden = "$baseUrl/warden";
 
   static Future<Either<String, LoginSession>> loginWarden({
     required String empId,
@@ -210,7 +208,7 @@ class AuthService {
       };
 
       final response = await http.post(
-        Uri.parse("https://hostel-leave-3.onrender.com/api/parent/login"),
+        Uri.parse("$baseUrl/parent/login"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(payload),
       );

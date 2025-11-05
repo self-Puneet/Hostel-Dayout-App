@@ -189,7 +189,7 @@ class ProfileOverlay extends StatelessWidget {
                           icon: const Icon(Icons.logout),
                           label: const Text("Logout"),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.redAccent,
+                            backgroundColor: Colors.black,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(

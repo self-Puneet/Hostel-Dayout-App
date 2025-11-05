@@ -34,6 +34,35 @@ class WelcomeHeader extends StatelessWidget {
   }) : date = date ?? DateTime.now();
 
   // Derive initials from a full name (e.g., "Alvaro Morte" -> "AM").
+  void showDynamicSheet(BuildContext context, {required Widget content}) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // allow dynamic height + draggability
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+      ),
+      constraints: BoxConstraints(
+        // cap height (example: 90% of screen)
+        maxHeight: MediaQuery.sizeOf(context).height * 0.9,
+      ),
+      builder: (context) {
+        return Padding(
+          // inner padding only; not an external bottom gap
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+            left: 16,
+            right: 16,
+            top: 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // wrap intrinsic height
+            children: [Flexible(child: SingleChildScrollView(child: content))],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
