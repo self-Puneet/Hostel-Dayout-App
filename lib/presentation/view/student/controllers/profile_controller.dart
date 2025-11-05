@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:dartz/dartz.dart';
+import 'package:get/instance_manager.dart';
+import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/services/auth_service.dart';
 import 'package:hostel_mgmt/services/profile_service.dart';
 import '../state/profile_state.dart';
@@ -38,6 +40,12 @@ class ProfileController {
       print(result);
       result.fold((err) => state.setErrored(err), (updated) {
         state.setProfilePic(updated.profilePic!); // ✅ Uses existing method
+        final loginSession = Get.find<LoginSession>();
+        final updatedSession = loginSession.copyWith(
+          imageURL: updated.profilePic!,
+        );
+        Get.replace<LoginSession>(updatedSession);
+        print(Get.find<LoginSession>().imageURL);
       });
     } catch (e) {
       state.setErrored('Failed to update profile picture');

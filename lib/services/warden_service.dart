@@ -78,15 +78,8 @@ class WardenService {
       }
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
-      final hehe = [];
-      data["requests"].map((e) {
-        hehe.add(e['request_id']);
-      }).toString();
-      print("duplicate${hehe.length}");
-      print("duplicate-nahi${hehe.toSet().length}");
 
       final list = (data['requests'] as List?) ?? const [];
-      print(list.length);
       final results = <(RequestModel, StudentProfileModel)>[];
 
       for (final raw in list) {

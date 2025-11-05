@@ -158,6 +158,33 @@ class RequestModel {
 
   /// Deserialize from JSON
   factory RequestModel.fromJson(Map<String, dynamic> json) {
+    // print("==================================================>>");
+    // print(DateTime.parse(json['applied_from']).toIST);
+    // print(DateTime.parse(json['applied_to']).toIST);
+    // print(_statusFromString(json['request_status']));
+    // // keep on printing all values assigned below to check where problem occured
+    // print(json['applied_from']);
+    // print(json['applied_to']);
+    // print(json['reason']);
+    // print(json['active']);
+    // print(json['assistent_warden_action']);
+    // print(
+    //   json.containsKey('assistent_warden_action')
+    //       ? AssistantWardenAction(
+    //           assistantWardenModel: WardenModel.fromJson(
+    //             json['assistent_warden_action']['action_by'],
+    //           ),
+    //           action: RequestActionX.ApiStringToAction(
+    //             json['assistent_warden_action']['action'],
+    //           ),
+    //           actionAt: DateTime.parse(
+    //             json['assistent_warden_action']['createdAt'],
+    //           ),
+    //         )
+    //       : null,
+    // );
+    // print("ho ja yaar");
+    // print("==================================================<<");
     return RequestModel(
       id: json['_id'] ?? '',
       requestId: json['request_id'] ?? '',
@@ -180,16 +207,6 @@ class RequestModel {
             )
           : null,
       parentRemark: json['parent_remark'],
-      // studentAction: StudentAction(
-      //   studentProfileModel: StudentProfileModel.fromJson(
-      //     json['student_action']['action_by'],
-      //   ),
-      //   action: RequestAction.values.firstWhere(
-      //     (e) =>
-      //         e.toString().split('.').last == json['student_action']['action'],
-      //   ),
-      //   actionAt: DateTime.parse(json['student_action']['action_at']),
-      // ),
       parentAction: json.containsKey('parent_action')
           ? ParentAction(
               parentModel: ParentModel.fromJson(
@@ -211,9 +228,11 @@ class RequestModel {
               assistantWardenModel: WardenModel.fromJson(
                 json['assistent_warden_action']['action_by'],
               ),
-              action: RequestActionX.ApiStringToAction(
-                json['assistent_warden_action']['action'],
-              ),
+              action:
+                  _statusFromString(json['request_status']) ==
+                      RequestStatus.cancelled
+                  ? RequestAction.cancel
+                  : RequestAction.refer,
               actionAt: DateTime.parse(
                 json['assistent_warden_action']['createdAt'],
               ),
@@ -391,12 +410,14 @@ class RequestDetailApiResponse {
   final RequestModel request;
   final WardenModel assistentWarden;
   final WardenModel seniorWarden;
+  // final StudentProfileModel studentProfileModel;
 
   RequestDetailApiResponse({
     required this.message,
     required this.request,
     required this.assistentWarden,
     required this.seniorWarden,
+    // required this.studentProfileModel,
   });
 
   factory RequestDetailApiResponse.fromJson(Map<String, dynamic> json) {
@@ -405,6 +426,7 @@ class RequestDetailApiResponse {
       request: RequestModel.fromJson(json['request'] ?? {}),
       assistentWarden: WardenModel.fromJson(json['assistantWarden']),
       seniorWarden: WardenModel.fromJson(json['seniorWarden']),
+      // studentProfileModel: StudentProfileModel.fromJson(json['student_Info']),
     );
   }
 

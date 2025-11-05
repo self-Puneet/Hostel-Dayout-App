@@ -7,6 +7,7 @@ import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/core/routes/app_transition_page.dart'; // 👈 import here
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/login/login_layout.dart';
+import 'package:hostel_mgmt/models/student_profile.dart';
 import 'package:hostel_mgmt/presentation/view/parent/pages/parent_home.dart';
 import 'package:hostel_mgmt/presentation/view/parent/pages/parent_layout.dart';
 import 'package:hostel_mgmt/presentation/view/parent/pages/parent_profile_page.dart';
@@ -126,86 +127,6 @@ class AppRouter {
           },
           routes: [
             // warden action page route
-            // GoRoute(
-            //   path: AppRoutes.wardenActionPage,
-            //   name: AppRoutes.wardenActionPage,
-            //   pageBuilder: (context, state) {
-            //     final layoutState = context.read<WardenLayoutState>();
-            //     final tabParam = state.uri.queryParameters['tab'];
-            //     final initialTab = WardenTab.values.firstWhere(
-            //       (t) => t.name == tabParam,
-            //       orElse: () => WardenTab.pendingApproval,
-            //     );
-            //     return AppTransitionPage(
-            //       key: state.pageKey,
-            //       child: WardenActionSelectionGuard(
-            //         child: WardenHomePage(
-            //           actor: layoutState.loginSession.role,
-            //           initialTab: initialTab,
-            //         ),
-            //       ),
-            //     );
-            //   },
-            // ),
-
-            // // // warden home page route
-            // GoRoute(
-            //   path: AppRoutes.wardenHome,
-            //   name: AppRoutes.wardenHome,
-            //   pageBuilder: (context, state) {
-            //     // Instead of only providing state, provide both state and controller
-            //     return AppTransitionPage(
-            //       key: state.pageKey,
-            //       child: MultiProvider(
-            //         providers: [
-            //           ChangeNotifierProvider(
-            //             create: (_) => WardenStatisticsState(),
-            //           ),
-            //           ProxyProvider<
-            //             WardenStatisticsState,
-            //             WardenStatisticsController
-            //           >(
-            //             // ProxyProvider injects the state into the controller
-            //             update: (_, wardenState, __) =>
-            //                 WardenStatisticsController(wardenState),
-            //           ),
-            //         ],
-            //         child: HomeDashboardPage(),
-            //       ),
-            //     );
-            //   },
-            // ),
-
-            // // warden profile page route (matching the style of the history route)
-            // GoRoute(
-            //   path: AppRoutes.wardenProfile,
-            //   name: AppRoutes.wardenProfile,
-            //   pageBuilder: (context, state) {
-            //     return AppTransitionPage(
-            //       key: state.pageKey,
-            //       child: ChangeNotifierProvider(
-            //         create: (_) => WardenProfileState(),
-            //         child: WardenProfilePage(),
-            //       ),
-            //     );
-            //   },
-            // ),
-
-            // // warden history page route
-            // GoRoute(
-            //   path: AppRoutes.wardenHistory, // e.g., '/warden/history'
-            //   name: AppRoutes.wardenHistory,
-            //   pageBuilder: (context, state) {
-            //     final loginSession = Get.find<LoginSession>();
-            //     return AppTransitionPage(
-            //       key: state.pageKey,
-            //       child: ChangeNotifierProvider(
-            //         create: (_) => WardenHistoryState(),
-            //         child: WardenHistoryPage(actor: loginSession.role),
-            //       ),
-            //     );
-            //   },
-            // ),
             GoRoute(
               path: AppRoutes.wardenActionPage,
               name: AppRoutes.wardenActionPage,
@@ -230,6 +151,8 @@ class AppRouter {
                 );
               },
             ),
+
+            // warden home route
             GoRoute(
               path: AppRoutes.wardenHome,
               name: AppRoutes.wardenHome,
@@ -255,6 +178,8 @@ class AppRouter {
                     : SlideFrom.right,
               ),
             ),
+
+            // warden profile route
             GoRoute(
               path: AppRoutes.wardenProfile,
               name: AppRoutes.wardenProfile,
@@ -269,6 +194,8 @@ class AppRouter {
                     : SlideFrom.right,
               ),
             ),
+
+            // warden history route
             GoRoute(
               path: AppRoutes.wardenHistory,
               name: AppRoutes.wardenHistory,
@@ -279,6 +206,34 @@ class AppRouter {
                   child: ChangeNotifierProvider(
                     create: (_) => WardenHistoryState(),
                     child: WardenHistoryPage(actor: loginSession.role),
+                  ),
+                  slideFrom: (state.extra is SlideFrom)
+                      ? state.extra as SlideFrom
+                      : SlideFrom.right,
+                );
+              },
+            ),
+
+            // warden request detail route (nested, dynamic)
+            GoRoute(
+              // keep as child if you want the warden shell visible above details
+              path: AppRoutes.wardenRequestDetails, // '/warden/request/:id'
+              name: 'request-detail-warden',
+              pageBuilder: (context, state) {
+                final requestId = state.pathParameters['id'] ?? '';
+                final role = Get.find<LoginSession>().role;
+                // If route was pushed with a Map extra, forward it to the page as routeArgs
+                final StudentProfileModel? routeArgs =
+                    (state.extra is StudentProfileModel)
+                    ? state.extra as StudentProfileModel
+                    : null;
+
+                return AppTransitionPage(
+                  key: state.pageKey,
+                  child: RequestPage(
+                    actor: role,
+                    requestId: requestId,
+                    routeArgs: routeArgs,
                   ),
                   slideFrom: (state.extra is SlideFrom)
                       ? state.extra as SlideFrom
@@ -347,10 +302,6 @@ class AppRouter {
             ),
           ],
         ),
-
-        // Student request details (absolute route) - keep as a sibling so
-        // the details page can be opened from other shells/widgets regardless
-        // of the active ShellRoute.
 
         /// Login
         GoRoute(

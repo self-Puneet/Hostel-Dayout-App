@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/helpers/app_refreasher_widget.dart';
 import 'package:hostel_mgmt/core/theme/app_theme.dart';
+import 'package:hostel_mgmt/core/theme/elevated_button_theme.dart';
 import 'package:hostel_mgmt/core/util/input_convertor.dart';
+import 'package:hostel_mgmt/models/student_profile.dart';
 import 'package:hostel_mgmt/models/warden_model.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:hostel_mgmt/presentation/components/contact_card.dart';
@@ -21,8 +24,15 @@ import '../../../widgets/checkered_pattern.dart';
 class RequestPage extends StatefulWidget {
   final TimelineActor actor;
   final String requestId;
-  const RequestPage({Key? key, required this.actor, required this.requestId})
-    : super(key: key);
+  // Optional route arguments passed via GoRouter.extra (Map<String, dynamic>)
+  final StudentProfileModel? routeArgs;
+
+  const RequestPage({
+    Key? key,
+    required this.actor,
+    required this.requestId,
+    this.routeArgs,
+  }) : super(key: key);
 
   @override
   State<RequestPage> createState() => _RequestPageState();
@@ -30,8 +40,10 @@ class RequestPage extends StatefulWidget {
 
 class _RequestPageState extends State<RequestPage> {
   bool _expanded = false;
-
+  bool _isFabVisible = true; // track FAB visibility
   late final RequestDetailController _controller;
+  late final ScrollController _scrollController;
+
   @override
   void initState() {
     super.initState();
@@ -39,7 +51,37 @@ class _RequestPageState extends State<RequestPage> {
     _controller = RequestDetailController(
       state: state,
       requestId: widget.requestId,
+      actor: widget.actor,
     );
+
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.userScrollDirection ==
+        ScrollDirection.reverse) {
+      if (_isFabVisible) {
+        setState(() {
+          _isFabVisible = false; // hide FAB on scroll down
+          _expanded = false; // collapse expanded FAB menu when hiding
+        });
+      }
+    } else if (_scrollController.position.userScrollDirection ==
+        ScrollDirection.forward) {
+      if (!_isFabVisible) {
+        setState(() {
+          _isFabVisible = true; // show FAB on scroll up
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<bool> _confirmAction(
@@ -75,6 +117,8 @@ class _RequestPageState extends State<RequestPage> {
     final padding = EdgeInsets.symmetric(
       horizontal: 31 * mediaQuery.size.width / 402,
     );
+
+    final StudentProfileModel? studentProfile = widget.routeArgs;
 
     final TextTheme textTheme = Theme.of(context).textTheme;
 
@@ -127,123 +171,59 @@ class _RequestPageState extends State<RequestPage> {
             role: req.seniorWarden.wardenRole.displayName,
             phoneNumber: req.seniorWarden.phoneNo,
           );
-          final studentContactCard = seniorWardenContactCard;
-          final parentContactCard = assistentWardenContactCard;
-          // Compute actions based on actor + current status
-          final statusNow = req.request.status;
-          final actions = RequestActionX.actionPossibleonStatus(
-            statusNow,
-            widget.actor,
-          );
-
-          // Build FABs only when not loading and not empty
-          Widget? fab;
-          if (!state.isLoading && actions.isNotEmpty) {
-            // Build the core FAB content (single or expandable group)
-            final Widget coreFab = (actions.length == 1)
-                ? (() {
-                    final a = actions.first;
-                    return FloatingActionButton.extended(
-                      onPressed: state.isActioning
-                          ? null
-                          : () async {
-                              final ok = await _confirmAction(context, a);
-                              if (!ok) return;
-                              await _controller.performAction(
-                                actor: widget.actor,
-                                action: a,
-                              );
-                            },
-                      icon: a.icon,
-                      label: Text(a.name, style: textTheme.h5.w500),
-                      backgroundColor: a.actionColor,
-                    );
-                  })()
-                : Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      AnimatedSize(
-                        duration: const Duration(milliseconds: 200),
-                        curve: Curves.easeInOut,
-                        child: _expanded
-                            ? Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: actions.map((a) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 10),
-                                    child: FloatingActionButton.extended(
-                                      heroTag:
-                                          '${a.name}-${req.request.requestId}',
-                                      onPressed: state.isActioning
-                                          ? null
-                                          : () async {
-                                              final ok = await _confirmAction(
-                                                context,
-                                                a,
-                                              );
-                                              if (!ok) return;
-                                              setState(() => _expanded = false);
-                                              await _controller.performAction(
-                                                actor: widget.actor,
-                                                action: a,
-                                              );
-                                            },
-                                      icon: a.icon,
-                                      label: Text(a.name),
-                                      backgroundColor: a.actionColor,
-                                      isExtended: true,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      materialTapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
-                                      elevation: 6,
-                                    ),
-                                  );
-                                }).toList(),
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                      FloatingActionButton(
-                        heroTag: 'toggle-${req.request.requestId}',
-                        onPressed: state.isActioning
-                            ? null
-                            : () => setState(() => _expanded = !_expanded),
-                        child: Icon(_expanded ? Icons.close : Icons.more_vert),
-                      ),
-                    ],
+          final studentContactCard = (studentProfile != null)
+              ? ContactCard(
+                  name: studentProfile.name,
+                  role: TimelineActor.student.displayName,
+                  phoneNumber: studentProfile.phoneNo,
+                  imageUrl: studentProfile.profilePic,
+                )
+              : ContactCard(
+                  name: "Student",
+                  role: 'Student',
+                  phoneNumber: "phone_no",
+                );
+          final List<ContactCard> parentContactCard = (studentProfile != null)
+              ? studentProfile.parents.map((parent) {
+                  return ContactCard(
+                    name: parent.name,
+                    role: parent.relation,
+                    phoneNumber: parent.phoneNo,
                   );
-
-            // Wrap with SafeArea + Padding to add bottom/left gaps
-            fab = Padding(
-              // Additional fine-tuning if needed
-              padding: EdgeInsets.only(
-                bottom: (84 + MediaQuery.of(context).viewPadding.bottom) / 2,
-                right: 16,
-                left: 16,
-              ),
-              child: coreFab,
-            );
-          }
+                }).toList()
+              : [];
 
           return Scaffold(
             backgroundColor: const Color(0xFFE9E9E9),
-            floatingActionButton: fab,
-            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+            // floatingActionButton: fab,
+            // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             body: AppRefreshWrapper(
               onRefresh: () async {
                 await _controller.fetchRequestDetail(widget.requestId);
               },
               child: SingleChildScrollView(
+                controller: _scrollController,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     checkeredDesign(
-                      child: Text(
-                        req.request.requestType.displayName,
-                        style: textTheme.h1.w500,
+                      child: Container(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              req.request.requestType.displayName,
+                              style: textTheme.h1.w500,
+                            ),
+                            SizedBox(height: 20),
+                            actionButton(
+                              actor: widget.actor,
+                              status: req.request.status,
+                              isActioning: state.isActioning,
+                            ),
+                          ],
+                        ),
                       ),
                       color: state.request!.request.status.minimalStatusColor,
                     ),
@@ -277,8 +257,8 @@ class _RequestPageState extends State<RequestPage> {
                             reason: req.request.reason,
                             parentRemark: req.request.parentRemark,
                           ),
-                          if (widget.actor == TimelineActor.student)
-                            dynamicTimeline(req: req, actor: widget.actor),
+
+                          dynamicTimeline(req: req, actor: widget.actor),
                           if (widget.actor == TimelineActor.student ||
                               widget.actor == TimelineActor.parent) ...[
                             assistentWardenContactCard,
@@ -287,8 +267,8 @@ class _RequestPageState extends State<RequestPage> {
                           if (widget.actor == TimelineActor.seniorWarden ||
                               widget.actor ==
                                   TimelineActor.assistentWarden) ...[
-                            parentContactCard,
                             studentContactCard,
+                            ...parentContactCard,
                           ],
 
                           Container(
@@ -306,6 +286,153 @@ class _RequestPageState extends State<RequestPage> {
         },
       ),
     );
+  }
+
+  Widget actionButton({
+    required TimelineActor actor,
+    required RequestStatus status,
+    required bool isActioning,
+  }) {
+    // button widget
+    print(actor);
+    print(status);
+    // Replace the old animatingButton with this version (no Expanded inside)
+    Widget animatingButton(
+      bool isActioning,
+      String text,
+      VoidCallback? onPressed,
+    ) {
+      final btnStyle = ElevatedButton.styleFrom(
+        textStyle: Theme.of(context).textTheme.h5.copyWith(height: 1.0),
+        minimumSize: const Size.fromHeight(48), // standard min height
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(30)),
+        ),
+      );
+
+      return SizedBox(
+        width: double.infinity, // force full width
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          switchInCurve: Curves.easeOut,
+          switchOutCurve: Curves.easeIn,
+          // keep the container full-width during transitions
+          layoutBuilder: (currentChild, previousChildren) => SizedBox(
+            width: double.infinity,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                ...previousChildren,
+                if (currentChild != null) currentChild,
+              ],
+            ),
+          ),
+          child: isActioning
+              ? DisabledElevatedButton(
+                  key: ValueKey('disabled-$text'),
+                  text: text,
+                  onPressed: null,
+                )
+              : ElevatedButton(
+                  key: ValueKey('enabled-$text'),
+                  style: btnStyle,
+                  onPressed: onPressed,
+                  child: Text(text),
+                ),
+        ),
+      );
+    }
+
+    void performAction(RequestAction action) async {
+      final ok = await _confirmAction(context, action);
+      if (!ok) return;
+      await _controller.performAction(actor: widget.actor, action: action);
+    }
+
+    if (actor == TimelineActor.student) {
+      if (![
+        RequestStatus.parentDenied,
+        RequestStatus.cancelled,
+        RequestStatus.cancelledStudent,
+        RequestStatus.rejected,
+        RequestStatus.approved,
+      ].contains(status)) {
+        // Student: single full-width button
+        return SizedBox(
+          width: double.infinity,
+          child: animatingButton(isActioning, "Cancel Request", () {
+            performAction(RequestAction.cancel);
+          }),
+        );
+      } else {
+        return SizedBox.shrink();
+      }
+    } else if (actor == TimelineActor.parent) {
+      if (status == RequestStatus.referred) {
+        // Parent / SeniorWarden / AssistentWarden: two side-by-side buttons
+        return Row(
+          children: [
+            Expanded(
+              child: animatingButton(isActioning, "Reject", () {
+                performAction(RequestAction.reject);
+              }),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: animatingButton(isActioning, "Accept", () {
+                performAction(RequestAction.approve);
+              }),
+            ),
+          ],
+        );
+      } else {
+        return SizedBox.shrink();
+      }
+    } else if (actor == TimelineActor.seniorWarden) {
+      if (status == RequestStatus.parentApproved) {
+        // Parent / SeniorWarden / AssistentWarden: two side-by-side buttons
+        return Row(
+          children: [
+            Expanded(
+              child: animatingButton(isActioning, "Reject", () {
+                performAction(RequestAction.reject);
+              }),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: animatingButton(isActioning, "Accept", () {
+                performAction(RequestAction.approve);
+              }),
+            ),
+          ],
+        );
+      } else {
+        return SizedBox.shrink();
+      }
+    } else if (actor == TimelineActor.assistentWarden) {
+      if (status == RequestStatus.requested) {
+        // Parent / SeniorWarden / AssistentWarden: two side-by-side buttons
+        return Row(
+          children: [
+            Expanded(
+              child: animatingButton(isActioning, "Reject", () {
+                performAction(RequestAction.reject);
+              }),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: animatingButton(isActioning, "Accept", () {
+                performAction(RequestAction.approve);
+              }),
+            ),
+          ],
+        );
+      } else {
+        return SizedBox.shrink();
+      }
+    } else {
+      return SizedBox.shrink();
+    }
   }
 
   Widget dynamicTimeline({
@@ -328,21 +455,25 @@ class _RequestPageState extends State<RequestPage> {
             time: (req.request.seniorWardenAction != null)
                 ? req.request.seniorWardenAction!.actionAt
                 : null,
-            status: (req.request.seniorWardenAction != null)
-                ? RequestActionX.actionToTimelineStatus(
-                    req.request.seniorWardenAction!.action,
-                  )
+            status: [RequestStatus.approved].contains(req.request.status)
+                ? TimelineStatus.completed
+                : [RequestStatus.rejected].contains(req.request.status)
+                ? TimelineStatus.rejected
                 : TimelineStatus.inProgress,
           ),
 
           TimelineEvent(
             title: TimelineActor.parent.displayName,
             subtitle: "Parent accepted the request",
-            status: (req.request.parentAction != null)
-                ? RequestActionX.actionToTimelineStatus(
-                    req.request.parentAction!.action,
-                  )
-                : TimelineStatus.inProgress,
+            status:
+                [
+                  RequestStatus.requested,
+                  RequestStatus.referred,
+                ].contains(req.request.status)
+                ? TimelineStatus.inProgress
+                : [RequestStatus.parentDenied].contains(req.request.status)
+                ? TimelineStatus.rejected
+                : TimelineStatus.completed,
             time: (req.request.parentAction != null)
                 ? req.request.parentAction!.actionAt
                 : null,
@@ -353,11 +484,11 @@ class _RequestPageState extends State<RequestPage> {
             time: (req.request.assistantWardenAction != null)
                 ? req.request.assistantWardenAction!.actionAt
                 : null,
-            status: (req.request.assistantWardenAction != null)
-                ? RequestActionX.actionToTimelineStatus(
-                    req.request.assistantWardenAction!.action,
-                  )
-                : TimelineStatus.inProgress,
+            status: [RequestStatus.requested].contains(req.request.status)
+                ? TimelineStatus.inProgress
+                : (req.request.status == RequestStatus.cancelled)
+                ? TimelineStatus.rejected
+                : TimelineStatus.completed,
           ),
           TimelineEvent(
             title: TimelineActor.student.displayName,
@@ -457,22 +588,24 @@ class _RequestPageState extends State<RequestPage> {
   }
 
   Widget infoCard(DateTime outDateTime, DateTime inDateTime) {
-    return Expanded(
-      child: Column(
-        children: [
-          _InfoCard(
-            icon: Icons.north_east,
-            date: InputConverter.formatDate(outDateTime).split(",")[0],
-            time: InputConverter.formatTime(outDateTime),
-          ),
-          SizedBox(height: 12),
-          _InfoCard(
-            icon: Icons.south_west,
-            date: InputConverter.formatDate(inDateTime).split(",")[0],
-            time: InputConverter.formatTime(inDateTime),
-          ),
-        ],
-      ),
+    // Do not return an Expanded here - the caller already wraps this widget
+    // in an Expanded when needed. Returning Expanded here caused nested
+    // Expanded widgets which produce a ParentDataWidget conflict at runtime.
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _InfoCard(
+          icon: Icons.north_east,
+          date: InputConverter.formatDate(outDateTime).split(",")[0],
+          time: InputConverter.formatTime(outDateTime),
+        ),
+        SizedBox(height: 12),
+        _InfoCard(
+          icon: Icons.south_west,
+          date: InputConverter.formatDate(inDateTime).split(",")[0],
+          time: InputConverter.formatTime(inDateTime),
+        ),
+      ],
     );
   }
 
@@ -520,12 +653,12 @@ class _RequestPageState extends State<RequestPage> {
   Widget checkeredDesign({required Widget child, required Color color}) {
     return CheckeredContainer(
       color: color,
-      height: 200,
+      height: 300,
       tileSize: 40,
       child: Align(
         alignment: Alignment.bottomLeft,
         child: Container(
-          height: 200,
+          height: 300,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
             child: SafeArea(
@@ -538,7 +671,10 @@ class _RequestPageState extends State<RequestPage> {
                     onPressed: () => context.pop(),
                     radius: 30,
                   ),
-                  child,
+                  Padding(
+                    padding: EdgeInsetsGeometry.symmetric(vertical: 10),
+                    child: child,
+                  ),
                 ],
               ),
             ),

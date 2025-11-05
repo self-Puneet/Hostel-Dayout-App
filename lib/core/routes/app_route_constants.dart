@@ -16,8 +16,10 @@ class AppRoutes {
   static const String requestForm = '/student/create-request';
   static const String requestDetails = '/student/request/:id';
   static const String parentRequestDetails = '/parent/request/:id';
+  static const String wardenRequestDetails = '/warden/request/:id';
   static String requestDetailsPath(String id) => '/student/request/$id';
   static String parentLayoutPath(String id) => '/parent/request/$id';
+  static String wardenRequestDetailsPath(String id) => '/warden/request/$id';
   static const String parentProfile = '/parent/profile';
 
   static const String wardenProfile = '/warden/profile';
@@ -41,6 +43,8 @@ class AppRoutes {
       wardenProfile,
       login,
       requestDetails,
+      '/warden/request',
+      '/warden/request/:id',
       wardenActionPage,
       wardenHistory,
       seniorWardenHome,
@@ -50,6 +54,8 @@ class AppRoutes {
       wardenProfile,
       login,
       requestDetails,
+      '/warden/request',
+      '/warden/request/:id',
       wardenActionPage,
       wardenHistory,
     ],

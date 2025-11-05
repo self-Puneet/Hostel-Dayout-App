@@ -51,15 +51,15 @@ extension RequestActionX on RequestAction {
   Icon get icon {
     switch (this) {
       case RequestAction.refer:
-        return Icon(Icons.phone_in_talk_outlined, color: Colors.black);
+        return Icon(Icons.phone_in_talk_outlined, color: Colors.white);
       case RequestAction.cancel:
-        return Icon(Icons.cancel_outlined, color: Colors.black);
+        return Icon(Icons.cancel_outlined, color: Colors.white);
       case RequestAction.approve:
-        return Icon(Icons.check, color: Colors.black);
+        return Icon(Icons.check, color: Colors.white);
       case RequestAction.reject:
-        return Icon(Icons.cancel_outlined);
+        return Icon(Icons.cancel_outlined, color: Colors.white);
       case RequestAction.none:
-        return Icon(Icons.help_outline, color: Colors.black);
+        return Icon(Icons.help_outline, color: Colors.white);
     }
   }
 
@@ -170,7 +170,7 @@ extension RequestActionX on RequestAction {
           case TimelineActor.student:
             return [RequestAction.cancel];
           case TimelineActor.parent:
-            return [RequestAction.approve, RequestAction.approve];
+            return [RequestAction.approve, RequestAction.reject];
           default:
             return [];
         }

@@ -128,4 +128,34 @@ class LoginSession {
       return left('Error loading session: $e');
     }
   }
+    LoginSession copyWith({
+    String? token,
+    String? username,
+    String? email,
+    String? primaryId,
+    List<HostelInfo>? hostels,
+    String? identityId,
+    DateTime? expiry,
+    String? phone,
+    String? fcmToken,
+    TimelineActor? role,
+    String? imageURL,
+    String? roomNo,
+  }) {
+    return LoginSession(
+      token: token ?? this.token,
+      username: username ?? this.username,
+      email: email ?? this.email,
+      primaryId: primaryId ?? this.primaryId,
+      hostels: hostels ?? this.hostels,
+      identityId: identityId ?? this.identityId,
+      expiry: expiry ?? this.expiry,
+      phone: phone ?? this.phone,
+      fcmToken: fcmToken ?? this.fcmToken,
+      role: role ?? this.role,
+      imageURL: imageURL ?? this.imageURL,
+      roomNo: roomNo ?? this.roomNo,
+    );
+  }
+
 }

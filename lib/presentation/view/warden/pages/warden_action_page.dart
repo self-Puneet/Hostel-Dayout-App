@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
@@ -541,6 +542,7 @@ class _PendingApprovalList extends StatelessWidget {
                     final stu = wrap.student;
                     final selected = wrap.isSelected;
                     final safeName = (stu.name).isEmpty ? 'Unknown' : stu.name;
+                    // print(stu.name);
 
                     return SimpleActionRequestCard(
                       profileImageUrl: stu.profilePic,
@@ -556,7 +558,15 @@ class _PendingApprovalList extends StatelessWidget {
                           : null,
                       onTap: (!s.isActioning && s.hasSelection)
                           ? () => s.toggleSelectedById(req.requestId, actor)
-                          : null,
+                          : () {
+                              // Pass an extra Map via `extra` to the route. This will be
+                              // available to the page as `widget.routeArgs`.
+                              context.pushNamed(
+                                'request-detail-warden',
+                                pathParameters: {'id': req.requestId},
+                                extra: stu,
+                              );
+                            },
                       onRejection: (!s.hasSelection && !s.isActioning)
                           ? () async {
                               await stateController.actionRequestById(

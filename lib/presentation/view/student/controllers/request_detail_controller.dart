@@ -7,19 +7,30 @@ import 'package:hostel_mgmt/services/request_service.dart';
 class RequestDetailController {
   final RequestState state;
   final String requestId;
+  final TimelineActor actor;
 
-  RequestDetailController({required this.state, required this.requestId}) {
+  RequestDetailController({
+    required this.state,
+    required this.requestId,
+    required this.actor,
+  }) {
     fetchRequestDetail(requestId);
+    if (actor == TimelineActor.assistentWarden ||
+        actor == TimelineActor.seniorWarden) {
+      // fetchStudentParentInfo();
+    }
   }
 
   Future<void> fetchRequestDetail(String requestId) async {
     state.setLoading(true);
     state.clearError();
     final result = await RequestService.getRequestById(requestId: requestId);
-    result.fold(
-      (error) => state.setError(error),
-      (request) => state.setRequest(request),
-    );
+    result.fold((error) => state.setError(error), (request) {
+      state.setRequest(request);
+      print("get the name from request detail controller");
+      // print(request.request.studentAction!.studentProfileModel.name);
+      print("get the name from request detail controller");
+    });
     state.setLoading(false);
   }
 
@@ -79,4 +90,15 @@ class RequestDetailController {
       },
     );
   }
+
+  // Future<void> fetchStudentParentInfo() async {
+  //   state.setLoadingStudentParentInfo(true);
+  //   state.clearError();
+  //   final result = await ProfileService.getStudentProfile();
+  //   result.fold(
+  //     (error) => state.setError(error),
+  //     (info) => state.setStudentParentInfo(info),
+  //   );
+  //   state.setLoadingStudentParentInfo(false);
+  // }
 }

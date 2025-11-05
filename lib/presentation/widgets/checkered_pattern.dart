@@ -15,7 +15,7 @@ class CheckeredContainer extends StatelessWidget {
     Key? key,
     required this.color,
     this.columns = 8,
-    this.rows = 6,
+    this.rows = 9,
     this.opacityStep = 0.1,
     this.tileSize = 48,
     this.child,
@@ -40,8 +40,9 @@ class CheckeredContainer extends StatelessWidget {
         final nonlinear = pow(t, 4).toDouble();
         final opacity = (nonlinear * 1.5).clamp(0.0, 1.0);
 
-        final backgroundColor =
-            t < 0.02 ? Colors.white : color.withOpacity(opacity);
+        final backgroundColor = t < 0.02
+            ? Colors.white
+            : color.withOpacity(opacity);
 
         tiles.add(
           Positioned(

@@ -43,10 +43,12 @@ class WardenActionPageController {
         resolvedHostelId,
       );
 
-      result.fold(
-        (error) => state.setError(true, error),
-        (response) => state.setRequests(response),
-      );
+      result.fold((error) => state.setError(true, error), (response) {
+        state.setRequests(response);
+        // print("fetch requests in warden action page controller");
+        // response.map((response1) => {print(response1.$2)}).toList();
+        // print(response[0].$2);
+      });
     } catch (e) {
       state.setError(true, 'Failed to load requests: $e');
     } finally {
