@@ -82,11 +82,11 @@ class RequestFormController {
     });
   }
 
-  Future<void> submit() async {
+  Future<bool> submit() async {
     state.validateAndMarkSubmitted();
     if (!state.canSubmit) {
       _showSnackBar('Please fix the errors');
-      return;
+      return false;
     }
 
     // Build payload using current selection
@@ -144,6 +144,7 @@ class RequestFormController {
     };
 
     state.setSubmitting(true);
+    bool success = false;
     try {
       final result = await RequestService.createRequest(requestData: payload);
       result.fold((err) => _showSnackBar(err.toString()), (_) {
@@ -154,8 +155,7 @@ class RequestFormController {
           type: AppSnackBarType.success,
           icon: LoginSnackBarType.success.icon,
         );
-        // print("hereherehereherehereherehereherehere");
-        // context.goIfNotCurrent(AppRoutes.studentHome, extra: SlideFrom.left);
+        success = true;
       });
     } catch (_) {
       AppSnackBar.show(
@@ -167,6 +167,7 @@ class RequestFormController {
     } finally {
       state.setSubmitting(false);
     }
+    return success;
   }
 
   // RequestFormController.fetchProfile

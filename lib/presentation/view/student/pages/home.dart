@@ -30,6 +30,26 @@ class _HomePageState extends State<HomePage> {
   final PageController _pageController = PageController();
 
   @override
+  void initState() {
+    super.initState();
+    // Check if we returned from request form with success
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final shouldRefresh = GoRouterState.of(context).extra;
+      if (shouldRefresh == true) {
+        final controller = context.read<HomeController>();
+        controller.fetchProfileAndRequests();
+        controller.fetchHistoryRequests();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final mediaQuery = MediaQuery.of(context);

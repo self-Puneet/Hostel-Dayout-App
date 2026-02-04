@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/instance_manager.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
+import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/presentation/view/student/controllers/request_form_controller.dart';
@@ -360,8 +361,10 @@ class _RequestFormView extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: provider.isSubmittable
                       ? () async {
-                          await controller.submit();
-                          context.pop();
+                          final success = await controller.submit();
+                          if (success && context.mounted) {
+                            context.go(AppRoutes.studentHome, extra: true);
+                          }
                         }
                       : null,
                   style: ElevatedButton.styleFrom(

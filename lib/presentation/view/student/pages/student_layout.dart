@@ -12,14 +12,14 @@ class StudentLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-      final media = MediaQuery.of(context);
-      final bottomInset = media.viewInsets.bottom;
-      final bottomSafe = media.viewPadding.bottom;
+    final media = MediaQuery.of(context);
+    final bottomInset = media.viewInsets.bottom;
+    final bottomSafe = media.viewPadding.bottom;
 
-      final bool isKeyboardOpen = bottomInset > 0;
-      final bool showNavBar = !isKeyboardOpen;
+    final bool isKeyboardOpen = bottomInset > 0;
+    final bool showNavBar = !isKeyboardOpen;
 
-      final double barBottomOffset = bottomSafe + 12;
+    final double barBottomOffset = bottomSafe + 12;
 
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
@@ -69,14 +69,18 @@ class StudentLayout extends StatelessWidget {
                               extra: SlideFrom.left,
                             ),
 
-                            onNewPressed: () => context.pushIfNotCurrent(
-                              AppRoutes.requestForm,
-                              extra:
-                                  GoRouterState.of(context).uri.path ==
-                                      AppRoutes.studentHome
-                                  ? SlideFrom.right
-                                  : SlideFrom.left,
-                            ),
+                            onNewPressed: () async {
+                              final result = await context.push<bool>(
+                                AppRoutes.requestForm,
+                              );
+                              // If submission was successful, refresh home
+                              if (result == true && context.mounted) {
+                                context.go(
+                                  AppRoutes.studentHome,
+                                  extra: true, // signal to refresh
+                                );
+                              }
+                            },
 
                             onProfilePressed: () => context.pushIfNotCurrent(
                               AppRoutes.profile,

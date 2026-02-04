@@ -30,13 +30,14 @@ class SimpleRequestCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    print(fromDate);
-    print(InputConverter.formatTime(fromDate));
-    print("please");
+
     return InkWell(
       highlightColor: Colors.transparent,
       splashColor: Colors.transparent,
       onTap: () {
+        print(
+          '🔍 SimpleRequestCard: Navigating with requestId=$requestId, actor=$actor',
+        );
         if (actor == TimelineActor.student) {
           context.pushNamed(
             'request-detail',

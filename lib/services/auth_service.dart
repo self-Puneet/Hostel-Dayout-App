@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:hostel_mgmt/core/config/constants.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
@@ -31,7 +32,19 @@ class AuthService {
       print("📡 Status: ${response.statusCode}");
 
       if (response.statusCode != 200) {
-        return left("${jsonDecode(response.body)["error"]}");
+        // Handle server errors (5xx) that may not return JSON
+        if (response.statusCode >= 500) {
+          return left(
+            "Server is currently unavailable. Please try again later.",
+          );
+        }
+        // Try to parse JSON error, fallback to generic message
+        try {
+          final errorData = jsonDecode(response.body);
+          return left(errorData["error"]?.toString() ?? "Login failed");
+        } catch (e) {
+          return left("Login failed. Please try again.");
+        }
       }
 
       final data = jsonDecode(response.body);
@@ -88,9 +101,12 @@ class AuthService {
         },
       );
       return right(session);
+    } on SocketException {
+      print("❌ No internet connection");
+      return left("No internet connection. Please check your network.");
     } catch (e) {
       print("❌ Exception: $e");
-      return left("Exception: $e");
+      return left("Server issue. Please try again later.");
     }
   }
 
@@ -119,7 +135,19 @@ class AuthService {
       print('Response body: ${response.body}');
 
       if (response.statusCode != 200) {
-        return left("${jsonDecode(response.body)["error"]}");
+        // Handle server errors (5xx) that may not return JSON
+        if (response.statusCode >= 500) {
+          return left(
+            "Server is currently unavailable. Please try again later.",
+          );
+        }
+        // Try to parse JSON error, fallback to generic message
+        try {
+          final errorData = jsonDecode(response.body);
+          return left(errorData["error"]?.toString() ?? "Login failed");
+        } catch (e) {
+          return left("Login failed. Please try again.");
+        }
       }
 
       final data = jsonDecode(response.body);
@@ -191,9 +219,12 @@ class AuthService {
       await diSession.saveToPrefs();
       print(diSession.hostels);
       return right(diSession);
+    } on SocketException {
+      print("❌ No internet connection");
+      return left("No internet connection. Please check your network.");
     } catch (e) {
       print(e);
-      return left("Exception: $e");
+      return left("Server issue. Please try again later.");
     }
   }
 
@@ -214,7 +245,19 @@ class AuthService {
       );
 
       if (response.statusCode != 200) {
-        return left("${jsonDecode(response.body)["error"]}");
+        // Handle server errors (5xx) that may not return JSON
+        if (response.statusCode >= 500) {
+          return left(
+            "Server is currently unavailable. Please try again later.",
+          );
+        }
+        // Try to parse JSON error, fallback to generic message
+        try {
+          final errorData = jsonDecode(response.body);
+          return left(errorData["error"]?.toString() ?? "Login failed");
+        } catch (e) {
+          return left("Login failed. Please try again.");
+        }
       }
 
       final data = jsonDecode(response.body);
@@ -246,8 +289,10 @@ class AuthService {
           return right(diSession);
         },
       );
+    } on SocketException {
+      return left("No internet connection. Please check your network.");
     } catch (e) {
-      return left("Exception: $e");
+      return left("Server issue. Please try again later.");
     }
   }
 
@@ -293,11 +338,28 @@ class AuthService {
       if (response.statusCode == 200) {
         return right(true);
       } else {
-        return left("${jsonDecode(response.body)['error']}");
+        // Handle server errors (5xx) that may not return JSON
+        if (response.statusCode >= 500) {
+          return left(
+            "Server is currently unavailable. Please try again later.",
+          );
+        }
+        // Try to parse JSON error, fallback to generic message
+        try {
+          final errorData = jsonDecode(response.body);
+          return left(
+            errorData['error']?.toString() ?? "Password reset failed",
+          );
+        } catch (e) {
+          return left("Password reset failed. Please try again.");
+        }
       }
+    } on SocketException {
+      print("❌ No internet connection");
+      return left("No internet connection. Please check your network.");
     } catch (e) {
       print("❌ Exception: $e");
-      return left("Exception: $e");
+      return left("Server issue. Please try again later.");
     }
   }
 }

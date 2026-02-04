@@ -421,9 +421,16 @@ class RequestDetailApiResponse {
   });
 
   factory RequestDetailApiResponse.fromJson(Map<String, dynamic> json) {
+    print("🔍 RequestDetailApiResponse.fromJson called with: $json");
+
+    if (json['request'] == null) {
+      print("❌ json['request'] is null");
+      throw Exception("Request data is missing from API response");
+    }
+
     return RequestDetailApiResponse(
       message: json['message'] ?? '',
-      request: RequestModel.fromJson(json['request'] ?? {}),
+      request: RequestModel.fromJson(json['request']),
       assistentWarden: WardenModel.fromJson(json['assistantWarden']),
       seniorWarden: WardenModel.fromJson(json['seniorWarden']),
       // studentProfileModel: StudentProfileModel.fromJson(json['student_Info']),

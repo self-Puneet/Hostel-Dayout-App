@@ -133,7 +133,7 @@ class _MonthGroupCardState extends State<MonthGroupCard> {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: SimpleRequestCard(
-            requestId: r.id,
+            requestId: r.requestId,
             actor: widget.actor,
             requestType: r.requestType,
             fromDate: r.appliedFrom,

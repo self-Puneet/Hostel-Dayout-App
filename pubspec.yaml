@@ -57,7 +57,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/spsu_logo.jpg
     - .env
     - packages/liquid_glass_renderer/assets/shaders/liquid_glass.frag
     - assets/user.png
@@ -70,6 +69,10 @@ flutter:
     - assets/hero1.png
     - assets/monthly_calender.png
     - assets/today_calender.png
+    - assets/hostel.jpg
+    - assets/spsu_logo.png
+    - assets/spsu2.jpg
+
 
 flutter_native_splash:
   color: "#ffffff"

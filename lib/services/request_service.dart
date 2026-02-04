@@ -34,9 +34,12 @@ class RequestService {
       } else {
         return left("Error: ${response.body}");
       }
+    } on SocketException {
+      print("❌ No internet connection");
+      return left("No internet connection. Please check your network.");
     } catch (e) {
-      print("❌ Exceptions: $e");
-      return left("Exception: $e");
+      print("❌ Exception: $e");
+      return left("Server issue. Please try again later.");
     }
   }
 
@@ -47,7 +50,6 @@ class RequestService {
     final token = session.token;
 
     try {
-      print(requestId);
       final response = await http.get(
         Uri.parse("$url/request/request/$requestId"),
         headers: {
@@ -59,14 +61,30 @@ class RequestService {
       print("📡 Status of get request by id: ${response.statusCode}");
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        print("🔍 RequestService.getRequestById response data: $data");
+
+        if (data == null) {
+          print("❌ Response data is null");
+          return left("Invalid response from server");
+        }
+
+        if (data['request'] == null) {
+          print("❌ Request object is null in response");
+          return left("Request data not found");
+        }
+
         final request = RequestDetailApiResponse.fromJson(data);
         return right(request);
       } else {
         return left("Error: ${jsonDecode(response.body)["error"]}");
       }
-    } catch (e) {
-      print("❌ Exception: $e");
-      return left("Exception: $e");
+    } on SocketException {
+      print("❌ No internet connection");
+      return left("No internet connection. Please check your network.");
+    } catch (e, stackTrace) {
+      print("❌ Exception in getRequestById: $e");
+      print("📍 Stack trace: $stackTrace");
+      return left("Server issue. Please try again later.");
     }
   }
 
@@ -95,9 +113,12 @@ class RequestService {
       } else {
         return left("Error: ${response.body}");
       }
+    } on SocketException {
+      print("❌ No internet connection");
+      return left("No internet connection. Please check your network.");
     } catch (e) {
       print("❌ Exception: $e");
-      return left("Exception: $e");
+      return left("Server issue. Please try again later.");
     }
   }
 
@@ -136,9 +157,12 @@ class RequestService {
       } else {
         return left("Error: ${jsonDecode(response.body)['error']}");
       }
+    } on SocketException {
+      print("❌ No internet connection");
+      return left("No internet connection. Please check your network.");
     } catch (e) {
       print("❌ Exception: $e");
-      return left("Exception: $e");
+      return left("Server issue. Please try again later.");
     }
   }
 

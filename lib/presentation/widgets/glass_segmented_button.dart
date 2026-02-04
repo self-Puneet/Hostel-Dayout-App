@@ -12,6 +12,9 @@ class GlassSegmentedTabs extends StatefulWidget {
   final double margin;
   final ValueChanged<int>? onTabChanged;
 
+  // NEW: padding inside each segmented tab
+  final EdgeInsets? tabPadding;
+
   const GlassSegmentedTabs({
     super.key,
     required this.options,
@@ -21,6 +24,7 @@ class GlassSegmentedTabs extends StatefulWidget {
     this.showTabs,
     this.onTabChanged,
     this.margin = 0,
+    this.tabPadding, // NEW
   }) : assert(
          options.length == views.length,
          "Options and views must have the same length",
@@ -88,7 +92,6 @@ class _GlassSegmentedTabsState extends State<GlassSegmentedTabs>
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(40),
-                // color: Colors.transparent,
                 color: Colors.white.withAlpha((0.05 * 225).toInt()),
               ),
             ),
@@ -101,6 +104,9 @@ class _GlassSegmentedTabsState extends State<GlassSegmentedTabs>
           padding: const EdgeInsets.symmetric(horizontal: 4),
           child: SegmentedTabControl(
             indicatorPadding: const EdgeInsets.symmetric(vertical: 4),
+            // Wire through the new padding
+            tabPadding:
+                widget.tabPadding ?? const EdgeInsets.symmetric(horizontal: 8),
             barDecoration: BoxDecoration(
               color: Colors.transparent,
               borderRadius: BorderRadius.circular(999),
@@ -136,11 +142,9 @@ class _GlassSegmentedTabsState extends State<GlassSegmentedTabs>
       child: Builder(
         builder: (innerCtx) {
           _attachIfNeeded(DefaultTabController.of(innerCtx));
-          // BOUNDED HEIGHT: overlay header above content so lists slide behind it
           return Stack(
             clipBehavior: Clip.none,
             children: [
-              // Content layer fills available space, offset below the header
               Positioned.fill(
                 child: Padding(
                   padding: EdgeInsets.only(
@@ -152,7 +156,6 @@ class _GlassSegmentedTabsState extends State<GlassSegmentedTabs>
                   ),
                 ),
               ),
-              // Overlay header stays fixed at the top
               if (showTabsResolved)
                 Positioned(
                   top: 0,

@@ -48,6 +48,9 @@ class _RequestPageState extends State<RequestPage> {
   void initState() {
     super.initState();
     final state = RequestState();
+    print(
+      '📄 RequestPage initState: requestId=${widget.requestId}, actor=${widget.actor}, hasRouteArgs=${widget.routeArgs != null}',
+    );
     _controller = RequestDetailController(
       state: state,
       requestId: widget.requestId,
@@ -161,6 +164,9 @@ class _RequestPageState extends State<RequestPage> {
           }
 
           final req = state.request!;
+          print(
+            '✅ RequestPage loaded: requestId=${req.request.requestId}, studentEnrollment=${req.request.studentEnrollmentNumber}',
+          );
           final assistentWardenContactCard = ContactCard(
             name: req.assistentWarden.name,
             role: req.assistentWarden.wardenRole.displayName,
@@ -293,9 +299,6 @@ class _RequestPageState extends State<RequestPage> {
     required RequestStatus status,
     required bool isActioning,
   }) {
-    // button widget
-    print(actor);
-    print(status);
     // Replace the old animatingButton with this version (no Expanded inside)
     Widget animatingButton(
       bool isActioning,

@@ -31,25 +31,6 @@ class LoginPage extends StatelessWidget {
     final verificationController =
         state.textFieldMap[actor]?[FieldsType.verificationField];
 
-    // final otherFunctionalities = Row(
-    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //   children: [
-    //     loginModel.showForgotPassword
-    //         ? TextButton(
-    //             onPressed: () => controller.forgotPassword(context, actor),
-    //             child: const Text("Forgot Password?"),
-    //           )
-    //         : const SizedBox.shrink(),
-    //     loginModel.showResetPassword
-    //         ? TextButton(
-    //             onPressed: () =>
-    //                 LoginController.doResetPassword(context, actor),
-    //             child: const Text("Reset Password"),
-    //           )
-    //         : const SizedBox.shrink(),
-    //   ],
-    // );
-
     final identityField = TextField(
       controller: identityController,
       cursorColor: Colors.black,
@@ -65,6 +46,8 @@ class LoginPage extends StatelessWidget {
         prefixIcon: Icon(loginModel.identityFieldIconData),
         // Always black icon
         prefixIconColor: Colors.black,
+        fillColor: Colors.white.withAlpha(85),
+        filled: true,
         // Borders: same color, thicker on focus
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -92,6 +75,10 @@ class LoginPage extends StatelessWidget {
           color: Colors.black,
           fontWeight: FontWeight.w700,
         ),
+        fillColor: Colors.white.withAlpha(85),
+        filled: true,
+
+        // focusColor: Colors.white,
         prefixIcon: Icon(loginModel.verificationFieldIconData),
         prefixIconColor: Colors.black,
         enabledBorder: OutlineInputBorder(
@@ -180,65 +167,63 @@ class LoginPage extends StatelessWidget {
               ),
             ),
           )
-        : DisabledElevatedButton(text: loginModel.disabledButtonText);
+        : SizedBox(
+            width: double.infinity,
+            child: DisabledElevatedButton(text: loginModel.disabledButtonText),
+          );
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(0),
-          child: KeyboardDismissOnTap(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 0),
-              child:
-                  LiquidGlass(
-                    // Same shape as GlassSegmentedTabs
-                    shape: LiquidRoundedSuperellipse(
-                      borderRadius: BorderRadius.circular(40).topLeft,
-                    ),
-                    // Same settings as GlassSegmentedTabs
-                    settings: const LiquidGlassSettings(
-                      thickness: 10,
-                      blur: 20, // increased from 8 for stronger frost
-                      chromaticAberration: 0.01,
-                      lightAngle: pi * 5 / 18,
-                      lightIntensity: 0.5,
-                      refractiveIndex: 1.4,
-                      saturation: 1,
-                      lightness: 1,
-                    ),
-                    // Glass body + your content
-                    child:
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(40),
-                      // ~5% white tint over the glass to match your tabs component
-                      color: Colors.white.withAlpha((0.05 * 225).toInt()),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          formTitle,
-                          const SizedBox(height: 16),
-                          wardenTypeSelector,
-                          const SizedBox(height: 16),
-                          identityField,
-                          const SizedBox(height: 16),
-                          varificationField,
-                          const SizedBox(height: 24),
-                          loginButton,
-                          // const SizedBox(height: 16),
-                          // otherFunctionalities,
-                        ],
-                      ),
-                    ),
+        child: KeyboardDismissOnTap(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 0),
+            child: LiquidGlass(
+              // Same shape as GlassSegmentedTabs
+              shape: LiquidRoundedSuperellipse(
+                borderRadius: BorderRadius.circular(28).topLeft,
+              ),
+              // Same settings as GlassSegmentedTabs
+              settings: const LiquidGlassSettings(
+                thickness: 10,
+                blur: 8, // increased from 8 for stronger frost
+                chromaticAberration: 0.01,
+                lightAngle: pi * 5 / 18,
+                lightIntensity: 0.5,
+                refractiveIndex: 1.4,
+                saturation: 1,
+                lightness: 1,
+              ),
+              // Glass body + your content
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(28),
+                  // ~5% white tint over the glass to match your tabs component
+                  color: Colors.white.withAlpha((0.05 * 225).toInt()),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      formTitle,
+                      const SizedBox(height: 16),
+                      wardenTypeSelector,
+                      const SizedBox(height: 16),
+                      identityField,
+                      const SizedBox(height: 16),
+                      varificationField,
+                      const SizedBox(height: 24),
+                      loginButton,
+                      // const SizedBox(height: 16),
+                      // otherFunctionalities,
+                    ],
                   ),
+                ),
+              ),
             ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -338,6 +323,7 @@ class _GlassWardenRoleBarState extends State<GlassWardenRoleBar>
               tabTextColor: Colors.black,
               selectedTabTextColor: Colors.white,
               squeezeIntensity: 2,
+              
               tabs: const [
                 SegmentTab(
                   label: 'Assistant Warden',
