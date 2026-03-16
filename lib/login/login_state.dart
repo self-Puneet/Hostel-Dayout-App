@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
+import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/login/login_page_model.dart';
 
 enum FieldsType { identityField, verificationField, model }
@@ -79,9 +80,43 @@ class LoginState extends ChangeNotifier with WidgetsBindingObserver {
   bool _isLoggingIn = false;
   bool _isKeyboardOpen = false;
 
+  // Parent OTP flow state
+  final TextEditingController parentOtpController = TextEditingController();
+  String? _parentOtpRequestId;
+  String? _pendingParentEnrollmentNo;
+  String? _pendingParentPhoneNo;
+  LoginSession? _pendingParentSession;
+
   bool get isLoggingIn => _isLoggingIn;
   bool get isKeyboardOpen => _isKeyboardOpen;
   dynamic get model => textFieldMap;
+  String? get parentOtpRequestId => _parentOtpRequestId;
+  String? get pendingParentEnrollmentNo => _pendingParentEnrollmentNo;
+  String? get pendingParentPhoneNo => _pendingParentPhoneNo;
+  LoginSession? get pendingParentSession => _pendingParentSession;
+
+  void setPendingParentOtpFlow({
+    required String requestId,
+    required String enrollmentNo,
+    required String phoneNo,
+    required LoginSession pendingSession,
+  }) {
+    _parentOtpRequestId = requestId;
+    _pendingParentEnrollmentNo = enrollmentNo;
+    _pendingParentPhoneNo = phoneNo;
+    _pendingParentSession = pendingSession;
+    parentOtpController.clear();
+    notifyListeners();
+  }
+
+  void clearParentOtpFlow() {
+    _parentOtpRequestId = null;
+    _pendingParentEnrollmentNo = null;
+    _pendingParentPhoneNo = null;
+    _pendingParentSession = null;
+    parentOtpController.clear();
+    notifyListeners();
+  }
 
   void setLoggingIn(bool value) {
     _isLoggingIn = value;
@@ -95,6 +130,7 @@ class LoginState extends ChangeNotifier with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    parentOtpController.dispose();
     for (final fieldMap in textFieldMap.values) {
       for (final controller in fieldMap.values) {
         controller.dispose();

@@ -5,14 +5,14 @@ import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/login/login_state.dart';
 import 'package:provider/provider.dart';
 import 'dependency_injection.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+// import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initDependencies();
-  await dotenv.load();
+  // await dotenv.load();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,

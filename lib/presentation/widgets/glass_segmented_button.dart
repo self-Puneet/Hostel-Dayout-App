@@ -11,6 +11,7 @@ class GlassSegmentedTabs extends StatefulWidget {
   final bool? showTabs;
   final double margin;
   final ValueChanged<int>? onTabChanged;
+  final int initialIndex;
 
   // NEW: padding inside each segmented tab
   final EdgeInsets? tabPadding;
@@ -23,6 +24,7 @@ class GlassSegmentedTabs extends StatefulWidget {
     this.selectedLabelFontSize,
     this.showTabs,
     this.onTabChanged,
+    this.initialIndex = 0,
     this.margin = 0,
     this.tabPadding, // NEW
   }) : assert(
@@ -139,6 +141,7 @@ class _GlassSegmentedTabsState extends State<GlassSegmentedTabs>
 
     return DefaultTabController(
       length: widget.options.length,
+      initialIndex: widget.initialIndex,
       child: Builder(
         builder: (innerCtx) {
           _attachIfNeeded(DefaultTabController.of(innerCtx));

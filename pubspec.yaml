@@ -38,7 +38,6 @@ dependencies:
   glassmorphism: ^3.0.0
   liquid_glass_renderer: ^0.1.1-dev.10
   smooth_page_indicator: ^1.2.1
-  google_fonts: ^6.3.1
   flutter_inset_box_shadow: ^1.0.8
   material_segmented_control: ^5.0.1
   url_launcher: ^6.3.2
@@ -48,6 +47,7 @@ dependencies:
   syncfusion_flutter_datepicker: ^31.2.2
   wheel_picker: ^0.2.2
   timezone: ^0.10.1
+  google_fonts: ^8.0.2
 
 dev_dependencies:
   flutter_test:
@@ -57,7 +57,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - .env
     - packages/liquid_glass_renderer/assets/shaders/liquid_glass.frag
     - assets/user.png
     - assets/home.png

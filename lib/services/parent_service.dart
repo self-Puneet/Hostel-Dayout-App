@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/config/constants.dart';
+import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/models/parent_model.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
@@ -10,6 +11,68 @@ import 'package:http/http.dart' as http;
 
 class ParentService {
   static const String url = baseUrl;
+
+  static Future<Either<String, LoginSession>> verifyParentCredentials({
+    required String phoneNo,
+    required String enrollmentNo,
+  }) async {
+    try {
+      final payload = {
+        'phone_no': phoneNo,
+        'student_enrollment_no': enrollmentNo,
+      };
+
+      final response = await http.post(
+        Uri.parse('$url/parent/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(payload),
+      );
+
+      if (response.statusCode != 200) {
+        if (response.statusCode >= 500) {
+          return left(
+            'Server is currently unavailable. Please try again later.',
+          );
+        }
+
+        try {
+          final errorData = jsonDecode(response.body) as Map<String, dynamic>;
+          return left(errorData['error']?.toString() ?? 'Login failed');
+        } catch (_) {
+          return left('Login failed. Please try again.');
+        }
+      }
+
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      final token = (data['token'] ?? '').toString();
+
+      if (token.isEmpty) {
+        return left(data['message']?.toString() ?? 'Login failed');
+      }
+
+      final profileResult = await getParentProfile(token: token);
+
+      return profileResult.fold(
+        (profileError) => left(profileError),
+        (parent) => right(
+          LoginSession(
+            token: token,
+            username: parent.name,
+            email: parent.email ?? '',
+            identityId: parent.phoneNo,
+            primaryId: parent.parentId,
+            phone: parent.phoneNo,
+            role: TimelineActor.parent,
+            imageURL: null,
+          ),
+        ),
+      );
+    } on TimeoutException {
+      return left('Request timed out. Please try again.');
+    } catch (e) {
+      return left('Exception: $e');
+    }
+  }
 
   /// Fetch parent profile from `/parent/profile`
   static Future<Either<String, ParentModel>> getParentProfile({

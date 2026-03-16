@@ -17,12 +17,15 @@ import 'package:animated_segmented_tab_control/animated_segmented_tab_control.da
 
 class LoginPage extends StatelessWidget {
   final TimelineActor actor; // 👈 decides which login config to use
+
   const LoginPage({super.key, required this.actor});
 
   @override
   Widget build(BuildContext context) {
     final state = context.watch<LoginState>();
     final controller = LoginController(state);
+    final showParentOtpFlow =
+      actor == TimelineActor.parent && state.parentOtpRequestId != null;
 
     // pull the correct model + controllers for this actor
     final loginModel = state.textFieldMap[actor]?[FieldsType.model];
@@ -98,6 +101,54 @@ class LoginPage extends StatelessWidget {
       style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
     );
 
+    final maskedPhone =
+        (state.pendingParentPhoneNo != null &&
+            state.pendingParentPhoneNo!.length >= 4)
+        ? '******${state.pendingParentPhoneNo!.substring(state.pendingParentPhoneNo!.length - 4)}'
+        : state.pendingParentPhoneNo;
+
+    final otpTitle = const Text(
+      'Verify Parent Login',
+      style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+    );
+
+    final otpInfo = Text(
+      maskedPhone == null
+          ? 'Enter the 6-digit OTP to continue.'
+          : 'Enter the 6-digit OTP sent to $maskedPhone',
+      textAlign: TextAlign.center,
+      style: const TextStyle(color: Colors.black87, fontSize: 14),
+    );
+
+    final otpField = TextField(
+      controller: state.parentOtpController,
+      keyboardType: TextInputType.number,
+      maxLength: 6,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        counterText: '',
+        labelText: 'OTP',
+        labelStyle: const TextStyle(color: Colors.black),
+        floatingLabelStyle: const TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w700,
+        ),
+        prefixIcon: const Icon(Icons.password),
+        prefixIconColor: Colors.black,
+        fillColor: Colors.white.withAlpha(85),
+        filled: true,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.black, width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.black, width: 2),
+        ),
+      ),
+      style: const TextStyle(color: Colors.black),
+    );
+
     // inside LoginPage.build, replace wardenTypeSelector with:
     final int initialIndex =
         state.selectedWardenRole == TimelineActor.assistentWarden ? 0 : 1;
@@ -160,7 +211,13 @@ class LoginPage extends StatelessWidget {
         ? SizedBox(
             width: double.infinity, // take all available horizontal space
             child: ElevatedButton(
-              onPressed: () => controller.login(context, actor),
+              onPressed: () {
+                if (actor == TimelineActor.parent && !showParentOtpFlow) {
+                  controller.sendParentOtp(context);
+                  return;
+                }
+                controller.login(context, actor);
+              },
               child: Text(
                 loginModel.elevatedButtonText,
                 style: const TextStyle(fontSize: 16),
@@ -171,6 +228,31 @@ class LoginPage extends StatelessWidget {
             width: double.infinity,
             child: DisabledElevatedButton(text: loginModel.disabledButtonText),
           );
+
+    final verifyOtpButton = !state.isLoggingIn
+        ? SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => controller.verifyParentOtp(context),
+              child: const Text(
+                'Verify OTP',
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+          )
+        : const SizedBox(
+            width: double.infinity,
+            child: DisabledElevatedButton(text: 'Verifying OTP ...'),
+          );
+
+    final backToLoginButton = TextButton.icon(
+      onPressed: () => controller.cancelParentOtpFlow(context),
+      icon: const Icon(Icons.arrow_back, color: Colors.black),
+      label: const Text(
+        'Back to Parent Login',
+        style: TextStyle(color: Colors.black),
+      ),
+    );
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -206,15 +288,27 @@ class LoginPage extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      formTitle,
-                      const SizedBox(height: 16),
-                      wardenTypeSelector,
-                      const SizedBox(height: 16),
-                      identityField,
-                      const SizedBox(height: 16),
-                      varificationField,
-                      const SizedBox(height: 24),
-                      loginButton,
+                      if (showParentOtpFlow) ...[
+                        otpTitle,
+                        const SizedBox(height: 12),
+                        otpInfo,
+                        const SizedBox(height: 16),
+                        otpField,
+                        const SizedBox(height: 24),
+                        verifyOtpButton,
+                        const SizedBox(height: 8),
+                        backToLoginButton,
+                      ] else ...[
+                        formTitle,
+                        const SizedBox(height: 16),
+                        wardenTypeSelector,
+                        const SizedBox(height: 16),
+                        identityField,
+                        const SizedBox(height: 16),
+                        varificationField,
+                        const SizedBox(height: 24),
+                        loginButton,
+                      ],
                       // const SizedBox(height: 16),
                       // otherFunctionalities,
                     ],

@@ -4,6 +4,8 @@ import 'package:hostel_mgmt/core/enums/ui_eums/snackbar_type.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
 import 'package:hostel_mgmt/services/auth_service.dart';
+import 'package:hostel_mgmt/services/otp_service.dart';
+import 'package:hostel_mgmt/services/parent_service.dart';
 import 'package:hostel_mgmt/login/login_state.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 import 'package:get/get.dart';
@@ -72,6 +74,11 @@ class LoginController {
   }
 
   Future<void> login(BuildContext context, TimelineActor actor) async {
+    if (actor == TimelineActor.parent) {
+      await sendParentOtp(context);
+      return;
+    }
+
     state.setLoggingIn(true);
 
     final identity =
@@ -189,34 +196,7 @@ class LoginController {
           }
 
         case TimelineActor.parent:
-          final result = await AuthService.loginParent(
-            phoneNo: verification,
-            enrollmentNo: identity,
-          );
-
-          result.fold(
-            (error) {
-              state.setLoggingIn(false);
-              AppSnackBar.show(
-                context,
-                message: error,
-                type: AppSnackBarType.error,
-                icon: LoginSnackBarType.loginFailed.icon,
-              );
-            },
-            (profile) async {
-              state.setLoggingIn(false);
-
-              GoRouter.of(context).go(AppRoutes.parentHome);
-
-              AppSnackBar.show(
-                context,
-                message: LoginSnackBarType.success.message,
-                type: AppSnackBarType.success,
-                icon: LoginSnackBarType.success.icon,
-              );
-            },
-          );
+          await sendParentOtp(context);
           break;
 
         default:
@@ -244,6 +224,175 @@ class LoginController {
         icon: LoginSnackBarType.loginFailed.icon,
       );
     }
+  }
+
+  Future<void> sendParentOtp(BuildContext context) async {
+    state.setLoggingIn(true);
+
+    final identity =
+        state
+            .textFieldMap[TimelineActor.parent]?[FieldsType.identityField]
+            ?.text
+            .trim() ??
+        "";
+    final verification =
+        state
+            .textFieldMap[TimelineActor.parent]?[FieldsType.verificationField]
+            ?.text
+            .trim() ??
+        "";
+
+    if (identity.isEmpty || verification.isEmpty) {
+      state.setLoggingIn(false);
+      AppSnackBar.show(
+        context,
+        message: LoginSnackBarType.emptyFields.message,
+        type: AppSnackBarType.alert,
+        icon: LoginSnackBarType.emptyFields.icon,
+      );
+      return;
+    }
+
+    final parentValidationResult = await ParentService.verifyParentCredentials(
+      phoneNo: verification,
+      enrollmentNo: identity,
+    );
+
+    await parentValidationResult.fold(
+      (error) async {
+        state.setLoggingIn(false);
+        AppSnackBar.show(
+          context,
+          message: error,
+          type: AppSnackBarType.error,
+          icon: Icons.error,
+        );
+      },
+      (pendingSession) async {
+        final otpResponse = await OtpService.generateParentOtp(
+          phoneNo: verification,
+          enrollmentNo: identity,
+        );
+
+        otpResponse.fold(
+          (error) {
+            state.setLoggingIn(false);
+            AppSnackBar.show(
+              context,
+              message: error,
+              type: AppSnackBarType.error,
+              icon: Icons.error,
+            );
+          },
+          (requestId) {
+            state.setPendingParentOtpFlow(
+              requestId: requestId,
+              enrollmentNo: identity,
+              phoneNo: verification,
+              pendingSession: pendingSession,
+            );
+            state.setLoggingIn(false);
+            AppSnackBar.show(
+              context,
+              message: 'OTP sent successfully.',
+              type: AppSnackBarType.info,
+              icon: Icons.sms,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> verifyParentOtp(BuildContext context) async {
+    state.setLoggingIn(true);
+
+    final otp = state.parentOtpController.text.trim();
+    final enrollmentNo = state.pendingParentEnrollmentNo;
+    final phoneNo = state.pendingParentPhoneNo;
+    final pendingSession = state.pendingParentSession;
+
+    if (enrollmentNo == null || phoneNo == null || pendingSession == null) {
+      state.setLoggingIn(false);
+      state.clearParentOtpFlow();
+      AppSnackBar.show(
+        context,
+        message: 'OTP session not found. Please login again.',
+        type: AppSnackBarType.error,
+        icon: Icons.error,
+      );
+      return;
+    }
+
+    if (otp.isEmpty) {
+      state.setLoggingIn(false);
+      AppSnackBar.show(
+        context,
+        message: 'Please enter OTP.',
+        type: AppSnackBarType.alert,
+        icon: Icons.warning,
+      );
+      return;
+    }
+
+    final verifyResult = await OtpService.verifyParentOtp(
+      phoneNo: phoneNo,
+      otp: otp,
+    );
+
+    await verifyResult.fold(
+      (error) async {
+        state.setLoggingIn(false);
+        AppSnackBar.show(
+          context,
+          message: error,
+          type: AppSnackBarType.error,
+          icon: Icons.error,
+        );
+      },
+      (isVerified) async {
+        if (!isVerified) {
+          state.setLoggingIn(false);
+          AppSnackBar.show(
+            context,
+            message: 'OTP verification failed.',
+            type: AppSnackBarType.error,
+            icon: Icons.error,
+          );
+          return;
+        }
+
+        final diSession = Get.find<LoginSession>();
+        diSession
+          ..token = pendingSession.token
+          ..role = pendingSession.role
+          ..identityId = pendingSession.identityId
+          ..username = pendingSession.username
+          ..email = pendingSession.email
+          ..phone = pendingSession.phone
+          ..primaryId = pendingSession.primaryId
+          ..imageURL = pendingSession.imageURL
+          ..hostels = pendingSession.hostels
+          ..roomNo = pendingSession.roomNo
+          ..fcmToken = pendingSession.fcmToken
+          ..expiry = pendingSession.expiry;
+
+        await diSession.saveToPrefs();
+        state.clearParentOtpFlow();
+        state.setLoggingIn(false);
+        GoRouter.of(context).go(AppRoutes.parentHome);
+        AppSnackBar.show(
+          context,
+          message: LoginSnackBarType.success.message,
+          type: AppSnackBarType.success,
+          icon: LoginSnackBarType.success.icon,
+        );
+      },
+    );
+  }
+
+  void cancelParentOtpFlow(BuildContext context) {
+    state.clearParentOtpFlow();
   }
 
   /// Logout service
