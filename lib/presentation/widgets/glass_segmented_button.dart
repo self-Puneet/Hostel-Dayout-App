@@ -66,10 +66,10 @@ class _GlassSegmentedTabsState extends State<GlassSegmentedTabs>
   @override
   Widget build(BuildContext context) {
     const tabsHeight = 48.0;
-    const double _defaultSize = 12.0;
-    final double resolvedLabelSize = widget.labelFontSize ?? _defaultSize;
+    const double defaultSize = 12.0;
+    final double resolvedLabelSize = widget.labelFontSize ?? defaultSize;
     final double resolvedSelectedSize =
-        widget.selectedLabelFontSize ?? widget.labelFontSize ?? _defaultSize;
+        widget.selectedLabelFontSize ?? widget.labelFontSize ?? defaultSize;
     final bool showTabsResolved = widget.showTabs ?? true;
 
     Widget header(BuildContext context) => Stack(

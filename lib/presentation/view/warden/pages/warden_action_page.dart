@@ -221,30 +221,7 @@ class _WardenHomePageState extends State<WardenHomePage>
                                       height: 0,
                                       color: Colors.grey.shade300,
                                     ),
-                                  ),
-                                  (state.currentTab ==
-                                          WardenTab.pendingApproval)
-                                      ? GestureDetector(
-                                          onTap: () {
-                                            state.toggleAllSelectedCheckbox(
-                                              widget.actor,
-                                            );
-                                          },
-                                          child: Container(
-                                            color: const Color(0xFFE9E9E9),
-                                            height: 20,
-                                            width: 20,
-                                            child: Icon(
-                                              state.allSelected
-                                                  ? Icons.check_box
-                                                  : Icons
-                                                        .check_box_outline_blank,
-                                              color: Colors.black,
-                                              size: 20,
-                                            ),
-                                          ),
-                                        )
-                                      : Container(),
+                                  )
                                 ],
                               ),
                             ),

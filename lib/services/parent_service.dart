@@ -8,6 +8,8 @@ import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/models/parent_model.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
+
 
 class ParentService {
   static const String url = baseUrl;
@@ -95,7 +97,6 @@ class ParentService {
           ? jsonDecode(response.body) as Map<String, dynamic>
           : null;
 
-      print(decoded);
 
       if (decoded == null || decoded["error"] != null) {
         return left(
@@ -133,12 +134,12 @@ class ParentService {
       if (response.statusCode != 200) {
         return left("Error: ${response.statusCode} - ${response.body}");
       }
-      print("heeeeeeee");
-      print(response.body);
+      debugPrint("heeeeeeee");
+      debugPrint(response.body);
       final decoded = response.body.isNotEmpty
           ? jsonDecode(response.body) as Map<String, dynamic>
           : null;
-      // print(decoded);
+      // debugPrint(decoded);
       if (decoded == null || decoded["error"] != null) {
         return left(
           decoded != null

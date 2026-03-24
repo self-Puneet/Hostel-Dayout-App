@@ -87,7 +87,7 @@ class ActiveRequestCard extends StatelessWidget {
   final VoidCallback? onDecline;
 
   const ActiveRequestCard({
-    Key? key,
+    super.key,
     required this.actor,
     required this.reason,
     required this.requestType,
@@ -99,7 +99,7 @@ class ActiveRequestCard extends StatelessWidget {
     this.showActions = false,
     this.onApprove,
     this.onDecline,
-  }) : super(key: key);
+  });
 
   String _formatDate(DateTime date) =>
       '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';

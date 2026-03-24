@@ -89,7 +89,7 @@ class _MonthGroupCardState extends State<MonthGroupCard> {
           child: ExpansionTile(
             // No PageStorageKey → no persistence across tabs
             // Use a ValueKey that changes after tab switches so initiallyExpanded is reapplied
-            key: ValueKey<String>('exp:${_resetTick}:${widget.monthTitle}'),
+            key: ValueKey<String>('exp:$_resetTick:${widget.monthTitle}'),
             initiallyExpanded: _expanded,
             onExpansionChanged: (val) => setState(() => _expanded = val),
             backgroundColor: Colors.white,

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 class HostelInfo {
   String hostelId;
   String hostelName;

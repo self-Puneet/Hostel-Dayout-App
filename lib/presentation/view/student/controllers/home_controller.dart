@@ -5,6 +5,7 @@ import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/services/profile_service.dart';
 import 'package:hostel_mgmt/services/request_service.dart';
 import '../state/home_state.dart';
+import 'package:flutter/foundation.dart';
 
 class HomeController {
   final HomeState state = HomeState(isLoading: true);
@@ -25,7 +26,7 @@ class HomeController {
     final profileResult = await ProfileService.getStudentProfile();
     await profileResult.fold(
       (error) async {
-        print('Profile error: $error');
+        debugPrint('Profile error: $error');
       },
       (profileResponse) async {
         session
@@ -51,7 +52,7 @@ class HomeController {
     final result = await RequestService.getAllRequests();
     result.fold(
       (error) {
-        print(error);
+        debugPrint(error);
       },
       (apiResponse) {
         final active = apiResponse.requests.where((r) => r.active).toList();
@@ -72,7 +73,7 @@ class HomeController {
       final requests = await RequestService.getRequestsByStatusKey(filter);
       state.setHistoryRequests(requests);
     } catch (e) {
-      print('History fetch error ($filter): $e');
+      debugPrint('History fetch error ($filter): $e');
     } finally {
       state.isLoadingHistory = false;
     }

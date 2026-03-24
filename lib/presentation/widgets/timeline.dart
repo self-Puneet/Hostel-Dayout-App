@@ -13,8 +13,7 @@ class Checkpoint {
 class HorizontalCheckpointTimeline extends StatelessWidget {
   final List<Checkpoint> checkpoints;
 
-  const HorizontalCheckpointTimeline({Key? key, required this.checkpoints})
-    : super(key: key);
+  const HorizontalCheckpointTimeline({super.key, required this.checkpoints});
 
   @override
   Widget build(BuildContext context) {

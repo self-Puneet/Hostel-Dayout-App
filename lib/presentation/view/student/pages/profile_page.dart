@@ -21,7 +21,7 @@ import '../../../components/skeleton_loaders/profile_page_skeleton.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+  const ProfilePage({super.key});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -519,8 +519,8 @@ class _ProfilePageState extends State<ProfilePage>
                                             ), // circular shape
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.black.withOpacity(
-                                                  0.2,
+                                                color: Colors.black.withValues(
+                                                  alpha: 0.2,
                                                 ),
                                                 blurRadius: 2,
                                                 offset: Offset(0, 1),

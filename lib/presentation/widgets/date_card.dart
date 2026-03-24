@@ -11,14 +11,14 @@ class DateCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const DateCard({
-    Key? key,
+    super.key,
     required this.value,
     required this.label,
     required this.placeholder,
     required this.touched,
     required this.error,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   String get dateStr {
     if (value == null) return placeholder;

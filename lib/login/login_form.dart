@@ -389,7 +389,7 @@ class _GlassWardenRoleBarState extends State<GlassWardenRoleBar>
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(40),
-                    color: Colors.white.withOpacity(0.14),
+                    color: Colors.white.withValues(alpha: 0.14),
                   ),
                 ),
             // ),

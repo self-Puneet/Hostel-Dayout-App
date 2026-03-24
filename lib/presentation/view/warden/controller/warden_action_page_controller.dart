@@ -8,6 +8,7 @@ import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_action_state.dart';
 import 'package:hostel_mgmt/services/request_service.dart';
 import 'package:hostel_mgmt/services/warden_service.dart';
+import 'package:flutter/foundation.dart';
 
 class WardenActionPageController {
   final WardenActionState state;
@@ -45,9 +46,9 @@ class WardenActionPageController {
 
       result.fold((error) => state.setError(true, error), (response) {
         state.setRequests(response);
-        // print("fetch requests in warden action page controller");
-        // response.map((response1) => {print(response1.$2)}).toList();
-        // print(response[0].$2);
+        // debugPrint("fetch requests in warden action page controller");
+        // response.map((response1) => {debugPrint(response1.$2)}).toList();
+        // debugPrint(response[0].$2);
       });
     } catch (e) {
       state.setError(true, 'Failed to load requests: $e');
@@ -99,7 +100,7 @@ class WardenActionPageController {
         .where((w) => w.isSelected)
         .map((w) => w.request.requestId)
         .toList();
-    print("here we goo !!");
+    debugPrint("here we goo !!");
     if (ids.isEmpty) return;
 
     state.setIsActioning(true);

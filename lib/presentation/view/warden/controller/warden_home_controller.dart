@@ -5,6 +5,7 @@ import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/models/warden_statistics.dart';
 import 'package:hostel_mgmt/presentation/view/warden/state/warden_home_state.dart';
 import 'package:hostel_mgmt/services/warden_service.dart';
+import 'package:flutter/foundation.dart';
 
 class WardenStatisticsController {
   final WardenStatisticsState state;
@@ -15,10 +16,10 @@ class WardenStatisticsController {
   Future<void> initFromSession() async {
     final session = Get.find<LoginSession>();
     final hostels = session.hostels ?? [];
-    // print(hostels.length);
-    // print("aaaaaaaaaaaaaaaaaaaaaah");
+    // debugPrint(hostels.length);
+    // debugPrint("aaaaaaaaaaaaaaaaaaaaaah");
     hostels.map((hostel) {
-      print('${hostel.hostelId} ${hostel.hostelName}');
+      debugPrint('${hostel.hostelId} ${hostel.hostelName}');
     });
     state.setHostelList(hostels);
     if (state.selectedHostelId != null) {

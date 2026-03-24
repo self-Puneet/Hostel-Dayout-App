@@ -58,15 +58,13 @@ enum SlideFrom { left, right, top, bottom }
 
 class AppTransitionPage<T> extends CustomTransitionPage<T> {
   AppTransitionPage({
-    required Widget child,
-    LocalKey? key,
+    required super.child,
+    super.key,
     Duration duration = const Duration(milliseconds: 450),
     double dimMaxOpacity = 0.5,
     SlideFrom slideFrom = SlideFrom.right,
     Curve curve = Curves.easeInOut,
   }) : super(
-         key: key,
-         child: child,
          transitionDuration: duration,
          reverseTransitionDuration: duration,
          transitionsBuilder: (context, animation, secondaryAnimation, child) {

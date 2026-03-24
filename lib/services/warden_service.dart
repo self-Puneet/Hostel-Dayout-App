@@ -9,6 +9,8 @@ import 'package:hostel_mgmt/models/student_profile.dart';
 import 'package:hostel_mgmt/models/warden_model.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
+
 
 class WardenService {
   static const url = baseUrl;
@@ -33,7 +35,6 @@ class WardenService {
       }
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
-      print(data);
       final list = (data['requests'] as List?) ?? const [];
 
       final results = <(RequestModel, StudentProfileModel)>[];
@@ -41,17 +42,15 @@ class WardenService {
       for (final raw in list) {
         final item = raw as Map<String, dynamic>;
         final req = RequestModel.fromJson(item);
-        print(req.reason);
+        debugPrint(req.reason);
         // Try multiple keys for student info; fallback to top-level if present.
         final studentJson = item['student_info'] as Map<String, dynamic>;
-        print(studentJson);
-        print("()" * 90);
+        debugPrint("()" * 90);
         final student = StudentProfileModel.fromJson(studentJson);
-        print("aaah");
+        debugPrint("aaah");
         results.add((req, student));
       }
 
-      print(results.length);
 
       return right(results);
     } catch (e) {
@@ -99,11 +98,11 @@ class WardenService {
         results.add((req, updatedStudent));
       }
       for (int i = 0; i < results.length; i++) {
-        // print("8" * 89);
-        // print(results[i].$1.status);
+        // debugPrint("8" * 89);
+        // debugPrint(results[i].$1.status);
       }
 
-      print("Fetched active requests: ${results.length}");
+      debugPrint("Fetched active requests: ${results.length}");
       return right(results);
     } catch (e) {
       return left("Exception: $e");
@@ -124,7 +123,7 @@ class WardenService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print("📡 getWardenProfile - Response: $data");
+        debugPrint("📡 getWardenProfile - Response: $data");
         final warden = WardenModel.fromJson(data['profile']);
         return right(warden);
       } else {
@@ -152,7 +151,6 @@ class WardenService {
       if (res.statusCode == 200) {
         final Map<String, dynamic> data =
             jsonDecode(res.body) as Map<String, dynamic>;
-        print(data);
         final stats = WardenStatistics.fromJson(data);
         return right(stats);
       } else {
@@ -172,7 +170,7 @@ class WardenService {
   }) async {
     final session = Get.find<LoginSession>();
     final token = session.token;
-    // print(yearMonth);
+    // debugPrint(yearMonth);
 
     try {
       final base = url; // assumes same global base as other services
@@ -185,8 +183,8 @@ class WardenService {
         },
       );
 
-      // print(yearMonth);
-      // print(jsonDecode(response.body)['requests'][0]["request_status"]);
+      // debugPrint(yearMonth);
+      // debugPrint(jsonDecode(response.body)['requests'][0]["request_status"]);
       if (response.statusCode != 200) {
         return left(jsonDecode(response.body)['error']);
       }
@@ -201,11 +199,9 @@ class WardenService {
         final student = StudentProfileModel.fromJson(studentJson);
         results.add((req, student));
       }
-      print("hiiiii");
 
       return right(results);
     } catch (e) {
-      print(e);
       return left("Exception: $e");
     }
   }

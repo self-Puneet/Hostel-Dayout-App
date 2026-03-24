@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get/get.dart';
+import 'package:flutter/foundation.dart';
 
 class NetworkProvider extends GetxService {
   final Connectivity _connectivity = Connectivity();
@@ -11,7 +12,7 @@ class NetworkProvider extends GetxService {
 
     // Later changes → show snackbar
     _connectivity.onConnectivityChanged.listen((results) {
-      print("Network status changed: $results");
+      debugPrint("Network status changed: $results");
       _handleStatus(results, showSnackbar: true);
     });
 

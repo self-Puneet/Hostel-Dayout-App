@@ -1,5 +1,6 @@
 /// Reusable TimeCard widget: tapable, shows selected time or placeholder.
 /// Updated to display 12-hour format with AM/PM using MaterialLocalizations.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/theme/app_theme.dart';
@@ -13,14 +14,14 @@ class TimeCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const TimeCard({
-    Key? key,
+    super.key,
     required this.value,
     required this.label,
     required this.placeholder,
     required this.touched,
     required this.error,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

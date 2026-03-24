@@ -21,7 +21,7 @@ import 'package:hostel_mgmt/presentation/view/parent/state/parent_state.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class ParentHomePage extends StatefulWidget {
-  const ParentHomePage({Key? key}) : super(key: key);
+  const ParentHomePage({super.key});
 
   @override
   State<ParentHomePage> createState() => _ParentHomePageState();

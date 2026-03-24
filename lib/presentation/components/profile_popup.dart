@@ -253,7 +253,7 @@ class _BottomPopupOverlayState<T> extends State<_BottomPopupOverlay<T>>
     );
 
     // Compute dynamic collapsed height from available width using aspect ratio 340:65.
-    double _collapsedHeightForWidth(double w) => w / (340 / 65);
+    double collapsedHeightForWidth(double w) => w / (340 / 65);
 
     Widget sized;
     if (!_armAnimatedSize) {
@@ -261,7 +261,7 @@ class _BottomPopupOverlayState<T> extends State<_BottomPopupOverlay<T>>
       sized = LayoutBuilder(
         builder: (context, constraints) {
           final w = constraints.maxWidth;
-          final h = _collapsedHeightForWidth(w);
+          final h = collapsedHeightForWidth(w);
           return ConstrainedBox(
             constraints: BoxConstraints.tightFor(height: h),
             child: popupCore,
@@ -289,7 +289,7 @@ class _BottomPopupOverlayState<T> extends State<_BottomPopupOverlay<T>>
         child: LayoutBuilder(
           builder: (context, constraints) {
             final w = constraints.maxWidth;
-            final h = _collapsedHeightForWidth(w);
+            final h = collapsedHeightForWidth(w);
             return ConstrainedBox(
               constraints: _expanded
                   ? BoxConstraints(maxHeight: maxH)

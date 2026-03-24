@@ -20,6 +20,7 @@ extension WardenRoleX on WardenRole {
   }
 }
 
+
 class WardenModel {
   final String wardenId;
   final String empId;
@@ -107,7 +108,6 @@ class WardenModel {
     String? email,
     String? languagePreference,
   }) {
-    print(hostels);
     return WardenModel(
       wardenId: wardenId ?? this.wardenId,
       empId: empId ?? this.empId,

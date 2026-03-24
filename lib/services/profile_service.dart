@@ -8,6 +8,7 @@ import 'package:hostel_mgmt/models/warden_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
+import 'package:flutter/foundation.dart';
 
 class ProfileService {
   static const url = baseUrl;
@@ -15,7 +16,7 @@ class ProfileService {
   static Future<Either<String, StudentApiResponse>> getStudentProfile() async {
     final session = Get.find<LoginSession>();
     final token = session.token;
-    print(session.token);
+    debugPrint(session.token);
 
     try {
       final response = await http.get(
@@ -121,18 +122,18 @@ class ProfileService {
         },
       );
 
-      print("📡 getHostelInfo - Status: ${response.statusCode}");
+      debugPrint("📡 getHostelInfo - Status: ${response.statusCode}");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print("📡 getHostelInfo - Response: $data");
+        debugPrint("📡 getHostelInfo - Response: $data");
         final hostelResponse = HostelSingleResponse.fromJson(data);
         return right(hostelResponse);
       } else {
         return left("Error: ${response.body}");
       }
     } catch (e) {
-      print("❌ Exception: $e");
+      debugPrint("❌ Exception: $e");
       return left("Exception: $e");
     }
   }
@@ -150,11 +151,11 @@ class ProfileService {
         },
       );
 
-      print("📡 getHostelInfo - Status: ${response.statusCode}");
+      debugPrint("📡 getHostelInfo - Status: ${response.statusCode}");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print("📡 getHostelInfo - Response: $data");
+        debugPrint("📡 getHostelInfo - Response: $data");
         final hostelResponse = (data['hostels'] as List<dynamic>)
             .map((e) => HostelModel.fromJson(e))
             .toList();
@@ -163,7 +164,7 @@ class ProfileService {
         return left("Error: ${response.body}");
       }
     } catch (e) {
-      print("❌ Exception: $e");
+      debugPrint("❌ Exception: $e");
       return left("Exception: $e");
     }
   }
@@ -187,8 +188,8 @@ class ProfileService {
       final decoded = response.body.isNotEmpty
           ? jsonDecode(response.body)
           : null;
-      print("he" * 90);
-      print(decoded);
+      debugPrint("he" * 90);
+      debugPrint(decoded);
       if (decoded == null) {
         return left(
           decoded != null
@@ -200,11 +201,11 @@ class ProfileService {
       // Expected shape: { message, student: { student: {...}, parentsInfo: [...] } }
       // final api = StudentApiResponse.fromJson(decoded);
       // decode = [{child1},{child2},{child3}]
-      print("right below");
+      debugPrint("right below");
       final result = (decoded as List)
           .map((e) => StudentProfileModel.fromJson(e))
           .toList();
-      print("result");
+      debugPrint("result");
       return right(result);
     } catch (e) {
       return left("Exception: $e");

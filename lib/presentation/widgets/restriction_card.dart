@@ -11,12 +11,12 @@ class RestrictionCard extends StatelessWidget {
   final VoidCallback? onRetry;
 
   const RestrictionCard({
-    Key? key,
+    super.key,
     required this.restriction,
     required this.isLoading,
     required this.isApplicable,
     this.onRetry,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -166,7 +166,7 @@ class RestrictionCard extends StatelessWidget {
                 Text(
                   subtitle,
                   style: textTheme.h3.copyWith(
-                    color: colorScheme.onSurface.withOpacity(0.7),
+                    color: colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
               ],

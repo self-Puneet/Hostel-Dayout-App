@@ -29,7 +29,7 @@ class StudentProfileModel {
   });
 
   // Small helper to coerce any JSON value to String safely.
-  static String? _asString(dynamic v) => v == null ? null : v.toString();
+  static String? _asString(dynamic v) => v?.toString();
 
   factory StudentProfileModel.fromJson(Map<String, dynamic> json) {
     // print(json['profile_pic']);

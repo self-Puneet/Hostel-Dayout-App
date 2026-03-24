@@ -59,7 +59,7 @@ class _OuterShadowPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final rrect = borderRadius.toRRect(Offset.zero & size);
     final paint = Paint()
-      ..color = Colors.black.withOpacity(0.2)
+      ..color = Colors.black.withValues(alpha: 0.2)
       ..maskFilter = const MaskFilter.blur(BlurStyle.outer, 20);
     canvas.drawRRect(rrect, paint);
   }

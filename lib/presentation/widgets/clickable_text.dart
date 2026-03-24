@@ -7,11 +7,11 @@ class ClickableText extends StatelessWidget {
   final Color color;
 
   const ClickableText({
-    Key? key,
+    super.key,
     required this.text,
     required this.onTap,
     this.color = Colors.black, // default clickable color
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

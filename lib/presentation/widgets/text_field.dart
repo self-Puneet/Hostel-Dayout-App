@@ -15,7 +15,7 @@ class CustomLabelPasswordField extends StatefulWidget {
   final IconData? icon;
 
   const CustomLabelPasswordField({
-    Key? key,
+    super.key,
     required this.label,
     required this.placeholder,
     required this.controller,
@@ -26,7 +26,7 @@ class CustomLabelPasswordField extends StatefulWidget {
     this.onSubmitted,
     this.obscure = false,
     this.icon,
-  }) : super(key: key);
+  });
 
   @override
   State<CustomLabelPasswordField> createState() =>

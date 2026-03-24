@@ -198,7 +198,7 @@ class WardenActionState extends ChangeNotifier {
   // NEW: Trigger bulk action from anywhere (called from layout)
   Future<void> triggerBulkAction({required RequestAction action}) async {
     if (_onBulkAction != null) {
-      print("ok right path !");
+      debugPrint("ok right path !");
       await _onBulkAction!(action: action);
       layoutState.hideActionsOverlay();
     }

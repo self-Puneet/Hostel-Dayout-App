@@ -18,7 +18,7 @@ import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'dart:math';
 
 class WardenProfilePage extends StatefulWidget {
-  const WardenProfilePage({Key? key}) : super(key: key);
+  const WardenProfilePage({super.key});
 
   @override
   State<WardenProfilePage> createState() => _WardenProfilePageState();

@@ -7,6 +7,7 @@ import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
+import 'package:flutter/foundation.dart';
 
 class RequestService {
   static const url = baseUrl;
@@ -24,21 +25,21 @@ class RequestService {
         },
       );
 
-      print("📡 Status: ${response.statusCode}");
+      debugPrint("📡 Status: ${response.statusCode}");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        // print(data['requests']);
+        // debugPrint(data['requests']);
         final apiResponse = RequestApiResponse.fromJson(data);
         return right(apiResponse);
       } else {
         return left("Error: ${response.body}");
       }
     } on SocketException {
-      print("❌ No internet connection");
+      debugPrint("❌ No internet connection");
       return left("No internet connection. Please check your network.");
     } catch (e) {
-      print("❌ Exception: $e");
+      debugPrint("❌ Exception: $e");
       return left("Server issue. Please try again later.");
     }
   }
@@ -58,18 +59,18 @@ class RequestService {
         },
       );
 
-      print("📡 Status of get request by id: ${response.statusCode}");
+      debugPrint("📡 Status of get request by id: ${response.statusCode}");
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print("🔍 RequestService.getRequestById response data: $data");
+        debugPrint("🔍 RequestService.getRequestById response data: $data");
 
         if (data == null) {
-          print("❌ Response data is null");
+          debugPrint("❌ Response data is null");
           return left("Invalid response from server");
         }
 
         if (data['request'] == null) {
-          print("❌ Request object is null in response");
+          debugPrint("❌ Request object is null in response");
           return left("Request data not found");
         }
 
@@ -79,11 +80,11 @@ class RequestService {
         return left("Error: ${jsonDecode(response.body)["error"]}");
       }
     } on SocketException {
-      print("❌ No internet connection");
+      debugPrint("❌ No internet connection");
       return left("No internet connection. Please check your network.");
     } catch (e, stackTrace) {
-      print("❌ Exception in getRequestById: $e");
-      print("📍 Stack trace: $stackTrace");
+      debugPrint("❌ Exception in getRequestById: $e");
+      debugPrint("📍 Stack trace: $stackTrace");
       return left("Server issue. Please try again later.");
     }
   }
@@ -104,7 +105,7 @@ class RequestService {
         body: jsonEncode(requestData),
       );
 
-      print("📡 Request Creation Status: ${response.statusCode}");
+      debugPrint("📡 Request Creation Status: ${response.statusCode}");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -114,10 +115,10 @@ class RequestService {
         return left("Error: ${response.body}");
       }
     } on SocketException {
-      print("❌ No internet connection");
+      debugPrint("❌ No internet connection");
       return left("No internet connection. Please check your network.");
     } catch (e) {
-      print("❌ Exception: $e");
+      debugPrint("❌ Exception: $e");
       return left("Server issue. Please try again later.");
     }
   }
@@ -146,7 +147,7 @@ class RequestService {
         body: jsonEncode(requestData),
       );
 
-      print("📡 Update Status: ${response.statusCode}");
+      debugPrint("📡 Update Status: ${response.statusCode}");
 
       if (response.statusCode == 200) {
         return right(
@@ -158,10 +159,10 @@ class RequestService {
         return left("Error: ${jsonDecode(response.body)['error']}");
       }
     } on SocketException {
-      print("❌ No internet connection");
+      debugPrint("❌ No internet connection");
       return left("No internet connection. Please check your network.");
     } catch (e) {
-      print("❌ Exception: $e");
+      debugPrint("❌ Exception: $e");
       return left("Server issue. Please try again later.");
     }
   }
@@ -186,7 +187,7 @@ class RequestService {
     }
 
     final body = jsonDecode(response.body) as Map<String, dynamic>;
-    print(body['requests'][0].keys.toList());
+    debugPrint(body['requests'][0].keys.toList());
     // Adjust parsing if your API wraps data differently.
     final list = (body['requests'] as List<dynamic>? ?? [])
         .map((e) => RequestModel.fromJson(e as Map<String, dynamic>))

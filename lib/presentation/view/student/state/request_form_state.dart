@@ -280,8 +280,9 @@ class RequestFormState extends ChangeNotifier {
         if (dayoutDate == null) errorDayoutDate = "Date is required.";
       }
       if (touchedDayoutFromTime || showSubmitAttempted) {
-        if (dayoutFromTime == null)
+        if (dayoutFromTime == null) {
           errorDayoutFromTime = "From time is required.";
+        }
       }
       if (touchedDayoutToTime || showSubmitAttempted) {
         if (dayoutToTime == null) errorDayoutToTime = "To time is required.";

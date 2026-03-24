@@ -11,7 +11,7 @@ class WardenActionSelectionGuard extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
         final s = context.read<WardenActionState>();
         // Block while actioning

@@ -147,6 +147,7 @@ class RequestFormController {
     bool success = false;
     try {
       final result = await RequestService.createRequest(requestData: payload);
+      if (!context.mounted) return false;
       result.fold((err) => _showSnackBar(err.toString()), (_) {
         _showSnackBar('Request submitted successfully!');
         AppSnackBar.show(
@@ -158,6 +159,7 @@ class RequestFormController {
         success = true;
       });
     } catch (_) {
+      if (!context.mounted) return false;
       AppSnackBar.show(
         context,
         message: "Something went wrong.",

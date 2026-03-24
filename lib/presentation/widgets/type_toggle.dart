@@ -6,8 +6,7 @@ class TypeToggle extends StatelessWidget {
   final RequestType selected;
   final ValueChanged<RequestType> onChanged;
 
-  const TypeToggle({Key? key, required this.selected, required this.onChanged})
-    : super(key: key);
+  const TypeToggle({super.key, required this.selected, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -48,14 +47,13 @@ class _OptionCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const _OptionCard({
-    Key? key,
     required this.isActive,
     required this.icon,
     required this.iconColor,
     required this.title,
     required this.subtitle,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

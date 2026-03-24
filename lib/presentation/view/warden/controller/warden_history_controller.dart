@@ -21,8 +21,6 @@ class WardenHistoryPageController {
     String? hostelId,
     DateTime? monthYear,
   }) async {
-    print(hostelId);
-    print(monthYear);
     state.setIsLoading(true);
     state.setError(false, '');
     try {

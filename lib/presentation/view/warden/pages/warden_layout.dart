@@ -17,7 +17,7 @@ import '../../../components/glass_shell.dart';
 
 class WardenLayout extends StatelessWidget {
   final Widget child;
-  const WardenLayout({Key? key, required this.child}) : super(key: key);
+  const WardenLayout({super.key, required this.child});
 
   static const BorderRadius _barRadius = BorderRadius.all(Radius.circular(999));
   static const double _barAspect = 340 / 65;

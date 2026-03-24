@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
-import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
 import 'package:hostel_mgmt/presentation/components/request_timeline.dart';
 
 class RequestActionDialogParam {
@@ -208,7 +207,7 @@ extension RequestActionX on RequestAction {
     }
   }
 
-  static RequestAction ApiStringToAction(String action) {
+  static RequestAction apiStringToAction(String action) {
     switch (action) {
       case "cancelled_assistent_warden":
         return RequestAction.cancel;

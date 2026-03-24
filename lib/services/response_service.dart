@@ -2,23 +2,28 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
+import 'package:hostel_mgmt/core/util/crypto_utils.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 
 class OtpService {
   static const String otpApiBaseUrl = 'https://2factor.in/API/V1';
-
-  static const String otpApiKey = '';
-  static const String otpSecretKey = '';
+  static const String baseUrl = String.fromEnvironment(
+    'BASE_URL',
+    defaultValue: '',
+  );
 
   static const String statusFieldName = 'Status';
   static const String detailsFieldName = 'Details';
   static const String statusSuccessValue = 'Success';
   static const String statusFailureValue = 'Error';
+  static const String universityId = 'SPSU_HosteLeaveOTP';
 
   static Future<Either<String, String>> generateParentOtp({
     required String phoneNo,
     required String enrollmentNo,
   }) async {
+    String baseURL = CryptoUtil.unpad(baseUrl);
     try {
       if (enrollmentNo.trim().isEmpty) {
         return left('Enrollment number is required.');
@@ -26,26 +31,27 @@ class OtpService {
       if (phoneNo.trim().length < 10) {
         return left('Enter a valid phone number.');
       }
-
+      debugPrint(String.fromEnvironment('BASE_URL'));
+      debugPrint(baseUrl);
       final uri = Uri.parse(
-        '$otpApiBaseUrl/$otpApiKey/SMS/$phoneNo/AUTOGEN/$otpSecretKey',
+        '$otpApiBaseUrl/$baseURL/SMS/$phoneNo/AUTOGEN/$universityId',
       );
       final headers = {
         'Accept': 'application/json',
-        'X-OTP-API-KEY': otpApiKey,
-        'X-OTP-SECRET-KEY': otpSecretKey,
+        'X-OTP-API-KEY': baseURL,
+        'X-OTP-SECRET-KEY': universityId,
       };
 
-      print('[OtpService] REQUEST generateParentOtp');
-      print('[OtpService] METHOD: GET');
-      print('[OtpService] URL: $uri');
-      print('[OtpService] HEADERS: $headers');
+      debugPrint('[OtpService] REQUEST generateParentOtp');
+      debugPrint('[OtpService] METHOD: GET');
+      debugPrint('[OtpService] URL: $uri');
+      debugPrint('[OtpService] HEADERS: $headers');
 
       final response = await http.get(uri, headers: headers);
 
-      print('[OtpService] RESPONSE generateParentOtp');
-      print('[OtpService] STATUS_CODE: ${response.statusCode}');
-      print('[OtpService] BODY: ${response.body}');
+      debugPrint('[OtpService] RESPONSE generateParentOtp');
+      debugPrint('[OtpService] STATUS_CODE: ${response.statusCode}');
+      debugPrint('[OtpService] BODY: ${response.body}');
 
       return _parseGenerateResponse(response, fallbackRequestId: phoneNo);
     } on SocketException {
@@ -59,6 +65,7 @@ class OtpService {
     required String phoneNo,
     required String otp,
   }) async {
+    String baseURL = CryptoUtil.unpad(baseUrl);
     try {
       if (phoneNo.trim().isEmpty) {
         return left('Phone number is required for OTP verification.');
@@ -68,24 +75,24 @@ class OtpService {
       }
 
       final uri = Uri.parse(
-        '$otpApiBaseUrl/$otpApiKey/SMS/VERIFY3/$phoneNo/$otp',
+        '$otpApiBaseUrl/$baseURL/SMS/VERIFY3/$phoneNo/$otp',
       );
       final headers = {
         'Accept': 'application/json',
-        'X-OTP-API-KEY': otpApiKey,
-        'X-OTP-SECRET-KEY': otpSecretKey,
+        'X-OTP-API-KEY': baseURL,
+        'X-OTP-SECRET-KEY': universityId,
       };
 
-      print('[OtpService] REQUEST verifyParentOtp');
-      print('[OtpService] METHOD: GET');
-      print('[OtpService] URL: $uri');
-      print('[OtpService] HEADERS: $headers');
+      debugPrint('[OtpService] REQUEST verifyParentOtp');
+      debugPrint('[OtpService] METHOD: GET');
+      debugPrint('[OtpService] URL: $uri');
+      debugPrint('[OtpService] HEADERS: $headers');
 
       final response = await http.get(uri, headers: headers);
 
-      print('[OtpService] RESPONSE verifyParentOtp');
-      print('[OtpService] STATUS_CODE: ${response.statusCode}');
-      print('[OtpService] BODY: ${response.body}');
+      debugPrint('[OtpService] RESPONSE verifyParentOtp');
+      debugPrint('[OtpService] STATUS_CODE: ${response.statusCode}');
+      debugPrint('[OtpService] BODY: ${response.body}');
 
       return _parseVerifyResponse(response);
     } on SocketException {

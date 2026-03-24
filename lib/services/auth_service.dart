@@ -11,6 +11,7 @@ import 'package:hostel_mgmt/services/warden_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
+import 'package:flutter/foundation.dart';
 
 class AuthService {
   static const String apiUrl = "$baseUrl/student/login";
@@ -19,7 +20,7 @@ class AuthService {
     required String enrollmentNo,
     required String password,
   }) async {
-    print("Attempting student login for $enrollmentNo");
+    debugPrint("Attempting student login for $enrollmentNo");
     try {
       final payload = {"enrollment_no": enrollmentNo, "password": password};
 
@@ -28,8 +29,8 @@ class AuthService {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(payload),
       );
-      print('phone_no: $enrollmentNo, password: $password');
-      print("📡 Status: ${response.statusCode} ${response.body}");
+      debugPrint('phone_no: $enrollmentNo, password: $password');
+      debugPrint("📡 Status: ${response.statusCode} ${response.body}");
 
       if (response.statusCode != 200) {
         // Handle server errors (5xx) that may not return JSON
@@ -70,8 +71,8 @@ class AuthService {
       final profile = await ProfileService.getStudentProfile();
       profile.fold(
         (error) {
-          print("--------------------->error");
-          print(error);
+          debugPrint("--------------------->error");
+          debugPrint(error);
           return error;
         },
         (profileResponse) async {
@@ -93,8 +94,8 @@ class AuthService {
             ..role = TimelineActor.student
             ..imageURL = data['imageURL'];
 
-          print("hiiiiiiiiiiiiiiiiiiiii");
-          print(session.phone);
+          debugPrint("hiiiiiiiiiiiiiiiiiiiii");
+          debugPrint(session.phone);
 
           await session.saveToPrefs();
           return right(session);
@@ -102,10 +103,10 @@ class AuthService {
       );
       return right(session);
     } on SocketException {
-      print("❌ No internet connection");
+      debugPrint("❌ No internet connection");
       return left("No internet connection. Please check your network.");
     } catch (e) {
-      print("❌ Exception: $e");
+      debugPrint("❌ Exception: $e");
       return left("Server issue. Please try again later.");
     }
   }
@@ -131,8 +132,8 @@ class AuthService {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(payload),
       );
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      debugPrint('Response status: ${response.statusCode}');
+      debugPrint('Response body: ${response.body}');
 
       if (response.statusCode != 200) {
         // Handle server errors (5xx) that may not return JSON
@@ -172,7 +173,7 @@ class AuthService {
 
       if (profileResult.isLeft()) {
         final error = profileResult.fold((l) => l, (r) => null);
-        print(error);
+        debugPrint(error);
       } else {
         WardenModel warden = profileResult.getOrElse(
           () => throw Exception('Missing warden'),
@@ -194,7 +195,7 @@ class AuthService {
             }
           }
         } else {
-          print(hostelResult.fold((l) => l, (r) => null));
+          debugPrint(hostelResult.fold((l) => l, (r) => null));
         }
 
         List<HostelInfo> finalHostels = [];
@@ -217,13 +218,11 @@ class AuthService {
       }
 
       await diSession.saveToPrefs();
-      print(diSession.hostels);
       return right(diSession);
     } on SocketException {
-      print("❌ No internet connection");
+      debugPrint("❌ No internet connection");
       return left("No internet connection. Please check your network.");
     } catch (e) {
-      print(e);
       return left("Server issue. Please try again later.");
     }
   }
@@ -333,7 +332,7 @@ class AuthService {
         body: jsonEncode(payload),
       );
 
-      print("📡 Status: ${response.statusCode}");
+      debugPrint("📡 Status: ${response.statusCode}");
 
       if (response.statusCode == 200) {
         return right(true);
@@ -355,10 +354,10 @@ class AuthService {
         }
       }
     } on SocketException {
-      print("❌ No internet connection");
+      debugPrint("❌ No internet connection");
       return left("No internet connection. Please check your network.");
     } catch (e) {
-      print("❌ Exception: $e");
+      debugPrint("❌ Exception: $e");
       return left("Server issue. Please try again later.");
     }
   }

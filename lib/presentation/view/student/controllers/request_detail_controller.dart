@@ -3,6 +3,7 @@ import 'package:hostel_mgmt/core/enums/actions.dart';
 import 'package:hostel_mgmt/core/enums/enum.dart';
 import 'package:hostel_mgmt/presentation/view/student/state/request_state.dart';
 import 'package:hostel_mgmt/services/request_service.dart';
+import 'package:flutter/foundation.dart';
 
 class RequestDetailController {
   final RequestState state;
@@ -27,9 +28,9 @@ class RequestDetailController {
     final result = await RequestService.getRequestById(requestId: requestId);
     result.fold((error) => state.setError(error), (request) {
       state.setRequest(request);
-      print("get the name from request detail controller");
-      // print(request.request.studentAction!.studentProfileModel.name);
-      print("get the name from request detail controller");
+      debugPrint("get the name from request detail controller");
+      // debugPrint(request.request.studentAction!.studentProfileModel.name);
+      debugPrint("get the name from request detail controller");
     });
     state.setLoading(false);
   }

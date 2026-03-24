@@ -12,7 +12,7 @@ class Dropdown<T> extends StatelessWidget {
   final double? height;
 
   const Dropdown({
-    Key? key,
+    super.key,
     required this.items,
     this.value,
     this.onChanged,
@@ -21,7 +21,7 @@ class Dropdown<T> extends StatelessWidget {
     this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 1),
     this.border,
     this.height,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

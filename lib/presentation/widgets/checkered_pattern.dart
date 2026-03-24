@@ -12,7 +12,7 @@ class CheckeredContainer extends StatelessWidget {
   final BorderRadiusGeometry? borderRadius;
 
   const CheckeredContainer({
-    Key? key,
+    super.key,
     required this.color,
     this.columns = 8,
     this.rows = 9,
@@ -21,7 +21,7 @@ class CheckeredContainer extends StatelessWidget {
     this.child,
     this.height,
     this.borderRadius,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +42,7 @@ class CheckeredContainer extends StatelessWidget {
 
         final backgroundColor = t < 0.02
             ? Colors.white
-            : color.withOpacity(opacity);
+            : color.withValues(alpha: opacity);
 
         tiles.add(
           Positioned(

@@ -163,7 +163,7 @@ class LoginState extends ChangeNotifier with WidgetsBindingObserver {
 
   @override
   void didChangeMetrics() {
-    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
+    final bottomInset = WidgetsBinding.instance.platformDispatcher.views.first.viewInsets.bottom;
     final isOpen = bottomInset > 0;
     if (isOpen != _isKeyboardOpen) {
       _isKeyboardOpen = isOpen;

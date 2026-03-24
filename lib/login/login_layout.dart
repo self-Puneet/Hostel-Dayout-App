@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hostel_mgmt/core/helpers/unfocus.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
-import 'package:hostel_mgmt/core/theme/app_theme.dart';
 // import 'package:hostel_mgmt/core/theme/app_theme.dart';
 import 'package:hostel_mgmt/login/login_form.dart';
 import 'package:hostel_mgmt/login/login_state.dart';
@@ -25,12 +24,12 @@ class _LoginLayoutState extends State<LoginLayout> {
 
   void _handleTabChanged(int newIndex) {
     final state = context.read<LoginState>();
-    
+
     // Get the previous actor
     final previousActor = tabActors[_lastTabIndex];
 
     // If switching away from Parent with OTP active, clear only OTP flow
-    if (previousActor == TimelineActor.parent && 
+    if (previousActor == TimelineActor.parent &&
         state.parentOtpRequestId != null) {
       // Only clear OTP flow, preserve parent form data
       state.clearParentOtpFlow();
@@ -46,7 +45,6 @@ class _LoginLayoutState extends State<LoginLayout> {
   Widget build(BuildContext context) {
     final state = context.watch<LoginState>();
     final mediaQuery = MediaQuery.of(context);
-    final textTheme = Theme.of(context).textTheme;
 
     return Container(
       decoration: const BoxDecoration(
@@ -66,28 +64,23 @@ class _LoginLayoutState extends State<LoginLayout> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 if (!state.isKeyboardOpen) ...[
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(20, 20, 0, 0),
-                    child: Image.asset(
-                      'assets/spsu_logo.png',
-                      fit: BoxFit.contain,
-                      height: 50,
-                    ),
-                  ),
-
+                  // Padding(
+                  //   padding: EdgeInsets.fromLTRB(20, 20, 0, 0),
+                  //   child: Image.asset(
+                  //     'assets/hero_tag.png',
+                  //     fit: BoxFit.contain,
+                  //     height: 50,
+                  //   ),
+                  // ),
                   Container(
-                    height: mediaQuery.size.height * 0.20,
+                    height: mediaQuery.size.height * 0.35,
                     width: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     child: Center(
-                      child: Text(
-                        'HOSTEL Leave erp'.toUpperCase(),
-                        textAlign: TextAlign.left,
-                        style: textTheme.h1.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF0B1228),
-                          letterSpacing: 2,
-                        ),
+                      child: Image.asset(
+                        'assets/hero_tag.png',
+                        fit: BoxFit.contain,
+                        height: 80,
                       ),
                     ),
                   ),

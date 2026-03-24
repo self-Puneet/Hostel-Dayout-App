@@ -165,7 +165,7 @@ class HostelSummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 6,
             spreadRadius: 0,
             offset: const Offset(0, 2),
@@ -476,12 +476,12 @@ class CompressedStatTable extends StatelessWidget {
   final Image image;
 
   const CompressedStatTable({
-    Key? key,
+    super.key,
     required this.textTheme,
     this.title = '[translate:Thid Month]',
     this.value = '10',
     required this.image,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

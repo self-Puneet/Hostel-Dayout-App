@@ -12,7 +12,7 @@ class ReasonCard extends StatefulWidget {
   final int maxLength;
 
   const ReasonCard({
-    Key? key,
+    super.key,
     required this.value,
     required this.label,
     required this.placeholder,
@@ -20,7 +20,7 @@ class ReasonCard extends StatefulWidget {
     required this.error,
     required this.onChanged,
     this.maxLength = 300,
-  }) : super(key: key);
+  });
 
   @override
   State<ReasonCard> createState() => _ReasonCardState();

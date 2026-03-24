@@ -17,7 +17,7 @@ class SimpleRequestCard extends StatelessWidget {
   final String requestId; // NEW
 
   const SimpleRequestCard({
-    Key? key,
+    super.key,
     required this.requestType,
     required this.fromDate,
     required this.toDate,
@@ -26,7 +26,7 @@ class SimpleRequestCard extends StatelessWidget {
     required this.reason,
     required this.actor,
     required this.requestId,
-  }) : super(key: key);
+  });
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -35,7 +35,7 @@ class SimpleRequestCard extends StatelessWidget {
       highlightColor: Colors.transparent,
       splashColor: Colors.transparent,
       onTap: () {
-        print(
+        debugPrint(
           '🔍 SimpleRequestCard: Navigating with requestId=$requestId, actor=$actor',
         );
         if (actor == TimelineActor.student) {

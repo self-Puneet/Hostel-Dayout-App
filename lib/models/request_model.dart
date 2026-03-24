@@ -7,6 +7,7 @@ import 'package:hostel_mgmt/models/warden_model.dart';
 import 'package:hostel_mgmt/models/parent_model.dart';
 import 'package:hostel_mgmt/models/security_guard_model.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
+import 'package:flutter/foundation.dart';
 
 class ParentAction {
   final ParentModel parentModel;
@@ -158,17 +159,17 @@ class RequestModel {
 
   /// Deserialize from JSON
   factory RequestModel.fromJson(Map<String, dynamic> json) {
-    // print("==================================================>>");
-    // print(DateTime.parse(json['applied_from']).toIST);
-    // print(DateTime.parse(json['applied_to']).toIST);
-    // print(_statusFromString(json['request_status']));
+    // debugPrint("==================================================>>");
+    // debugPrint(DateTime.parse(json['applied_from']).toIST);
+    // debugPrint(DateTime.parse(json['applied_to']).toIST);
+    // debugPrint(_statusFromString(json['request_status']));
     // // keep on printing all values assigned below to check where problem occured
-    // print(json['applied_from']);
-    // print(json['applied_to']);
-    // print(json['reason']);
-    // print(json['active']);
-    // print(json['assistent_warden_action']);
-    // print(
+    // debugPrint(json['applied_from']);
+    // debugPrint(json['applied_to']);
+    // debugPrint(json['reason']);
+    // debugPrint(json['active']);
+    // debugPrint(json['assistent_warden_action']);
+    // debugPrint(
     //   json.containsKey('assistent_warden_action')
     //       ? AssistantWardenAction(
     //           assistantWardenModel: WardenModel.fromJson(
@@ -183,8 +184,8 @@ class RequestModel {
     //         )
     //       : null,
     // );
-    // print("ho ja yaar");
-    // print("==================================================<<");
+    // debugPrint("ho ja yaar");
+    // debugPrint("==================================================<<");
     return RequestModel(
       id: json['_id'] ?? '',
       requestId: json['request_id'] ?? '',
@@ -216,10 +217,10 @@ class RequestModel {
                   ((json['parent_action'] as Map<String, dynamic>).containsKey(
                     'action',
                   ))
-                  ? RequestActionX.ApiStringToAction(
+                  ? RequestActionX.apiStringToAction(
                       json['parent_action']['action'],
                     )
-                  : RequestActionX.ApiStringToAction(""),
+                  : RequestActionX.apiStringToAction(""),
               actionAt: DateTime.parse(json['parent_action']['createdAt']),
             )
           : null,
@@ -244,7 +245,7 @@ class RequestModel {
               seniorWardenModel: WardenModel.fromJson(
                 json['senior_warden_action']['action_by'],
               ),
-              action: RequestActionX.ApiStringToAction(
+              action: RequestActionX.apiStringToAction(
                 json['senior_warden_action']['action'],
               ),
               actionAt: DateTime.parse(
@@ -386,7 +387,6 @@ class RequestApiResponse {
   RequestApiResponse({required this.message, required this.requests});
 
   factory RequestApiResponse.fromJson(Map<String, dynamic> json) {
-    print(json['requests'].runtimeType);
     return RequestApiResponse(
       message: json['message'] ?? '',
       requests: (json['requests'] as List<dynamic>)
@@ -421,10 +421,10 @@ class RequestDetailApiResponse {
   });
 
   factory RequestDetailApiResponse.fromJson(Map<String, dynamic> json) {
-    print("🔍 RequestDetailApiResponse.fromJson called with: $json");
+    debugPrint("🔍 RequestDetailApiResponse.fromJson called with: $json");
 
     if (json['request'] == null) {
-      print("❌ json['request'] is null");
+      debugPrint("❌ json['request'] is null");
       throw Exception("Request data is missing from API response");
     }
 

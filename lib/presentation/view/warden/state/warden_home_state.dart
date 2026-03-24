@@ -46,9 +46,9 @@ class WardenStatisticsState extends ChangeNotifier {
   //     _selectedHostelId = hostels.first.hostelId;
   //     _selectedHostelName = hostels.first.hostelName;
   //   }
-  //   print(hostels.length);
+  //   debugPrint(hostels.length);
   //   hostels.add(HostelInfo(hostelId: "sdf", hostelName: "sdfsdfsdf"));
-  //   print(hostels.length);
+  //   debugPrint(hostels.length);
   //   _hostelsInitialized = true;
   //   notifyListeners();
   // }
@@ -62,7 +62,6 @@ class WardenStatisticsState extends ChangeNotifier {
     }
     // optional: remove this test data now
     // _hostels.add(HostelInfo(hostelId: "sdf", hostelName: "sdfsdfsdf"));
-    print(_hostels.length); // Now prints the correct count
     _hostelsInitialized = true;
     notifyListeners();
   }

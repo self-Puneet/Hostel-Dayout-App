@@ -7,6 +7,7 @@ import 'package:hostel_mgmt/core/config/constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/models/request_model.dart';
+import 'package:flutter/foundation.dart';
 
 class StudentHistoryService {
   static const String _baseUrl = baseUrl;
@@ -39,8 +40,7 @@ class StudentHistoryService {
       if (decoded == null) {
         return left('Empty response');
       }
-      print(decoded);
-      print("-" * 90);
+      debugPrint("-" * 90);
 
       // Normalize message/messages
       if (decoded['message'] == null && decoded['messages'] != null) {

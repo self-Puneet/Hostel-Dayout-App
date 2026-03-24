@@ -28,11 +28,11 @@ class RequestPage extends StatefulWidget {
   final StudentProfileModel? routeArgs;
 
   const RequestPage({
-    Key? key,
+    super.key,
     required this.actor,
     required this.requestId,
     this.routeArgs,
-  }) : super(key: key);
+  });
 
   @override
   State<RequestPage> createState() => _RequestPageState();
@@ -48,7 +48,7 @@ class _RequestPageState extends State<RequestPage> {
   void initState() {
     super.initState();
     final state = RequestState();
-    print(
+    debugPrint(
       '📄 RequestPage initState: requestId=${widget.requestId}, actor=${widget.actor}, hasRouteArgs=${widget.routeArgs != null}',
     );
     _controller = RequestDetailController(
@@ -164,7 +164,7 @@ class _RequestPageState extends State<RequestPage> {
           }
 
           final req = state.request!;
-          print(
+          debugPrint(
             '✅ RequestPage loaded: requestId=${req.request.requestId}, studentEnrollment=${req.request.studentEnrollmentNumber}',
           );
           final assistentWardenContactCard = ContactCard(
@@ -213,24 +213,23 @@ class _RequestPageState extends State<RequestPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     checkeredDesign(
-                      child: Container(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              req.request.requestType.displayName,
-                              style: textTheme.h1.w500,
-                            ),
-                            SizedBox(height: 20),
-                            actionButton(
-                              actor: widget.actor,
-                              status: req.request.status,
-                              isActioning: state.isActioning,
-                            ),
-                          ],
-                        ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            req.request.requestType.displayName,
+                            style: textTheme.h1.w500,
+                          ),
+                          SizedBox(height: 20),
+                          actionButton(
+                            actor: widget.actor,
+                            status: req.request.status,
+                            isActioning: state.isActioning,
+                          ),
+                        ],
                       ),
+
                       color: state.request!.request.status.minimalStatusColor,
                     ),
                     // CheckeredBackground(color: Colors.red),
@@ -660,7 +659,7 @@ class _RequestPageState extends State<RequestPage> {
       tileSize: 40,
       child: Align(
         alignment: Alignment.bottomLeft,
-        child: Container(
+        child: SizedBox(
           height: 300,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),

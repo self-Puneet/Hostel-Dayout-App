@@ -99,6 +99,6 @@ extension AppMutedText on BuildContext {
   TextStyle get bodySmallMuted {
     final t = Theme.of(this).textTheme;
     final on = Theme.of(this).colorScheme.onSurface;
-    return t.bodySmall!.copyWith(color: on.withOpacity(0.56));
+    return t.bodySmall!.copyWith(color: on.withValues(alpha: 0.56));
   }
 }

@@ -6,11 +6,11 @@ class SegmentedControl extends StatefulWidget {
   final ValueChanged<String> onChanged;
 
   const SegmentedControl({
-    Key? key,
+    super.key,
     required this.options,
     required this.selected,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   State<SegmentedControl> createState() => _SegmentedControlState();

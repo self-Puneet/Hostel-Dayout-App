@@ -431,7 +431,7 @@
 //       tooltip: 'Back',
 //       icon: DecoratedBox(
 //         decoration: BoxDecoration(
-//           color: color?.withOpacity(0.08),
+//           color: color?.withValues(alpha: 0.08),
 //           shape: BoxShape.circle,
 //         ),
 //         child: const Padding(
@@ -921,7 +921,7 @@ class _DefaultBackButton extends StatelessWidget {
       tooltip: 'Back',
       icon: DecoratedBox(
         decoration: BoxDecoration(
-          color: color?.withOpacity(0.08),
+          color: color?.withValues(alpha: 0.08),
           shape: BoxShape.circle,
         ),
         child: const Padding(

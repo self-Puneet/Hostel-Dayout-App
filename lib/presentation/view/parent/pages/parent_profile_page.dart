@@ -11,7 +11,7 @@ import 'package:hostel_mgmt/services/profile_service.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class ParentProfilePage extends StatefulWidget {
-  const ParentProfilePage({Key? key}) : super(key: key);
+  const ParentProfilePage({super.key});
 
   @override
   State<ParentProfilePage> createState() => _ParentProfilePageState();
@@ -64,6 +64,7 @@ class _ParentProfilePageState extends State<ParentProfilePage>
             body: AppRefreshWrapper(
               onRefresh: () async {
                 await Future.delayed(const Duration(milliseconds: 300));
+                if (!context.mounted) return;
                 FocusScope.of(context).unfocus();
                 await controller.initialize();
               },

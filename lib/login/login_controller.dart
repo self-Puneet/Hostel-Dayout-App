@@ -4,7 +4,7 @@ import 'package:hostel_mgmt/core/enums/ui_eums/snackbar_type.dart';
 import 'package:hostel_mgmt/core/routes/app_route_constants.dart';
 import 'package:hostel_mgmt/models/student_profile.dart';
 import 'package:hostel_mgmt/services/auth_service.dart';
-import 'package:hostel_mgmt/services/otp_service.dart';
+import 'package:hostel_mgmt/services/response_service.dart';
 import 'package:hostel_mgmt/services/parent_service.dart';
 import 'package:hostel_mgmt/login/login_state.dart';
 import 'package:hostel_mgmt/core/enums/timeline_actor.dart';
@@ -120,8 +120,8 @@ class LoginController {
               diSession.token = session.token;
               await diSession.saveToPrefs();
               final profile = await fetchProfile();
-              print(profile.profilePic);
-              print("--------------------");
+              debugPrint(profile.profilePic);
+              debugPrint("--------------------");
               diSession.username = session.username;
               diSession.identityId = session.identityId;
               diSession.role = session.role;
@@ -135,9 +135,10 @@ class LoginController {
               ];
 
               await diSession.saveToPrefs();
-              print(diSession.roomNo);
+              debugPrint(diSession.roomNo);
               state.setLoggingIn(false);
               state.clearAllLoginState();
+              if (!context.mounted) return;
               GoRouter.of(context).go(AppRoutes.studentHome);
               AppSnackBar.show(
                 context,
@@ -217,6 +218,7 @@ class LoginController {
       if (errorMessage.contains("Exception:")) {
         errorMessage = errorMessage.replaceFirst("Exception:", "").trim();
       }
+      if (!context.mounted) return;
       AppSnackBar.show(
         context,
         message: errorMessage.isNotEmpty
@@ -382,6 +384,7 @@ class LoginController {
         await diSession.saveToPrefs();
         state.clearAllLoginState();
         state.setLoggingIn(false);
+        if (!context.mounted) return;
         GoRouter.of(context).go(AppRoutes.parentHome);
         AppSnackBar.show(
           context,

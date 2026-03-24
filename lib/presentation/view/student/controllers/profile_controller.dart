@@ -5,6 +5,7 @@ import 'package:hostel_mgmt/core/rumtime_state/login_session.dart';
 import 'package:hostel_mgmt/services/auth_service.dart';
 import 'package:hostel_mgmt/services/profile_service.dart';
 import '../state/profile_state.dart';
+import 'package:flutter/foundation.dart';
 
 class ProfileController {
   final ProfileState state;
@@ -36,8 +37,7 @@ class ProfileController {
         profileData: {"name": current.name},
         profilePic: file,
       );
-      print("-----------------");
-      print(result);
+      debugPrint("-----------------");
       result.fold((err) => state.setErrored(err), (updated) {
         state.setProfilePic(updated.profilePic!); // ✅ Uses existing method
         final loginSession = Get.find<LoginSession>();
@@ -45,7 +45,7 @@ class ProfileController {
           imageURL: updated.profilePic!,
         );
         Get.replace<LoginSession>(updatedSession);
-        print(Get.find<LoginSession>().imageURL);
+        debugPrint(Get.find<LoginSession>().imageURL);
       });
     } catch (e) {
       state.setErrored('Failed to update profile picture');

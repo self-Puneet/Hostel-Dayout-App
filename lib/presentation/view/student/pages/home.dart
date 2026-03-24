@@ -226,6 +226,7 @@ class _HomePageState extends State<HomePage> {
                         await context
                             .read<HomeController>()
                             .fetchProfileAndRequests();
+                        if (!context.mounted) return;
                         context.read<HomeController>().fetchHistoryRequests();
                       },
                       child: ListView(

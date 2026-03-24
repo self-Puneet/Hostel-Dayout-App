@@ -46,7 +46,7 @@ Future<TimeOfDay?> pickTime(BuildContext ctx, TimeOfDay? initial) async {
 }
 
 class RequestFormPage extends StatelessWidget {
-  RequestFormPage({super.key});
+  const RequestFormPage({super.key});
 
   @override
   Widget build(BuildContext context) {
