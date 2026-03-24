@@ -28,8 +28,8 @@ class AuthService {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(payload),
       );
-
-      print("📡 Status: ${response.statusCode}");
+      print('phone_no: $enrollmentNo, password: $password');
+      print("📡 Status: ${response.statusCode} ${response.body}");
 
       if (response.statusCode != 200) {
         // Handle server errors (5xx) that may not return JSON

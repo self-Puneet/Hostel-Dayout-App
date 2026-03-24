@@ -51,8 +51,9 @@ class _ParentHomePageState extends State<ParentHomePage> {
 
     return Consumer<ParentState>(
       builder: (context, state, _) {
-        // Trigger initial fetch only when no data has been loaded yet
-        if (!state.isLoading && !state.hasData) {
+        // Trigger initial fetch only once until data arrives or refresh is requested.
+        // If an error occurred, do not auto-loop from build.
+        if (!state.isLoading && !state.hasData && !state.isErrored) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             ParentHomeController(state).fetchActiveRequests();
           });

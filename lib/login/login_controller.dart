@@ -137,6 +137,7 @@ class LoginController {
               await diSession.saveToPrefs();
               print(diSession.roomNo);
               state.setLoggingIn(false);
+              state.clearAllLoginState();
               GoRouter.of(context).go(AppRoutes.studentHome);
               AppSnackBar.show(
                 context,
@@ -178,6 +179,7 @@ class LoginController {
               },
               (session) async {
                 state.setLoggingIn(false);
+                state.clearAllLoginState();
                 // Prefer routing by 'role' (known) instead of relying on session.role
                 GoRouter.of(context).go(
                   role == TimelineActor.assistentWarden
@@ -378,7 +380,7 @@ class LoginController {
           ..expiry = pendingSession.expiry;
 
         await diSession.saveToPrefs();
-        state.clearParentOtpFlow();
+        state.clearAllLoginState();
         state.setLoggingIn(false);
         GoRouter.of(context).go(AppRoutes.parentHome);
         AppSnackBar.show(

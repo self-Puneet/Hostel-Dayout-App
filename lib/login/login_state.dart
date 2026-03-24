@@ -118,6 +118,26 @@ class LoginState extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
   }
 
+  void clearFormForActor(TimelineActor actor) {
+    final formControllers = textFieldMap[actor];
+    if (formControllers != null) {
+      formControllers[FieldsType.identityField]?.clear();
+      formControllers[FieldsType.verificationField]?.clear();
+    }
+    notifyListeners();
+  }
+
+  void clearAllForms() {
+    for (final actor in TimelineActor.values) {
+      clearFormForActor(actor);
+    }
+  }
+
+  void clearAllLoginState() {
+    clearAllForms();
+    clearParentOtpFlow();
+  }
+
   void setLoggingIn(bool value) {
     _isLoggingIn = value;
     notifyListeners();

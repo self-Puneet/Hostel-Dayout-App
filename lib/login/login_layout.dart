@@ -8,13 +8,42 @@ import 'package:hostel_mgmt/login/login_state.dart';
 import 'package:hostel_mgmt/presentation/widgets/glass_segmented_button.dart';
 import 'package:provider/provider.dart';
 
-class LoginLayout extends StatelessWidget {
+class LoginLayout extends StatefulWidget {
   const LoginLayout({super.key});
 
   @override
+  State<LoginLayout> createState() => _LoginLayoutState();
+}
+
+class _LoginLayoutState extends State<LoginLayout> {
+  int _lastTabIndex = 0;
+  final tabActors = [
+    TimelineActor.student,
+    TimelineActor.assistentWarden,
+    TimelineActor.parent,
+  ];
+
+  void _handleTabChanged(int newIndex) {
+    final state = context.read<LoginState>();
+    
+    // Get the previous actor
+    final previousActor = tabActors[_lastTabIndex];
+
+    // If switching away from Parent with OTP active, clear only OTP flow
+    if (previousActor == TimelineActor.parent && 
+        state.parentOtpRequestId != null) {
+      // Only clear OTP flow, preserve parent form data
+      state.clearParentOtpFlow();
+    } else {
+      // Otherwise, clear the previous actor's form data
+      state.clearFormForActor(previousActor);
+    }
+
+    _lastTabIndex = newIndex;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // final textStyle = Theme.of(context).textTheme;
-    // final selectedTextStyle = textStyle?.copyWith(fontWeight: FontWeight.bold);
     final state = context.watch<LoginState>();
     final mediaQuery = MediaQuery.of(context);
     final textTheme = Theme.of(context).textTheme;
@@ -86,6 +115,7 @@ class LoginLayout extends StatelessWidget {
                     ],
                     labelFontSize: 14,
                     selectedLabelFontSize: 16,
+                    onTabChanged: _handleTabChanged,
                   ),
                 ),
               ],
