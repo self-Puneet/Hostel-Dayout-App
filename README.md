@@ -25,15 +25,12 @@ The app features four distinct roles with specific interfaces and permissions:
 
 ## 📸 App Screenshots
 
-````carousel
-![Dashboard](assets/mockup/WhatsApp%20Image%202026-03-30%20at%201.41.04%20PM.jpeg)
-<!-- slide -->
-![Request Form](assets/mockup/WhatsApp%20Image%202026-03-30%20at%201.41.04%20PM%20%281%29.jpeg)
-<!-- slide -->
-![Status Tracker](assets/mockup/WhatsApp%20Image%202026-03-30%20at%201.41.05%20PM.jpeg)
-<!-- slide -->
-![Approval Flow](assets/mockup/WhatsApp%20Image%202026-03-30%20at%201.41.05%20PM%20%281%29.jpeg)
-````
+<p align="center">
+  <img src="assets/mockup/WhatsApp%20Image%202026-03-30%20at%201.41.04%20PM.jpeg" width="20%" alt="Dashboard" />
+  <img src="assets/mockup/WhatsApp%20Image%202026-03-30%20at%201.41.04%20PM%20%281%29.jpeg" width="20%" alt="Request Form" />
+  <img src="assets/mockup/WhatsApp%20Image%202026-03-30%20at%201.41.05%20PM.jpeg" width="20%" alt="Status Tracker" />
+  <img src="assets/mockup/WhatsApp%20Image%202026-03-30%20at%201.41.05%20PM%20%281%29.jpeg" width="20%" alt="Approval Flow" />
+</p>
 
 ---
 
