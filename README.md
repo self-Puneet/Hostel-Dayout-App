@@ -1,8 +1,16 @@
-# Hostel Dayout Management System
+# Hostel Dayout Management System [![Download APK](https://img.shields.io/badge/Download-APK-2ea44f?style=for-the-badge&logo=android)](https://github.com/self-Puneet/Hostel-Dayout-App/releases/download/HostelLeaveApp-v1.0.0/app-release.apk)
+
 
 A comprehensive Flutter-based solution designed to digitalize and streamline the hostel leave and day-out application process. This platform facilitates seamless communication and approval workflows between students, parents, and hostel administration.
 
-[![Download APK](https://img.shields.io/badge/Download-APK-2ea44f?style=for-the-badge&logo=android)](YOUR_APK_DOWNLOAD_LINK_HERE)
+
+<p align="center">
+  <img src="assets/mockup/WhatsApp%20Image%202026-03-30%20at%201.41.04%20PM.jpeg" width="20%" alt="Dashboard" />
+  <img src="assets/mockup/WhatsApp%20Image%202026-03-30%20at%201.41.04%20PM%20%281%29.jpeg" width="20%" alt="Request Form" />
+  <img src="assets/mockup/WhatsApp%20Image%202026-03-30%20at%201.41.05%20PM.jpeg" width="20%" alt="Status Tracker" />
+  <img src="assets/mockup/WhatsApp%20Image%202026-03-30%20at%201.41.05%20PM%20%281%29.jpeg" width="20%" alt="Approval Flow" />
+</p>
+
 
 ---
 
@@ -20,17 +28,6 @@ The app features four distinct roles with specific interfaces and permissions:
 2.  **Parent**: Reviews and provides the first level of approval/verification for their child's request.
 3.  **Assistant Warden**: Reviews requests after parent verification.
 4.  **Senior Warden**: Final authority for request approval and management.
-
----
-
-## 📸 App Screenshots
-
-<p align="center">
-  <img src="assets/mockup/WhatsApp%20Image%202026-03-30%20at%201.41.04%20PM.jpeg" width="20%" alt="Dashboard" />
-  <img src="assets/mockup/WhatsApp%20Image%202026-03-30%20at%201.41.04%20PM%20%281%29.jpeg" width="20%" alt="Request Form" />
-  <img src="assets/mockup/WhatsApp%20Image%202026-03-30%20at%201.41.05%20PM.jpeg" width="20%" alt="Status Tracker" />
-  <img src="assets/mockup/WhatsApp%20Image%202026-03-30%20at%201.41.05%20PM%20%281%29.jpeg" width="20%" alt="Approval Flow" />
-</p>
 
 ---
 
